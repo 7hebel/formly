@@ -1,0 +1,100 @@
+/* --- BUTTONS --- */
+
+.button {
+    padding-block: 8px;
+    padding-inline: 12px;
+    font-family: var(--ui-font);
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: filter .2s, box-shadow .2s;
+}
+
+.button:hover {
+    filter: brightness(1.2);
+}
+
+.button:active {
+    filter: brightness(1.15);
+    transform: translateY(2px);
+}
+
+.button > svg {
+    margin-right: 8px;
+}
+
+/* Hierarchy */
+
+.primary-button {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.primary-button:hover {
+    filter: brightness(1.05);
+    box-shadow: 0px 20px 100px 0px var(--color-primary);
+}
+
+.secondary-button {
+    background-color: var(--color-text);
+    color: var(--color-bg-main);
+}
+
+.tertiary-button {
+    color: var(--color-text);
+    border: 1px solid var(--color-text);
+    background-color: var(--color-bg-item);
+}
+
+
+/* --- INPUTS --- */
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.input-label {
+    font-family: var(--ui-font);
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity .1s;
+    opacity: 0.8;
+}
+
+.input-element {
+    all: unset;
+    background-color: var(--color-bg-main);
+    border: 1px solid var(--color-text);
+    border-radius: 4px;
+    padding-block: 6px;
+    padding-inline: 12px;
+    color: var(--color-text);
+    font-family: var(--form-font);
+    font-size: 16px;
+    font-weight: 600;
+    transition: background-color .1s;
+}
+
+.input-element:invalid {
+    border-color: red;
+}
+
+.input-element:focus {
+    background-color: var(--color-bg-item);
+}
+
+.input-element:invalid:focus {
+    background-color: #ff000033;
+}
+.input-group:has(.input-element:focus) > .input-label {
+    opacity: 1;
+}
+.input-group:has(.input-element:invalid) > .input-label {
+    color: red;
+}
+
+
