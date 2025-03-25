@@ -63,11 +63,11 @@
     font-weight: 500;
     transition: opacity .1s;
     opacity: 0.8;
+    padding-left: 2px;
 }
 
 .input-element {
     all: unset;
-    background-color: var(--color-bg-main);
     border: 1px solid var(--color-text);
     border-radius: 4px;
     padding-block: 6px;
@@ -96,5 +96,3 @@
 .input-group:has(.input-element:invalid) > .input-label {
     color: red;
 }
-
-

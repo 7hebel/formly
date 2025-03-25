@@ -1,12 +1,12 @@
 import { IconoirProvider } from "iconoir-react"
 
-export function PrimaryButton({ children }) {
+export function PrimaryButton({ wide, onClick=null, children }) {
   return (
-    <button className='button primary-button'>
+    <button className={'button primary-button' + (wide? ' wide' : '')} onClick={onClick}>
       <IconoirProvider iconProps={{
           strokeWidth: 2.5,
-          width: '13px',
-          height: '13px',
+          width: '14px',
+          height: '14px',
         }}>
         {children}
       </IconoirProvider>
@@ -14,13 +14,13 @@ export function PrimaryButton({ children }) {
   )
 }
 
-export function SecondaryButton({ children }) {
+export function SecondaryButton({ wide, onClick=null, children }) {
   return (
-    <button className='button secondary-button'>
+    <button className={'button secondary-button' + (wide? ' wide' : '')} onClick={onClick}>
       <IconoirProvider iconProps={{
           strokeWidth: 2.5,
-          width: '13px',
-          height: '13px',
+          width: '14px',
+          height: '14px',
         }}>
         {children}
       </IconoirProvider>
@@ -28,13 +28,13 @@ export function SecondaryButton({ children }) {
   )
 }
 
-export function TertiaryButton({ children }) {
+export function TertiaryButton({ wide, onClick=null, children }) {
   return (
-    <button className='button tertiary-button'>
+    <button className={'button tertiary-button' + (wide? ' wide' : '')} onClick={onClick}>
       <IconoirProvider iconProps={{
           strokeWidth: 2.5,
-          width: '13px',
-          height: '13px',
+          width: '14px',
+          height: '14px',
         }}>
         {children}
       </IconoirProvider>

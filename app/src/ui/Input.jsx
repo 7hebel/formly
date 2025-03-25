@@ -13,14 +13,17 @@ export function InputLabel({ children }) {
   )
 }
 
-export function Input({ id, type, placeholder=null }) {
+export function Input({ id, type="text", placeholder=null, pattern=null, minlen=null }) {
+  if (pattern==null && type=="number") pattern = "[\d]"
+  
   return (
     <input 
       id={id} 
       type={type} 
       className="input-element" 
       placeholder={placeholder}
-      pattern={(type=="number"? "[\d]" : "")}
+      pattern={pattern}
+      minLength={minlen}
       >
     </input>
   )

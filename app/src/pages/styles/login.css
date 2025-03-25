@@ -1,0 +1,24 @@
+body {
+    display: grid;
+    place-items: center;
+    height: 100dvh;
+}
+
+.loginFormContainer {
+    width: 400px;
+}
+
+.loginFormFields {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-block: 20px;
+}
+
+.panelName {
+    font-family: var(--ui-font);
+    font-size: 36px;
+    text-align: center;
+}
+
+
