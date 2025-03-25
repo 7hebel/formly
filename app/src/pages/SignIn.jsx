@@ -9,21 +9,23 @@ export function LoginPanel() {
   
   return (
     <div className="loginFormContainer">
-      <h1 className='panelName'>Login</h1>
-      <div className='hzSep'></div>
-      <div className='loginFormFields'>
-        <InputGroup>
-          <InputLabel>Email</InputLabel>
-          <Input id='login-email' type='email' placeholder='example@email.com'></Input>
-        </InputGroup>
-        <InputGroup>
-          <InputLabel>Password</InputLabel>
-          <Input id='login-password' type='password' minlen={3}></Input>
-        </InputGroup>
-        <PrimaryButton wide>Login</PrimaryButton>
+      <div className="loginForm">
+        <h1 className='panelName'>Login</h1>
+        <div className='hzSep'></div>
+        <div className='loginFormFields'>
+          <InputGroup>
+            <InputLabel>Email</InputLabel>
+            <Input id='login-email' type='email' placeholder='example@email.com'></Input>
+          </InputGroup>
+          <InputGroup>
+            <InputLabel>Password</InputLabel>
+            <Input id='login-password' type='password' minlen={3}></Input>
+          </InputGroup>
+          <PrimaryButton wide>Login</PrimaryButton>
+        </div>
+        <div className='hzSep'></div>
+        <TertiaryButton wide onClick={() => {navigate('/register')}}>Create account</TertiaryButton>
       </div>
-      <div className='hzSep'></div>
-      <TertiaryButton wide onClick={() => {navigate('/register')}}>Create account</TertiaryButton>
     </div>
   )
 }
@@ -33,25 +35,27 @@ export function RegisterPanel() {
   
   return (
     <div className="loginFormContainer">
-      <h1 className='panelName'>Register</h1>
-      <div className='hzSep'></div>
-      <div className='loginFormFields'>
-        <InputGroup>
-          <InputLabel>Full name</InputLabel>
-          <Input id='register-fullname' type='text' placeholder='John Smith' minlen={3}></Input>
-        </InputGroup>
-        <InputGroup>
-          <InputLabel>Email</InputLabel>
-          <Input id='register-email' type='email' placeholder='example@email.com'></Input>
-        </InputGroup>
-        <InputGroup>
-          <InputLabel>Password</InputLabel>
-          <Input id='register-password' type='password' minlen={3}></Input>
-        </InputGroup>
-        <PrimaryButton wide>Register</PrimaryButton>
+      <div className="loginForm">
+        <h1 className='panelName'>Register</h1>
+        <div className='hzSep'></div>
+        <div className='loginFormFields'>
+          <InputGroup>
+            <InputLabel>Full name</InputLabel>
+            <Input id='register-fullname' type='text' placeholder='John Smith' minlen={3}></Input>
+          </InputGroup>
+          <InputGroup>
+            <InputLabel>Email</InputLabel>
+            <Input id='register-email' type='email' placeholder='example@email.com'></Input>
+          </InputGroup>
+          <InputGroup>
+            <InputLabel>Password</InputLabel>
+            <Input id='register-password' type='password' minlen={3}></Input>
+          </InputGroup>
+          <PrimaryButton wide>Register</PrimaryButton>
+        </div>
+        <div className='hzSep'></div>
+        <TertiaryButton wide onClick={() => {navigate('/login')}}>Login instead</TertiaryButton>
       </div>
-      <div className='hzSep'></div>
-      <TertiaryButton wide onClick={() => {navigate('/login')}}>Login instead</TertiaryButton>
     </div>
   )
 }
