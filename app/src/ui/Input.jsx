@@ -1,5 +1,3 @@
-import { IconoirProvider } from "iconoir-react"
-
 
 export function InputGroup({ children }) {
   return (
@@ -28,5 +26,3 @@ export function Input({ id, type="text", placeholder=null, pattern=null, minlen=
     </input>
   )
 }
-
-// InputGroup, InputLabel, Input

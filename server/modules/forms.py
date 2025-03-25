@@ -40,4 +40,3 @@ def insert_form(author_uuid: str, structure: list[list[dict]], settings: dict) -
 
     return form_id
 
-insert_form("abc123", [[{"test": 123}]], {"isopen": 123123})

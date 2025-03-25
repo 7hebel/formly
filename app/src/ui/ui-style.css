@@ -9,7 +9,7 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    transition: filter .2s, box-shadow .2s;
+    transition: filter .2s, box-shadow .4s;
 }
 
 .button:hover {
@@ -39,7 +39,7 @@
 
 .primary-button:hover {
     filter: brightness(1.05);
-    box-shadow: 0px 10px 130px 0px var(--color-primary);
+    box-shadow: 0px 10px 90px -10px var(--color-primary);
 }
 
 .secondary-button {
@@ -51,6 +51,11 @@
     color: var(--color-text);
     border: 1px solid var(--color-text);
     background-color: var(--color-bg-item);
+    transition: background-color .2s;
+}
+
+.tertiary-button:hover {
+    background-color: #0000002f;
 }
 
 
@@ -81,7 +86,7 @@
     font-family: var(--form-font);
     font-size: 16px;
     font-weight: 600;
-    transition: background-color .1s;
+    transition: background-color .4s;
 }
 
 .input-element:invalid {
@@ -101,3 +106,28 @@
 .input-group:has(.input-element:invalid) > .input-label {
     color: red;
 }
+
+
+/* --- ERROR LABEL --- */
+
+.error-label[iserror="0"] {
+    display: none;
+}
+
+.error-label > svg {
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    padding-bottom: 2px;
+    margin-right: 6px;
+    stroke-width: 2.5;
+}
+
+.error-label {
+    text-align: center;
+    color: red;
+    font-family: var(--ui-font);
+    font-size: 14px;
+    font-weight: 500;
+}
+

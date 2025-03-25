@@ -1,12 +1,13 @@
 header {
     padding-block: 12px;
     padding-inline: 16px;
-    font-family: var(--ui-font);
     justify-content: space-between;
 }
 
 .header-text {
     font-size: 30px;
     font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    font-family: var(--ui-font);
 }
-

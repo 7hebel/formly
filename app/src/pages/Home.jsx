@@ -14,7 +14,7 @@ export default function Home() {
         <Squares 
           speed={0.25} 
           squareSize={40}
-          direction='diagonal' // up, down, left, right, diagonal
+          direction='diagonal'
           borderColor='#f2eedd'
           hoverFillColor='#f2eedd'
         />
