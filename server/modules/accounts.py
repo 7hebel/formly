@@ -51,9 +51,31 @@ class Account:
     def prepare_login_data(self) -> dict[str, str]:
         return {
             "uuid": self.uuid,
-            "fullname": self.fullname
+            "fullname": self.fullname,
+            "email": self.email
         }
         
     def logout(self) -> None:
         self.set_trusted_ip("")
-
+        
+    def update_fullname(self, new_name: str) -> None:
+        self.fullname = new_name
+        db.DB.execute(f"UPDATE users SET fullname=? WHERE uuid=?", (new_name, self.uuid))
+        
+    def update_email(self, new_email: str) -> bool | str:
+        if db.is_email_used(new_email):
+            return "This email is already used by another user."
+        
+        self.email = new_email
+        db.DB.execute(f"UPDATE users SET email=? WHERE uuid=?", (new_email, self.uuid))
+        return True
+        
+    def update_password(self, new_raw_password: str, current_password) -> bool | str:
+        if not self.validate_password(current_password):
+            return "Incorrect current password."
+        
+        encrypted_password = bcrypt.hashpw(new_raw_password.encode(), bcrypt.gensalt()).decode()
+        self.password = encrypted_password
+        db.DB.execute(f"UPDATE users SET password=? WHERE uuid=?", (encrypted_password, self.uuid))
+        
+ 

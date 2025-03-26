@@ -28,7 +28,8 @@ function App() {
           setSessionAccepted(0);
         } else {
           sessionStorage.setItem('session-accepted', 1);
-          localStorage.setItem("fullname", response.data.fullname)
+          localStorage.setItem("fullname", response.data.fullname);
+          localStorage.setItem("email", response.data.email);
           console.log(`Autologin successful to: '${savedUuid}'`);
           setSessionAccepted(1);
         }

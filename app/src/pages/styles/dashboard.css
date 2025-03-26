@@ -116,6 +116,11 @@
     font-weight: 600;
     font-size: 20px;
     color: var(--color-text);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
 .dash-forms-container {
@@ -155,7 +160,7 @@
 .form-brief-view[isfeatured="1"] {
     border-color: var(--color-primary);
     border-width: 2px;
-    box-shadow: 0px 40px 130px -70px var(--color-primary);
+    box-shadow: 0px 30px 170px -78px var(--color-primary);
 }
 
 .form-brief-view > h5 {
@@ -222,5 +227,40 @@
     text-underline-offset: 2px;
 }
 
+
+/* --- ACCOUNT --- */
+
+.dash-account-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--ui-font);
+    gap: 8px;
+}
+
+.dash-account-container > h1 {
+    font-size: 32px;
+}
+.dash-account-container > h4 {
+    font-size: 18px;
+    font-weight: 500;
+    opacity: .6;
+}
+
+.dash-account-edits-container {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+
+.dash-account-edit-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
 

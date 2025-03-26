@@ -1,4 +1,4 @@
-import { KeyRound, LockKeyholeIcon, VenetianMask, Edit3, CornerDownRight, Eye, EyeOff, User, Users, CalendarClock, Medal, CheckCheck } from 'lucide-react';
+import { KeyRound, LockKeyholeIcon, VenetianMask, Edit3, CornerDownRight, Eye, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass } from 'lucide-react';
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
 import '../pages/styles/dashboard.css'
 
@@ -10,7 +10,8 @@ const characteristicsIcons = {
   password: LockKeyholeIcon,
   grade: Medal,
   target: Users,
-  submitted: CheckCheck
+  submitted: CheckCheck,
+  timelimit: Hourglass
 }
 
 

@@ -4,14 +4,17 @@ import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import DashboardCategorySwitcher from '../components/dashCategorySwitcher.jsx'
 import FormBrief from '../components/FormBrief.jsx'
 import { useNavigate } from 'react-router-dom';
-import { LogOut, ClipboardList, Users, Settings2, KeyRound, VenetianMask, Edit3, CornerDownRight, Eye, EyeOff } from 'lucide-react';
+import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, UserPen } from 'lucide-react';
+import { ErrorLabel } from "../ui/ErrorLabel.jsx"
 import { useEffect, useRef } from 'react';
 import './styles/dashboard.css'
 
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const fullname = localStorage.getItem("fullname") ?? "user"
+
+  const fullname = localStorage.getItem("fullname") ?? ""
+  const email = localStorage.getItem("email") ?? ""
   
   if (sessionStorage.getItem("session-accepted") == "0") {
     console.warn("Cannot enter dashboard without accepted session.");
@@ -35,6 +38,123 @@ export default function Dashboard() {
       sessionStorage.clear();
       localStorage.clear();
       navigate("/");
+    });
+  }
+
+  function onFullnameUpdate() {
+    const newName = document.getElementById("update-fullname");
+    const errorLabel = document.getElementById("update-fullname-errlabel");
+
+    if (!newName.value || !newName.validity.valid) {
+      errorLabel.textContent = "Invalid full name.";
+      errorLabel.setAttribute("iserror", "1");
+      return;
+    }
+    
+    errorLabel.setAttribute("iserror", "0");
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        fullname: newName.value
+      })
+    };
+    
+    fetch(import.meta.env.VITE_API_URL + "/account-update/fullname", requestOptions)
+    .then(response => response.json())
+    .then(response => {
+      if (response.status) {
+        errorLabel.setAttribute("iserror", "0");
+        localStorage.setItem("fullname", newName.value);
+        navigate("/dash");
+      } else {
+        errorLabel.textContent = response.err_msg;
+        errorLabel.setAttribute("iserror", "1");
+      }
+    })
+    .catch(err => {      
+      errorLabel.textContent = "Failed to update fullname.";
+      errorLabel.setAttribute("iserror", "1");
+    });
+  }
+
+  function onEmailUpdate() {
+    const newMail = document.getElementById("update-email");
+    const errorLabel = document.getElementById("update-email-errlabel");
+
+    if (!newMail.value || !newMail.validity.valid) {
+      errorLabel.textContent = "Invalid email.";
+      errorLabel.setAttribute("iserror", "1");
+      return;
+    }
+    
+    errorLabel.setAttribute("iserror", "0");
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        email: newMail.value
+      })
+    };
+    
+    fetch(import.meta.env.VITE_API_URL + "/account-update/email", requestOptions)
+    .then(response => response.json())
+    .then(response => {
+      if (response.status) {
+        errorLabel.setAttribute("iserror", "0");
+        localStorage.setItem("email", newMail.value);
+        navigate("/dash");
+      } else {
+        errorLabel.textContent = response.err_msg;
+        errorLabel.setAttribute("iserror", "1");
+      }
+    })
+    .catch(err => {      
+      errorLabel.textContent = "Failed to update email.";
+      errorLabel.setAttribute("iserror", "1");
+    });
+  }
+
+  function onPasswordUpdate() {
+    const newPassword = document.getElementById("update-password");
+    const currentPassword = document.getElementById("update-password-current").value;
+    const errorLabel = document.getElementById("update-password-errlabel");
+
+    if (!newPassword.value || !newPassword.validity.valid) {
+      errorLabel.textContent = "Invalid password.";
+      errorLabel.setAttribute("iserror", "1");
+      return;
+    }
+    
+    errorLabel.setAttribute("iserror", "0");
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        new_password: newPassword.value,
+        current_password: currentPassword,
+      })
+    };
+    
+    fetch(import.meta.env.VITE_API_URL + "/account-update/password", requestOptions)
+    .then(response => response.json())
+    .then(response => {
+      if (response.status) {
+        errorLabel.setAttribute("iserror", "0");
+      } else {
+        errorLabel.textContent = response.err_msg;
+        errorLabel.setAttribute("iserror", "1");
+      }
+    })
+    .catch(err => {      
+      errorLabel.textContent = "Failed to update password.";
+      errorLabel.setAttribute("iserror", "1");
     });
   }
 
@@ -94,7 +214,13 @@ export default function Dashboard() {
               </div>
             </div>
             <div className='dash-forms-category-container'>
-              <h1>My forms:</h1>
+              <h1>
+                My forms:
+                <PrimaryButton>
+                  <ClipboardPlus/>
+                  Create
+                </PrimaryButton>
+              </h1>
               <div className="dash-forms-container">
 
                 <FormBrief isMyForm></FormBrief>
@@ -119,7 +245,42 @@ export default function Dashboard() {
           </div>
 
           <div className='dash-category-content' ref={accountViewRef} active="0">
-            account...
+            <div className='dash-account-container'>
+              <h1>{fullname}</h1>
+              <h4>{email}</h4>
+              <div className='dash-account-edits-container'>
+                <div className='dash-account-edit-panel'>
+                  <InputGroup>
+                    <InputLabel>Full name</InputLabel>
+                    <Input id='update-fullname' placeholder={fullname} minlen={3}></Input>
+                    <TertiaryButton onClick={onFullnameUpdate}>Update</TertiaryButton>
+                  </InputGroup>
+                  <ErrorLabel id="update-fullname-errlabel"/>
+                </div>
+                <div className='vSep'></div>
+                <div className='dash-account-edit-panel'>
+                  <InputGroup>
+                    <InputLabel>Email</InputLabel>
+                    <Input id='update-email' type="email" placeholder={email} minlen={3}></Input>
+                    <TertiaryButton onClick={onEmailUpdate}>Update</TertiaryButton>
+                  </InputGroup>
+                  <ErrorLabel id="update-email-errlabel"/>
+                </div>
+                <div className='vSep'></div>
+                <div className='dash-account-edit-panel'>
+                  <InputGroup>
+                    <InputLabel>Password</InputLabel>
+                    <Input id='update-password' type="password" minlen={3}></Input>
+                  </InputGroup>
+                  <InputGroup>
+                    <InputLabel>Current password</InputLabel>
+                    <Input id='update-password-current' type="password" minlen={3}></Input>
+                    <TertiaryButton onClick={onPasswordUpdate}>Update</TertiaryButton>
+                  </InputGroup>
+                  <ErrorLabel id="update-password-errlabel"/>
+                </div>
+              </div>
+            </div>
           </div>
           
         </div>
@@ -127,4 +288,3 @@ export default function Dashboard() {
     </main>
   )
 }
-
