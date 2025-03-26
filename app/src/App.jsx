@@ -4,7 +4,6 @@ import { LoginPanel, RegisterPanel } from './pages/SignIn.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Home from './pages/Home.jsx';
 
-
 sessionStorage.setItem("session-accepted", 0);
 
 
@@ -43,14 +42,14 @@ function App() {
 
   return (
     <StrictMode>
-        <BrowserRouter>
-            <Routes>
-            <Route index path="/" element={<Home />} />
-            <Route path="/login" element={<LoginPanel />} />
-            <Route path="/register" element={<RegisterPanel />}/>
-            <Route path="/dash" element={<Dashboard />}/>
-            </Routes>
-        </BrowserRouter>
+      <BrowserRouter>
+        <Routes>
+        <Route index path="/" element={<Home />} />
+        <Route path="/login" element={<LoginPanel />} />
+        <Route path="/register" element={<RegisterPanel />}/>
+        <Route path="/dash" element={<Dashboard />}/>
+        </Routes>
+      </BrowserRouter>
     </StrictMode>
   );
 }

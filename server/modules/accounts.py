@@ -53,4 +53,7 @@ class Account:
             "uuid": self.uuid,
             "fullname": self.fullname
         }
+        
+    def logout(self) -> None:
+        self.set_trusted_ip("")
 

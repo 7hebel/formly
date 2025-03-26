@@ -50,6 +50,7 @@ export function LoginPanel() {
         
         localStorage.setItem("uuid", response.data.uuid);
         localStorage.setItem("fullname", response.data.fullname);
+        sessionStorage.setItem("session-accepted", "1")
         navigate("/dash");
       })
       .catch(err => {
@@ -146,6 +147,7 @@ export function RegisterPanel() {
 
         localStorage.setItem("uuid", response.data.uuid);
         localStorage.setItem("fullname", response.data.fullname);
+        sessionStorage.setItem("session-accepted", "1")
         navigate("/dash");
       })
       .catch(err => {

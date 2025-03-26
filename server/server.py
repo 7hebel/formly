@@ -71,6 +71,19 @@ async def get_autologin_check(uuid: str, request: Request) -> JSONResponse:
     
     return api_response(False, err_msg="This host cannot autologin to account.")
     
+    
+@api.get("/api/logout/{uuid}")
+async def get_logout(uuid: str, request: Request) -> JSONResponse:
+    user = accounts.Account.from_uuid(uuid)
+    if user is None:
+        return api_response(False, err_msg="User with this uuid not found.")
+
+    if accounts.hash_ip(request.client.host) != user.trusted_ip:
+        return api_response(False, err_msg="Cannot logout from different host.")
+    
+    user.logout()
+    return api_response(True)
+
 
 
 uvicorn.run(api, host="0.0.0.0", port=50500)
