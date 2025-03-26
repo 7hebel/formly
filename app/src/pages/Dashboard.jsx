@@ -1,12 +1,11 @@
 import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
-import { SingleSelect, MultiSelect } from '../ui/Select.jsx';
+import DashboardCategorySwitcher from '../components/dashCategorySwitcher.jsx'
 import { useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
-
+import { LogOut, ClipboardList, Users, Settings2 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import './styles/dashboard.css'
-import { useEffect } from 'react';
 
 
 export default function Dashboard() {
@@ -38,8 +37,12 @@ export default function Dashboard() {
     });
   }
 
+  const formsViewRef = useRef(0);
+  const groupsViewRef = useRef(0);
+  const accountViewRef = useRef(0);
+
   return (
-    <>
+    <main className='dash'>
       <div className='squaresBgContainer'>
         <Squares 
           speed={0.25} 
@@ -60,7 +63,42 @@ export default function Dashboard() {
           Logout
         </TertiaryButton>
       </header>
-    </>
+
+      <div className='dash-content-container'>
+        <div className="dash-categories-container">
+          <DashboardCategorySwitcher id="dash-cat-forms" viewRef={formsViewRef} isActive>
+            <ClipboardList/>
+            Forms
+          </DashboardCategorySwitcher>
+          <DashboardCategorySwitcher id="dash-cat-groups" viewRef={groupsViewRef}>
+            <Users/>
+            Groups
+          </DashboardCategorySwitcher>
+          <DashboardCategorySwitcher id="dash-cat-groups" viewRef={accountViewRef}>
+            <Settings2/>
+            Account
+          </DashboardCategorySwitcher>
+        </div>
+        
+        <div className='hzSepStrong'></div>
+
+        <div className='dash-categories-content-container'>
+
+          <div className='dash-category-content' ref={formsViewRef}>
+            forms...
+          </div>
+
+          <div className='dash-category-content' ref={groupsViewRef} active="0">
+            groups...
+          </div>
+
+          <div className='dash-category-content' ref={accountViewRef} active="0">
+            account...
+          </div>
+          
+        </div>
+      </div>
+    </main>
   )
 }
 
