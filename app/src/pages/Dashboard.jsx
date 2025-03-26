@@ -6,11 +6,10 @@ import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { SingleSelect, MultiSelect } from '../ui/Select.jsx';
 
-export default function Home() {
+export default function Dashboard() {
 
   return (
     <>
-      <Header/>
       <div className='squaresBgContainer'>
         <Squares 
           speed={0.25} 
@@ -20,6 +19,7 @@ export default function Home() {
           hoverFillColor='#f2eedd'
         />
       </div>
+      DASHBOARD
     </>
   )
 }

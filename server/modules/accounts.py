@@ -26,6 +26,12 @@ class Account:
         if data:
             return Account(*data)
     
+    @staticmethod
+    def from_uuid(uuid: str) -> "Account | None":
+        data = db.get_user_by_uuid(uuid)
+        if data is not None:
+            return Account(*data)
+    
     def __init__(self, uuid: str, fullname: str, email: str, password: str, owned_forms: str, answered_forms: str, trusted_ip: str) -> None:
         self.uuid = uuid
         self.fullname = fullname
@@ -38,8 +44,13 @@ class Account:
     def set_trusted_ip(self, raw_ip: str) -> None:
         self.trusted_ip = hash_ip(raw_ip)
         db.DB.execute(f"UPDATE users SET trusted_ip=? WHERE uuid=?", (self.trusted_ip, self.uuid))
-        
+
     def validate_password(self, raw_password: str) -> bool:
         return bcrypt.checkpw(raw_password.encode(), self.password.encode())
 
+    def prepare_login_data(self) -> dict[str, str]:
+        return {
+            "uuid": self.uuid,
+            "fullname": self.fullname
+        }
 

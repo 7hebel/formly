@@ -11,7 +11,6 @@ import './styles/login.css'
 export function LoginPanel() {
   const navigate = useNavigate();
 
-
   function handleLogin() {
     const emailEl = document.getElementById("login-email");
     const passwordEl = document.getElementById("login-password");
@@ -49,11 +48,9 @@ export function LoginPanel() {
           return;
         }
         
-        const uuid = response.data;
-        localStorage.setItem("uuid", uuid);
-
-        // TODO: redirect to dashboard
-        alert("OK LOGIN")
+        localStorage.setItem("uuid", response.data.uuid);
+        localStorage.setItem("fullname", response.data.fullname);
+        navigate("/dash");
       })
       .catch(err => {
         errorLabel.textContent = "Failed to login.";
@@ -147,11 +144,9 @@ export function RegisterPanel() {
           return;
         }
 
-        const uuid = response.data;
-        localStorage.setItem("uuid", uuid);
-
-        // TODO: redirect to dashboard
-        alert("OK REG")
+        localStorage.setItem("uuid", response.data.uuid);
+        localStorage.setItem("fullname", response.data.fullname);
+        navigate("/dash");
       })
       .catch(err => {
         errorLabel.textContent = "Failed to register.";

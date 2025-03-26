@@ -43,7 +43,7 @@ async def post_register(data: schemas.RegisterSchema, request: Request) -> JSONR
     if isinstance(user, str):
         return api_response(False, err_msg=user)
     
-    return api_response(True, user.uuid)
+    return api_response(True, user.prepare_login_data())
     
 
 @api.post("/api/login")
@@ -57,10 +57,20 @@ async def post_login(data: schemas.LoginSchema, request: Request) -> JSONRespons
         return api_response(False, err_msg="Incorrect password.")
     
     user.set_trusted_ip(request.client.host)
-    return api_response(True, user.uuid)
+    return api_response(True, user.prepare_login_data())
     
 
-
+@api.get("/api/autologinCheck/{uuid}")
+async def get_autologin_check(uuid: str, request: Request) -> JSONResponse:
+    user = accounts.Account.from_uuid(uuid)
+    if user is None:
+        return api_response(False, err_msg="User with this uuid not found.")
+    
+    if accounts.hash_ip(request.client.host) == user.trusted_ip:
+        return api_response(True, user.prepare_login_data())
+    
+    return api_response(False, err_msg="This host cannot autologin to account.")
+    
 
 
 uvicorn.run(api, host="0.0.0.0", port=50500)
