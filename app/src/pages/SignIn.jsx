@@ -55,6 +55,11 @@ export function LoginPanel() {
         // TODO: redirect to dashboard
         alert("OK LOGIN")
       })
+      .catch(err => {
+        errorLabel.textContent = "Failed to login.";
+        errorLabel.setAttribute("iserror", "1");
+        return;
+      })
   }
 
 
@@ -147,6 +152,11 @@ export function RegisterPanel() {
 
         // TODO: redirect to dashboard
         alert("OK REG")
+      })
+      .catch(err => {
+        errorLabel.textContent = "Failed to register.";
+        errorLabel.setAttribute("iserror", "1");
+        return;
       })
   }
 

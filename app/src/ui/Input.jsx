@@ -26,3 +26,14 @@ export function Input({ id, type="text", placeholder=null, pattern=null, minlen=
     </input>
   )
 }
+
+export function LongInput({ id, placeholder=null, minlen=null }) {
+  return (
+    <textarea
+      id={id}
+      placeholder={placeholder}
+      className="input-element"
+      minLength={minlen}
+    ></textarea>
+  )
+}
