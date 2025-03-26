@@ -2,8 +2,9 @@ import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import DashboardCategorySwitcher from '../components/dashCategorySwitcher.jsx'
+import FormBrief from '../components/FormBrief.jsx'
 import { useNavigate } from 'react-router-dom';
-import { LogOut, ClipboardList, Users, Settings2 } from 'lucide-react';
+import { LogOut, ClipboardList, Users, Settings2, KeyRound, VenetianMask, Edit3, CornerDownRight, Eye, EyeOff } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import './styles/dashboard.css'
 
@@ -84,11 +85,33 @@ export default function Dashboard() {
         <div className='dash-categories-content-container'>
 
           <div className='dash-category-content' ref={formsViewRef}>
-            <div className='dash-forms-container'>
+            <div className='dash-forms-category-container'>
               <h1>Assigned to me:</h1>
+              <div className="dash-forms-container">
 
+                <FormBrief isAssigned></FormBrief>
+
+              </div>
             </div>
-            
+            <div className='dash-forms-category-container'>
+              <h1>My forms:</h1>
+              <div className="dash-forms-container">
+
+                <FormBrief isMyForm></FormBrief>
+                <FormBrief isMyForm></FormBrief>
+                <FormBrief isMyForm></FormBrief>
+
+              </div>
+            </div>
+            <div className='dash-forms-category-container'>
+              <h1>Answered by me:</h1>
+              <div className="dash-forms-container">
+
+                <FormBrief isAnswered></FormBrief>
+                <FormBrief isAnswered></FormBrief>
+
+              </div>
+            </div>
           </div>
 
           <div className='dash-category-content' ref={groupsViewRef} active="0">

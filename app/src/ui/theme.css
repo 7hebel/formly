@@ -14,6 +14,7 @@
     --color-bg-item: #0000000a;
     --color-primary: #FFCC00;
     --color-text: #353535;
+    --color-panel: #FFFCEE;
 }
 
 body {
@@ -34,6 +35,13 @@ body {
     margin-block: 12px;
 }
 
+.hzSepMid {
+    width: 100%;
+    height: 1px;
+    background-color: #35353531;
+    margin-block: 12px;
+}
+
 .hzSepStrong {
     width: 100%;
     height: 2px;
@@ -42,7 +50,10 @@ body {
     margin-block: 12px;
 }
 
-
 .wide {
     width: 100%;
+}
+
+.bold-text {
+    font-weight: 600;
 }

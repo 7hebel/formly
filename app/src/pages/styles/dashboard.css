@@ -22,7 +22,6 @@
     text-decoration: underline 3px;
     text-decoration-color: var(--color-primary);
     text-underline-offset: 4px;
-    text-shadow: 0px 10px 40px var(--color-primary);
 }
 
 .dash {
@@ -96,7 +95,7 @@
 
 .dash-categories-content-container {
     width: 100%;
-    padding-inline: 40px;
+    padding-inline: 20px;
 }
 
 .dash-category-content[active="0"] { display: none; }
@@ -108,14 +107,120 @@
 
 /* --- FORMS --- */
 
-.dash-forms-container {
+.dash-forms-category-container {
     width: 100%;
 }
 
-.dash-forms-container > h1 {
+.dash-forms-category-container > h1 {
     font-family: var(--ui-font);
     font-weight: 600;
     font-size: 20px;
     color: var(--color-text);
 }
+
+.dash-forms-container {
+    margin-left: 16px;
+    margin-top: 16px;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+
+}
+
+
+/* From brief view */
+
+.form-brief-view {
+    width: 350px;
+    min-height: 250px;
+    background-color: var(--color-panel);
+    border-radius: 8px;
+    border: 1px solid #35353552;
+    padding: 8px;
+    flex-direction: column;
+    display: flex;
+    transition: box-shadow .6s;
+}
+
+.form-brief-view:hover {
+    box-shadow: 0px 8px 40px -4px #00000026;
+}
+
+.form-brief-view[isfinished="1"] {
+    background-color: transparent;
+}
+
+.form-brief-view[isfeatured="1"] {
+    border-color: var(--color-primary);
+    border-width: 2px;
+    box-shadow: 0px 40px 130px -70px var(--color-primary);
+}
+
+.form-brief-view > h5 {
+    all: unset;
+    font-family: var(--ui-font);
+    font-size: 18px;
+    color: var(--color-text);
+    font-weight: 500;
+    overflow-x: clip;
+    white-space: nowrap;
+}
+
+.form-brief-characteristics-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-left: 4px;
+    gap: 4px;    
+    height: 100%;
+}
+
+.form-characteristic {
+    font-family: var(--ui-font);
+    color: var(--color-text);
+    font-size: 14px
+}
+
+.form-characteristic > svg {
+    height: 14px;
+    width: 14px;
+    vertical-align: middle;
+    margin-bottom: 4px;
+    margin-right: 6px;
+    background-color: var(--color-primary);
+    padding: 3px;
+    box-sizing: content-box;
+    border-radius: 50%;
+}
+
+.form-brief-btn-container {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+
+.form-brief-active-state-badge {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    font-size: 12px;
+    font-family: var(--ui-font);
+    white-space: nowrap;
+}
+
+.form-brief-active-state-badge[state="0"] {
+    color: gray;
+}
+.form-brief-active-state-badge[state="1"] {
+    color: var(--color-text);
+}
+.form-brief-active-state-badge[state="2"] {
+    color: black;
+    text-decoration: underline 2px var(--color-primary);
+    text-underline-offset: 2px;
+}
+
+
 
