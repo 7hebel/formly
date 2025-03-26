@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import '../pages/styles/dashboard.css'
 
-export default function DashboardCategorySwitcher({ categoryId, viewRef, isActive=false, children }) {
+export default function DashboardCategorySwitcher({ viewRef, isActive=false, children }) {
   const buttonRef = useRef(0);
 
   function handleCategorySwitch() {
@@ -24,6 +24,7 @@ export default function DashboardCategorySwitcher({ categoryId, viewRef, isActiv
       onClick={handleCategorySwitch}
       >
         {children}
+        <div className='active-category-glow'></div>
     </button>
   )
 }
