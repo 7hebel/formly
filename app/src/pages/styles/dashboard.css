@@ -160,7 +160,7 @@
 .form-brief-view[isfeatured="1"] {
     border-color: var(--color-primary);
     border-width: 2px;
-    box-shadow: 0px 30px 170px -78px var(--color-primary);
+    box-shadow: 0px 30px 170px -78px var(--color-primary-muted);
 }
 
 .form-brief-view > h5 {
@@ -219,10 +219,10 @@
     color: gray;
 }
 .form-brief-active-state-badge[state="1"] {
-    color: var(--color-text);
+    color: var(--color-primary-muted);
 }
 .form-brief-active-state-badge[state="2"] {
-    color: black;
+    color: var(--color-text);
     text-decoration: underline 2px var(--color-primary);
     text-underline-offset: 2px;
 }
@@ -333,7 +333,43 @@
     font-weight: 400;
     font-size: 16px;
     color: var(--color-text);
+    transition: font-weight .4s;
 }
+
+/* invitation */
+
+.group-invitation {
+    font-family: var(--ui-font);
+    background-color: var(--color-panel);
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid var(--color-primary)
+}
+
+.group-invitation > h4 {
+    font-weight: 400;
+    margin-left: 8px;
+    margin-bottom: 8px;
+
+}
+
+.group-invitation > small {
+    color: var(--color-primary-muted);
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 4px;
+    margin-bottom: 4px;
+    gap: 4px;
+}
+
+.group-invitation > small > svg {
+    width: 14px;
+    height: 14px;
+}
+
 
 /* group details */
 
@@ -380,6 +416,16 @@
     margin-top: 16px;
     margin-bottom: 50px;
     gap: 20px;
+}
+
+.group-view-management-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin-left: 16px;
+    margin-top: 16px;
+    margin-bottom: 50px;
+    gap: 10px;
 }
 
 /* group member */

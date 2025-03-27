@@ -1,7 +1,8 @@
-import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
-import { ClipboardList, Users, Bolt, Trash2 } from 'lucide-react';
+import { DangerButton, PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
+import { ClipboardList, Users, Bolt, Trash2, Settings, DoorOpen, Edit3, Mail } from 'lucide-react';
 import FormBrief from './FormBrief.jsx';
 import '../pages/styles/dashboard.css'
+import { Input, InputGroup, InputLabel } from '../ui/Input.jsx';
 
 
 function GroupMember({ name, memberUUID, isMemberManager, isUserManager }) {
@@ -30,6 +31,7 @@ function GroupMember({ name, memberUUID, isMemberManager, isUserManager }) {
 export default function GroupView({ groupId=null }) {
   //TODO: fetch group data
 
+  const isOwner = true;
   const isManager = true;
   const managers = [
     ['Jan Kowalski', 'idJan'],
@@ -83,6 +85,53 @@ export default function GroupView({ groupId=null }) {
             return (<GroupMember name={memberName} memberUUID={memberUUID} isMemberManager={false} isUserManager={isManager}></GroupMember>)
           })
         }
+      </div>
+
+
+      <h2>
+        <Settings/>
+        Manage
+      </h2>
+      <div className='group-view-management-container'>
+        {
+          isManager && (
+            <>
+              <div className='row'>
+                <InputGroup>
+                  <InputLabel>Send invitation</InputLabel>
+                  <Input type="email" id="invite-email" placeholder="user@email.com" minlen={3}></Input>
+                  <TertiaryButton>
+                    <Mail/>
+                    Invite
+                  </TertiaryButton>
+                </InputGroup>
+                <InputGroup>
+                  <InputLabel>Rename group</InputLabel>
+                  <Input type="text" id="new-group-name" placeholder="Fantastic group" minlen={3}></Input>
+                  <TertiaryButton>
+                    <Edit3/>
+                    Rename
+                  </TertiaryButton>
+                </InputGroup>
+              </div>
+              <div className='hzSepMid'></div>
+            </>
+          )
+        }
+        <div className='row'>
+          <DangerButton>
+            <DoorOpen></DoorOpen>
+            Leave group
+          </DangerButton>
+          {
+            isOwner && (
+              <DangerButton>
+                <Trash2></Trash2>
+                Remove group
+              </DangerButton>
+            )
+          }
+        </div>
       </div>
     </div>
   )

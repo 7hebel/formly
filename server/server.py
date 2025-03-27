@@ -1,10 +1,11 @@
 import os
 
-if not os.path.exists("./data/forms"): os.mkdir("./data/forms/")
 if not os.path.exists("./data/"): os.mkdir("./data/")
+if not os.path.exists("./data/forms"): os.mkdir("./data/forms/")
+if not os.path.exists("./data/groups"): os.mkdir("./data/groups/")
 
-from modules import accounts
 from modules import schemas
+from modules import users
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -48,11 +49,11 @@ def protected_endpoint(endpoint_fn):
         request = kwargs["request"]
         caller_ip = request.client.host
         
-        user = accounts.Account.from_uuid(uuid)
+        user = users.get_user_by_uuid(uuid)
         if user is None:
             return api_response(False, err_msg=f"Validation failed: provided invalid uuid: `{uuid}` to protected endpoint.")
         
-        if accounts.hash_ip(caller_ip) != user.trusted_ip:
+        if users.hash_ip(caller_ip) != user.trusted_ip:
             return api_response(False, err_msg=f"Validation failed: called protected endpoint by untrusted host. Relogin.")
 
         return await endpoint_fn(*args, **kwargs)
@@ -64,46 +65,46 @@ def protected_endpoint(endpoint_fn):
 
 @api.post("/api/register")
 async def post_register(data: schemas.RegisterSchema, request: Request) -> JSONResponse:
-    user = accounts.Account.register(data.fullname, data.email, data.password, request.client.host)
+    user = users.register_user(data.fullname, data.email, data.password, request.client.host)
     if isinstance(user, str):
         return api_response(False, err_msg=user)
     
-    return api_response(True, user.prepare_login_data()) 
+    return api_response(True, users.prepare_user_brief(user.uuid)) 
 
 @api.post("/api/login")
 async def post_login(data: schemas.LoginSchema, request: Request) -> JSONResponse:
-    user = accounts.Account.from_email(data.email)
+    user = users.get_user_by_email(data.email)
     if user is None:
         return api_response(False, err_msg="There is no registered user with this email.")
     
-    status = user.validate_password(data.password)
+    status = users.validate_password(user.uuid, data.password)
     if not status:
         return api_response(False, err_msg="Incorrect password.")
     
-    user.set_trusted_ip(request.client.host)
-    return api_response(True, user.prepare_login_data())
+    users.set_trusted_ip(user.uuid, request.client.host)
+    return api_response(True, users.prepare_user_brief(user.uuid))
     
 @api.get("/api/autologinCheck/{uuid}")
 async def get_autologin_check(uuid: str, request: Request) -> JSONResponse:
-    user = accounts.Account.from_uuid(uuid)
+    user = users.get_user_by_uuid(uuid)
     if user is None:
         return api_response(False, err_msg="User with this uuid not found.")
     
-    if accounts.hash_ip(request.client.host) == user.trusted_ip:
-        return api_response(True, user.prepare_login_data())
+    if users.hash_ip(request.client.host) == user.trusted_ip:
+        return api_response(True, users.prepare_user_brief(user.uuid))
     
     return api_response(False, err_msg="This host cannot autologin to account.")
     
 @api.get("/api/logout/{uuid}")
 async def get_logout(uuid: str, request: Request) -> JSONResponse:
-    user = accounts.Account.from_uuid(uuid)
+    user = users.get_user_by_uuid(uuid)
     if user is None:
         return api_response(False, err_msg="User with this uuid not found.")
 
-    if accounts.hash_ip(request.client.host) != user.trusted_ip:
+    if users.hash_ip(request.client.host) != user.trusted_ip:
         return api_response(False, err_msg="Cannot logout from different host.")
     
-    user.logout()
+    users.logout(user.uuid)
     return api_response(True)
 
 
@@ -114,15 +115,13 @@ async def get_logout(uuid: str, request: Request) -> JSONResponse:
 @api.post("/api/account-update/fullname")
 @protected_endpoint
 async def post_account_update_fullname(data: schemas.FullnameUpdateSchema, request: Request) -> JSONResponse:
-    user = accounts.Account.from_uuid(data.uuid)
-    user.update_fullname(data.fullname)
+    users.update_fullname(data.uuid, data.fullname)
     return api_response(True)
 
 @api.post("/api/account-update/email")
 @protected_endpoint
 async def post_account_update_email(data: schemas.EmailUpdateSchema, request: Request) -> JSONResponse:
-    user = accounts.Account.from_uuid(data.uuid)
-    status = user.update_email(data.email)
+    status = users.update_email(data.uuid, data.email)
     if isinstance(status, str):
         return api_response(False, err_msg=status)
     return api_response(True)
@@ -130,8 +129,7 @@ async def post_account_update_email(data: schemas.EmailUpdateSchema, request: Re
 @api.post("/api/account-update/password")
 @protected_endpoint
 async def post_account_update_password(data: schemas.PasswordUpdateSchema, request: Request) -> JSONResponse:
-    user = accounts.Account.from_uuid(data.uuid)
-    status = user.update_password(data.new_password, data.current_password)
+    status = users.update_password(data.uuid, data.new_password, data.current_password)
     if isinstance(status, str):
         return api_response(False, err_msg=status)
     return api_response(True)

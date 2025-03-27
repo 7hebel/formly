@@ -26,13 +26,11 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .vSep {
-    width: 2px;
-    background-color: #35353531;
-    margin-inline: 20px;
+    margin-inline: 8px;
 }
 
 .hzSep {

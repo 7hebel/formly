@@ -1,11 +1,11 @@
 import Squares from '../blocks/Backgrounds/Squares.jsx';
-import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
+import { PrimaryButton, SecondaryButton, TertiaryButton, DangerButton } from '../ui/Button.jsx';
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import DashboardCategorySwitcher from '../components/dashCategorySwitcher.jsx'
 import FormBrief from '../components/FormBrief.jsx'
 import GroupView from '../components/GroupView.jsx'
 import { useNavigate } from 'react-router-dom';
-import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle } from 'lucide-react';
+import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle, Mail, Check, X } from 'lucide-react';
 import { ErrorLabel } from "../ui/ErrorLabel.jsx"
 import { useEffect, useRef, useState } from 'react';
 import './styles/dashboard.css'
@@ -69,6 +69,7 @@ export default function Dashboard() {
       if (response.status) {
         errorLabel.setAttribute("iserror", "0");
         localStorage.setItem("fullname", newName.value);
+        newName.value = "";
         navigate("/dash");
       } else {
         errorLabel.textContent = response.err_msg;
@@ -108,6 +109,7 @@ export default function Dashboard() {
       if (response.status) {
         errorLabel.setAttribute("iserror", "0");
         localStorage.setItem("email", newMail.value);
+        newMail.value = "";
         navigate("/dash");
       } else {
         errorLabel.textContent = response.err_msg;
@@ -122,7 +124,7 @@ export default function Dashboard() {
 
   function onPasswordUpdate() {
     const newPassword = document.getElementById("update-password");
-    const currentPassword = document.getElementById("update-password-current").value;
+    const currentPassword = document.getElementById("update-password-current");
     const errorLabel = document.getElementById("update-password-errlabel");
 
     if (!newPassword.value || !newPassword.validity.valid) {
@@ -139,7 +141,7 @@ export default function Dashboard() {
       body: JSON.stringify({
         uuid: String(localStorage.getItem("uuid")),
         new_password: newPassword.value,
-        current_password: currentPassword,
+        current_password: currentPassword.value,
       })
     };
     
@@ -148,6 +150,8 @@ export default function Dashboard() {
     .then(response => {
       if (response.status) {
         errorLabel.setAttribute("iserror", "0");
+        newPassword.value = "";
+        currentPassword.value = "";
       } else {
         errorLabel.textContent = response.err_msg;
         errorLabel.setAttribute("iserror", "1");
@@ -170,7 +174,7 @@ export default function Dashboard() {
   const groupsViewRef = useRef(0);
   const accountViewRef = useRef(0);
   let [selectedGroup, setSelectedGroup] = useState(null);
-  let [selectedGropName, setSelectedGroupName] = useState("");
+  let [selectedGropName, setSelectedGroupName] = useState("-");
 
   return (
     <main className='dash'>
@@ -263,6 +267,25 @@ export default function Dashboard() {
                 <div className='hzSepStrong'></div>
                 <div className='my-groups'>
 
+                  <div className='group-invitation'>
+                    <small>
+                      <Mail/>
+                      Invite
+                    </small>
+                    <h4>Some group awjdiawoi iojaw diojwd aowija awdoijadoijwdaj doij dawj</h4>
+                    <div className='row'>
+                      <PrimaryButton wide>
+                        <Check/>
+                        Join
+                      </PrimaryButton>
+                      <DangerButton wide>
+                        <X/>
+                        Reject
+                      </DangerButton>
+                    </div>
+                  </div>
+
+                  <div className='hzSepMid'></div>
                   <div onClick={() => {switchGroup('Group name test abc', '1')}} className='my-group' id='group-1' selected="0">
                     <h3>Group name test abc</h3>
                     <ChevronRightCircle/>

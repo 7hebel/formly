@@ -21,3 +21,11 @@ export function TertiaryButton({ wide, onClick=null, children }) {
     </button>
   )
 }
+
+export function DangerButton({ wide, onClick=null, children }) {
+  return (
+    <button className={'button danger-button' + (wide? ' wide' : '')} onClick={onClick}>
+      {children}
+    </button>
+  )
+}
