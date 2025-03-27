@@ -31,3 +31,6 @@ class PasswordUpdateSchema(ProtectedModel):
 
 class GroupCreateSchema(ProtectedModel):
     name: str
+
+class FetchGroupSchema(ProtectedModel):
+    group_id: str

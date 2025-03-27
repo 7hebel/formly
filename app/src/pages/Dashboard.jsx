@@ -12,6 +12,37 @@ import { useEffect, useRef, useState } from 'react';
 import './styles/dashboard.css'
 
 
+function MyGroupsPanel({ groups, onSwitchGroup }) {
+  if (!groups) return <p>Loading...</p>;
+  
+  return (
+    <>
+      {
+        groups.map(([group_id, group_name], index) => {
+          return (
+            <div key={group_id}>
+              <div 
+                onClick={() => onSwitchGroup(group_name, group_id)} 
+                className='my-group' 
+                id={'group-' + group_id} 
+                selected="0"
+              >
+                <h3>{group_name}</h3>
+                <ChevronRightCircle/>
+              </div>
+  
+              {
+                (index != groups.length - 1) && <div className='hzSepMid'></div>
+              }
+            </div>
+          )
+        })
+      }
+    </>
+  )
+}
+
+
 export default function Dashboard() {
   const navigate = useNavigate();
 
@@ -172,7 +203,7 @@ export default function Dashboard() {
   }
 
   function onGroupCreate() {
-    const name = document.getElementById("new-group-name");
+    const name = document.getElementById("create-group-name");
     if (!name.value || !name.validity.valid) return;
 
     const requestOptions = {
@@ -189,7 +220,8 @@ export default function Dashboard() {
     .then(response => {
       if (response.status) {
         console.log("Created group ", name.value);
-        navigate("/");
+        setAddGroupOpen(false);
+        fetchGroups();
       }
     })
   }
@@ -199,8 +231,25 @@ export default function Dashboard() {
   const accountViewRef = useRef(0);
   let [selectedGroup, setSelectedGroup] = useState(null);
   let [selectedGropName, setSelectedGroupName] = useState("-");
+  let [groups, setGroups] = useState(null);
 
   const [isAddGroupOpen, setAddGroupOpen] = useState(false);
+
+  const fetchGroups = async () => {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/groups/my-groups", requestOptions);
+    const data = await response.json();
+
+    if (data.status) setGroups(data.data);
+  };
+  useEffect(() => {fetchGroups()}, []);
 
 
   return (
@@ -294,7 +343,7 @@ export default function Dashboard() {
                       <Modal title="Create group" close={setAddGroupOpen}>
                         <InputGroup>
                           <InputLabel>Group name</InputLabel>
-                          <Input id="new-group-name" minlen={3}></Input>
+                          <Input id="create-group-name" minlen={3}></Input>
                         </InputGroup>
                         <PrimaryButton wide onClick={onGroupCreate}><PlusCircle/>Create</PrimaryButton>
                       </Modal>
@@ -304,7 +353,7 @@ export default function Dashboard() {
                 <div className='hzSepStrong'></div>
                 <div className='my-groups'>
 
-                  <div className='group-invitation'>
+                  {/* <div className='group-invitation'>
                     <small>
                       <Mail/>
                       Invite
@@ -320,24 +369,9 @@ export default function Dashboard() {
                         Reject
                       </DangerButton>
                     </div>
-                  </div>
+                  </div> */}
 
-                  <div className='hzSepMid'></div>
-                  <div onClick={() => {switchGroup('Group name test abc', '1')}} className='my-group' id='group-1' selected="0">
-                    <h3>Group name test abc</h3>
-                    <ChevronRightCircle/>
-                  </div>
-                  <div className='hzSepMid'></div>
-                  <div onClick={() => {switchGroup('Another group name', '2')}} className='my-group' id='group-2' selected="1">
-                    <h3>Another group name</h3>
-                    <ChevronRightCircle/>
-                  </div>
-                  <div className='hzSepMid'></div>
-                  <div onClick={() => {switchGroup('Long long long long long long long long long group name', '3')}} className='my-group' id='group-3' selected="0">
-                    <h3>Long long long long long long long long long group name</h3>
-                    <ChevronRightCircle/>
-                  </div>
-
+                  <MyGroupsPanel groups={groups} onSwitchGroup={switchGroup}/>
                 </div>
               </div>
               <div className='group-details'>

@@ -320,11 +320,12 @@
 .my-group > svg {
     height: 16px;
     width: 16px;
-    color: var(--color-text);
+    color: var(--color-primary-muted);
     opacity: 0;
     transition: opacity .2s;
 }
 
+.my-group[selected="1"] > svg,
 .my-group:hover > svg {
     opacity: 1;
 }
@@ -479,5 +480,9 @@
 
 .group-member-manage-icons > svg:hover {
     opacity: 1;
+}
+
+.group-member > p[isself="1"] {
+    color: var(--color-primary-muted);
 }
 

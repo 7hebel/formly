@@ -70,7 +70,6 @@ def remove_member_from_group(group_id: str, user_uuid: str) -> bool:
     with open(group_file_path, "w") as file:
         json.dump(content, file)
         
-
     return True
 
 
@@ -135,11 +134,31 @@ def get_group_details(group_id: str, user_uuid: str) -> dict:
             members.append([user.fullname, user.uuid])
     
     return {
-        "forms": [],
+        "is_owner": user_uuid == content["owner_uuid"],
+        "is_manager": user_uuid in content["managers"],
         "managers": managers,
-        "members": members
+        "members": members,
+        "assigned_forms": [],
+        "draft_forms": [],
     }
+        
+        
+def fetch_user_groups_names(groups_ids: list[str]) -> list[tuple[str, str]]:
+    groups_data = []
     
+    for group_id in groups_ids:
+        if not group_id: continue
+        
+        group_file_path = GROUPS_DIR_PATH + group_id + ".json"
+        with open(group_file_path, "r") as file:
+            content = json.load(file)
+            name = content["name"]
+        
+        groups_data.append((group_id, name))        
+    
+    return groups_data
+        
+        
 # Invitations
 
 def add_group_invitation(user_uuid: str, group_id: str) -> bool | str:

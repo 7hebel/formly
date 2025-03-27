@@ -4,16 +4,18 @@ import FormBrief from './FormBrief.jsx';
 import '../pages/styles/dashboard.css'
 import { Input, InputGroup, InputLabel } from '../ui/Input.jsx';
 import { Modal } from '../ui/Modal.jsx';
-
+import { useState, useEffect } from 'react';
 
 
 function GroupMember({ name, memberUUID, isMemberManager, isUserManager }) {
+  const isSelf = memberUUID == String(localStorage.getItem("uuid"));
+  
   return (
     <div className='group-member' manager={Number(isMemberManager)} id={memberUUID}>
       { isMemberManager && <Bolt/> }
-      <p>{name}</p>
+      <p isself={Number(isSelf)}>{name}</p>
       {
-        isUserManager && (
+        isUserManager && !isSelf && (
           <div className='group-member-manage-icons'>
             {
               (isMemberManager) ? (
@@ -31,54 +33,68 @@ function GroupMember({ name, memberUUID, isMemberManager, isUserManager }) {
 }
 
 export default function GroupView({ groupId=null }) {
-  //TODO: fetch group data
+  if (groupId==null) return <></>
 
-  const isOwner = true;
-  const isManager = true;
-  const managers = [
-    ['Jan Kowalski', 'idJan'],
-    ['Bartek Jakiś', 'idBar']
-  ];
-  const members = [
-    ['Użytkownik 1', 'idU1'],
-    ['Stefan Kuleczka', 'idSte'],
-    ['Grzegorz grzegżółka', 'idG'],
-  ];
-  const assignedForms = [
-    'formid1', 'formid2'
-  ];
-  const draftFroms = [
-    'formid3'
-  ]
+  const [groupData, setGroupData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            uuid: String(localStorage.getItem("uuid")),
+            group_id: groupId
+          }),
+        };
+
+        const response = await fetch(import.meta.env.VITE_API_URL + "/groups/fetch", requestOptions);
+        const data = await response.json();
+
+        console.log(data)
+        if (data.status) setGroupData(data.data);
+      } catch (error) {
+        console.error("Error fetching group:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGroups();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+  
   return (
     <div className="group-view-container">
       <h2><ClipboardList/>Forms</h2>
       <div className='group-view-forms-container'>
         {
-          assignedForms.map(formId => {
+          groupData.assigned_forms.map(formId => {
             return (<FormBrief isAssigned formId={formId} key={formId}></FormBrief>)
           })
         }
         {
-          draftFroms.map(formId => {
-            return isManager && (<FormBrief isMyForm formId={formId} key={formId}></FormBrief>)
+          groupData.draft_forms.map(formId => {
+            return groupData.is_manager && (<FormBrief isMyForm formId={formId} key={formId}></FormBrief>)
           })
         }
       </div>
       
-      <h2><Users/>Members ({members.length + managers.length})</h2>
+      <h2><Users/>Members ({groupData.members.length + groupData.managers.length})</h2>
       <div className='group-view-forms-container'>
         {
-          managers.map(memberData => {
+          groupData.managers.map(memberData => {
             let [memberName, memberUUID] = memberData;
-            return (<GroupMember name={memberName} memberUUID={memberUUID} isMemberManager={true} isUserManager={isManager} key={memberUUID}></GroupMember>)
+            return (<GroupMember name={memberName} memberUUID={memberUUID} isMemberManager={true} isUserManager={groupData.is_manager} key={memberUUID}></GroupMember>)
           })
         }
         {
-          members.map(memberData => {
+          groupData.members.map(memberData => {
             let [memberName, memberUUID] = memberData;
-            return (<GroupMember name={memberName} memberUUID={memberUUID} isMemberManager={false} isUserManager={isManager} key={memberUUID}></GroupMember>)
+            return (<GroupMember name={memberName} memberUUID={memberUUID} isMemberManager={false} isUserManager={groupData.is_manager} key={memberUUID}></GroupMember>)
           })
         }
       </div>
@@ -86,7 +102,7 @@ export default function GroupView({ groupId=null }) {
       <h2><Settings/>Manage</h2>
       <div className='group-view-management-container'>
         {
-          isManager && (
+          groupData.is_manager && (
             <>
               <div className='row'>
                 <InputGroup>
@@ -116,7 +132,7 @@ export default function GroupView({ groupId=null }) {
             Leave group
           </DangerButton>
           {
-            isOwner && (
+            groupData.is_owner && (
               <DangerButton>
                 <Trash2></Trash2>
                 Remove group
@@ -127,6 +143,8 @@ export default function GroupView({ groupId=null }) {
       </div>
     </div>
   )
+
+
 
 
 }

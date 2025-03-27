@@ -139,11 +139,27 @@ async def post_account_update_password(data: schemas.PasswordUpdateSchema, reque
 
 # Groups.
 
+@api.post("/api/groups/my-groups")
+@protected_endpoint
+async def post_fetch_my_groups(data: schemas.ProtectedModel, request: Request) -> JSONResponse:
+    user = users.get_user_by_uuid(data.uuid)
+    print(user.groups)
+    user_groups = groups.fetch_user_groups_names(user.groups.split("|"))
+    return api_response(True, user_groups)
+
+
+@api.post("/api/groups/fetch")
+@protected_endpoint
+async def post_fecth_group(data: schemas.FetchGroupSchema, request: Request) -> JSONResponse:
+    group_data = groups.get_group_details(data.group_id, data.uuid)
+    return api_response(True, group_data)
+
 
 @api.post("/api/groups/create")
 @protected_endpoint
 async def post_group_create(data: schemas.GroupCreateSchema, request: Request) -> JSONResponse:
-    groups.create_group(data.name, data.uuid)
+    group_id = groups.create_group(data.name, data.uuid)
+    users.add_group_to_user_list(data.uuid, group_id)
     return api_response(True)
 
 
