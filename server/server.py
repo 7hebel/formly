@@ -5,6 +5,7 @@ if not os.path.exists("./data/forms"): os.mkdir("./data/forms/")
 if not os.path.exists("./data/groups"): os.mkdir("./data/groups/")
 
 from modules import schemas
+from modules import groups
 from modules import users
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -133,6 +134,18 @@ async def post_account_update_password(data: schemas.PasswordUpdateSchema, reque
     if isinstance(status, str):
         return api_response(False, err_msg=status)
     return api_response(True)
+
+
+
+# Groups.
+
+
+@api.post("/api/groups/create")
+@protected_endpoint
+async def post_group_create(data: schemas.GroupCreateSchema, request: Request) -> JSONResponse:
+    groups.create_group(data.name, data.uuid)
+    return api_response(True)
+
 
 
 uvicorn.run(api, host="0.0.0.0", port=50500)

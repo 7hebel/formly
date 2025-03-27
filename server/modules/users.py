@@ -16,6 +16,14 @@ DB.execute("""
         trusted_ip STRING
     )
 """)
+DB.execute("""
+    CREATE TABLE IF NOT EXISTS invitations (
+        user_uuid STRING NOT NULL,
+        group_id STRING NOT NULL,
+        PRIMARY KEY (user_uuid, group_id),
+        FOREIGN KEY (user_uuid) REFERENCES users(user_uuid) ON DELETE CASCADE
+    )        
+""")
 
 
 def is_email_used(email: str) -> bool:
@@ -26,8 +34,8 @@ def hash_ip(raw_ip: str) -> str:
     return hashlib.sha1(raw_ip.encode()).hexdigest()
 
 
-
 User = namedtuple("User", ["uuid", "fullname", "email", "password", "trusted_ip"])
+
 
 def get_user_by_uuid(user_id: str) -> User | None:
     DB.execute(f"SELECT * FROM users WHERE uuid='{user_id}'")    
@@ -93,4 +101,3 @@ def update_password(user_uuid: str, new_raw_password: str, current_password: str
     encrypted_password = bcrypt.hashpw(new_raw_password.encode(), bcrypt.gensalt()).decode()
     DB.execute(f"UPDATE users SET password=? WHERE uuid=?", (encrypted_password, user_uuid))
     
-

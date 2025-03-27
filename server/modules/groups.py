@@ -139,3 +139,23 @@ def get_group_details(group_id: str, user_uuid: str) -> dict:
         "managers": managers,
         "members": members
     }
+    
+# Invitations
+
+def add_group_invitation(user_uuid: str, group_id: str) -> bool | str:
+    if users.get_user_by_uuid(user_uuid) is None:
+        return "User not found."
+
+    users.DB.execute("INSERT INTO invitations (user_uuid, group_id) VALUES (?, ?)", (user_uuid, group_id))
+    users.db_conn.commit()
+    return True
+
+def delete_group_invitation(user_uuid: str, group_id: str) -> None:
+    users.DB.execute("DELETE FROM invitations WEHRE user_uuid=? AND group_id=?", (user_uuid, group_id))
+    users.db_conn.commit()
+    return True
+
+def get_user_group_invitations(user_uuid: str) -> list[list[str, str]]:
+    users.DB.execute("SELECT * FROM invitations WHERE user_uuid=?", (user_uuid))
+    invitations = users.DB.fetchall()
+    return invitations

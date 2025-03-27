@@ -1,11 +1,12 @@
 import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { PrimaryButton, SecondaryButton, TertiaryButton, DangerButton } from '../ui/Button.jsx';
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
+import { Modal } from '../ui/Modal.jsx';
 import DashboardCategorySwitcher from '../components/dashCategorySwitcher.jsx'
 import FormBrief from '../components/FormBrief.jsx'
 import GroupView from '../components/GroupView.jsx'
 import { useNavigate } from 'react-router-dom';
-import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle, Mail, Check, X } from 'lucide-react';
+import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle, Mail, Check, X, CodeSquare } from 'lucide-react';
 import { ErrorLabel } from "../ui/ErrorLabel.jsx"
 import { useEffect, useRef, useState } from 'react';
 import './styles/dashboard.css'
@@ -170,11 +171,37 @@ export default function Dashboard() {
     document.getElementById("group-" + groupId).setAttribute("selected", "1");
   }
 
+  function onGroupCreate() {
+    const name = document.getElementById("new-group-name");
+    if (!name.value || !name.validity.valid) return;
+
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        name: name.value
+      })
+    };
+    
+    fetch(import.meta.env.VITE_API_URL + "/groups/create", requestOptions)
+    .then(response => response.json())
+    .then(response => {
+      if (response.status) {
+        console.log("Created group ", name.value);
+        navigate("/");
+      }
+    })
+  }
+
   const formsViewRef = useRef(0);
   const groupsViewRef = useRef(0);
   const accountViewRef = useRef(0);
   let [selectedGroup, setSelectedGroup] = useState(null);
   let [selectedGropName, setSelectedGroupName] = useState("-");
+
+  const [isAddGroupOpen, setAddGroupOpen] = useState(false);
+
 
   return (
     <main className='dash'>
@@ -259,10 +286,20 @@ export default function Dashboard() {
               <div className='my-groups-container'>
                 <div className='my-groups-header'>
                   <h1>My groups</h1>
-                  <PrimaryButton>
-                    <PlusCircle/>
-                    Add
+                  <PrimaryButton onClick={() => {setAddGroupOpen(true)}}>
+                    <PlusCircle/>New
                   </PrimaryButton>
+                  {
+                    isAddGroupOpen && (
+                      <Modal title="Create group" close={setAddGroupOpen}>
+                        <InputGroup>
+                          <InputLabel>Group name</InputLabel>
+                          <Input id="new-group-name" minlen={3}></Input>
+                        </InputGroup>
+                        <PrimaryButton wide onClick={onGroupCreate}><PlusCircle/>Create</PrimaryButton>
+                      </Modal>
+                    )
+                  }
                 </div>
                 <div className='hzSepStrong'></div>
                 <div className='my-groups'>

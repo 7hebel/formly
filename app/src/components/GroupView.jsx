@@ -3,6 +3,8 @@ import { ClipboardList, Users, Bolt, Trash2, Settings, DoorOpen, Edit3, Mail } f
 import FormBrief from './FormBrief.jsx';
 import '../pages/styles/dashboard.css'
 import { Input, InputGroup, InputLabel } from '../ui/Input.jsx';
+import { Modal } from '../ui/Modal.jsx';
+
 
 
 function GroupMember({ name, memberUUID, isMemberManager, isUserManager }) {
@@ -51,10 +53,7 @@ export default function GroupView({ groupId=null }) {
 
   return (
     <div className="group-view-container">
-      <h2>
-        <ClipboardList/>
-        Forms
-      </h2>
+      <h2><ClipboardList/>Forms</h2>
       <div className='group-view-forms-container'>
         {
           assignedForms.map(formId => {
@@ -68,30 +67,23 @@ export default function GroupView({ groupId=null }) {
         }
       </div>
       
-      <h2>
-        <Users/>
-        Members ({members.length + managers.length})
-      </h2>
+      <h2><Users/>Members ({members.length + managers.length})</h2>
       <div className='group-view-forms-container'>
         {
           managers.map(memberData => {
             let [memberName, memberUUID] = memberData;
-            return (<GroupMember name={memberName} memberUUID={memberUUID} isMemberManager={true} isUserManager={isManager}></GroupMember>)
+            return (<GroupMember name={memberName} memberUUID={memberUUID} isMemberManager={true} isUserManager={isManager} key={memberUUID}></GroupMember>)
           })
         }
         {
           members.map(memberData => {
             let [memberName, memberUUID] = memberData;
-            return (<GroupMember name={memberName} memberUUID={memberUUID} isMemberManager={false} isUserManager={isManager}></GroupMember>)
+            return (<GroupMember name={memberName} memberUUID={memberUUID} isMemberManager={false} isUserManager={isManager} key={memberUUID}></GroupMember>)
           })
         }
       </div>
 
-
-      <h2>
-        <Settings/>
-        Manage
-      </h2>
+      <h2><Settings/>Manage</h2>
       <div className='group-view-management-container'>
         {
           isManager && (
