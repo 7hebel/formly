@@ -3,10 +3,11 @@ import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import DashboardCategorySwitcher from '../components/dashCategorySwitcher.jsx'
 import FormBrief from '../components/FormBrief.jsx'
+import GroupView from '../components/GroupView.jsx'
 import { useNavigate } from 'react-router-dom';
-import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, UserPen } from 'lucide-react';
+import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle } from 'lucide-react';
 import { ErrorLabel } from "../ui/ErrorLabel.jsx"
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './styles/dashboard.css'
 
 
@@ -158,9 +159,18 @@ export default function Dashboard() {
     });
   }
 
+  function switchGroup(name, groupId) {
+    setSelectedGroupName(name);
+    setSelectedGroup(groupId);
+    document.querySelectorAll(".my-group").forEach(group => {group.setAttribute("selected", "0")})
+    document.getElementById("group-" + groupId).setAttribute("selected", "1");
+  }
+
   const formsViewRef = useRef(0);
   const groupsViewRef = useRef(0);
   const accountViewRef = useRef(0);
+  let [selectedGroup, setSelectedGroup] = useState(null);
+  let [selectedGropName, setSelectedGroupName] = useState("");
 
   return (
     <main className='dash'>
@@ -241,7 +251,41 @@ export default function Dashboard() {
           </div>
 
           <div className='dash-category-content' ref={groupsViewRef} active="0">
-            groups...
+            <div className='groups-category-container'>
+              <div className='my-groups-container'>
+                <div className='my-groups-header'>
+                  <h1>My groups</h1>
+                  <PrimaryButton>
+                    <PlusCircle/>
+                    Add
+                  </PrimaryButton>
+                </div>
+                <div className='hzSepStrong'></div>
+                <div className='my-groups'>
+
+                  <div onClick={() => {switchGroup('Group name test abc', '1')}} className='my-group' id='group-1' selected="0">
+                    <h3>Group name test abc</h3>
+                    <ChevronRightCircle/>
+                  </div>
+                  <div className='hzSepMid'></div>
+                  <div onClick={() => {switchGroup('Another group name', '2')}} className='my-group' id='group-2' selected="1">
+                    <h3>Another group name</h3>
+                    <ChevronRightCircle/>
+                  </div>
+                  <div className='hzSepMid'></div>
+                  <div onClick={() => {switchGroup('Long long long long long long long long long group name', '3')}} className='my-group' id='group-3' selected="0">
+                    <h3>Long long long long long long long long long group name</h3>
+                    <ChevronRightCircle/>
+                  </div>
+
+                </div>
+              </div>
+              <div className='group-details'>
+                <h1>{selectedGropName}</h1>
+                <div className='hzSepStrong'></div>
+                <GroupView groupId={selectedGroup}/>
+              </div>
+            </div>
           </div>
 
           <div className='dash-category-content' ref={accountViewRef} active="0">
