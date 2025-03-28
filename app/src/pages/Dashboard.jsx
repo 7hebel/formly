@@ -396,7 +396,7 @@ export default function Dashboard() {
               <div className='group-details'>
                 <h1>{selectedGroupName}</h1>
                 <div className='hzSepStrong'></div>
-                <GroupView groupNameSetter={(name) => {setSelectedGroupName(name); fetchGroups()}} groupId={selectedGroup}/>
+                <GroupView refreshPanel={fetchGroups} groupNameSetter={(name) => {setSelectedGroupName(name); fetchGroups()}} groupId={selectedGroup}/>
               </div>
             </div>
           </div>

@@ -40,8 +40,13 @@ def delete_group(group_id: str, deleter_uuid: str) -> str | bool:
     with open(group_file_path, "r") as file:
         content = json.load(file)
     
-    if content["owner_id"] != deleter_uuid:
+    if content["owner_uuid"] != deleter_uuid:
         return "Only a group owner can delete group."
+    
+    for user_uuid in content["members"]:
+        users.remove_group_from_user_list(user_uuid, group_id)
+    for user_uuid in content["managers"]:
+        users.remove_group_from_user_list(user_uuid, group_id)
 
     os.remove(group_file_path)
     return True
@@ -60,18 +65,13 @@ def remove_member_from_group(group_id: str, user_uuid: str) -> bool:
     if user_uuid not in content["members"] and user_uuid not in content["managers"]:
         return False
     
+    if user_uuid == content["owner_uuid"]:
+        return delete_group(group_id, user_uuid)
+        
     if user_uuid in content["members"]:
         content["members"].remove(user_uuid)
     if user_uuid in content["managers"]:
         content["managers"].remove(user_uuid)
-    
-    if user_uuid == content["owner_id"]:
-        if content["managers"]:
-            content["owner_id"] = content["managers"][0]
-        elif content["members"]:
-            content["owner_id"] = content["members"][0]
-        else:
-            return delete_group(group_id, user_uuid)
     
     _save_group_content(group_id, content)
     return True
@@ -80,7 +80,7 @@ def remove_member_from_group(group_id: str, user_uuid: str) -> bool:
 def promote_group_member(group_id: str, promoted_uuid: str, promoter_uuid: str) -> bool | str:
     content = _get_group_content(group_id)
 
-    if promoted_uuid in content["managers"]:
+    if promoted_uuid in content["managers"] or promoter_uuid == content["owner_uuid"]:
         return "Promoted member is already a manager."
     if promoted_uuid not in content["members"]:
         return "Promoted member not found in group."

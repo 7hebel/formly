@@ -29,20 +29,21 @@ class PasswordUpdateSchema(ProtectedModel):
 
 #  Groups.
 
+class GroupIdSchema(ProtectedModel):
+    group_id: str
+
 class GroupCreateSchema(ProtectedModel):
     name: str
-
-class FetchGroupSchema(ProtectedModel):
-    group_id: str
 
 class GroupInviteSchema(ProtectedModel):
     invite_email: str
     group_id: str
 
-class GroupInviteStateSchema(ProtectedModel):
-    group_id: str
-    
 class GroupRenameSchema(ProtectedModel):
     group_id: str
     new_name: str
+    
+class KickMemberSchema(ProtectedModel):
+    group_id: str
+    member_uuid: str
     

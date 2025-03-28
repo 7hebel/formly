@@ -89,7 +89,7 @@ def protect_group_endpoint(manager_only: bool = False, owner_only: bool = False)
 
 @api.post("/api/register")
 async def post_register(data: schemas.RegisterSchema, request: Request) -> JSONResponse:
-    user = users.register_user(data.fullname, data.email, data.password, request.client.host)
+    user = users.register_user(data.fullname, data.email.lower(), data.password, request.client.host)
     if isinstance(user, str):
         return api_response(False, err_msg=user)
     
@@ -97,7 +97,7 @@ async def post_register(data: schemas.RegisterSchema, request: Request) -> JSONR
 
 @api.post("/api/login")
 async def post_login(data: schemas.LoginSchema, request: Request) -> JSONResponse:
-    user = users.get_user_by_email(data.email)
+    user = users.get_user_by_email(data.email.lower())
     if user is None:
         return api_response(False, err_msg="There is no registered user with this email.")
     
@@ -144,7 +144,7 @@ async def post_account_update_fullname(data: schemas.FullnameUpdateSchema, reque
 @api.post("/api/account-update/email")
 @protected_endpoint
 async def post_account_update_email(data: schemas.EmailUpdateSchema, request: Request) -> JSONResponse:
-    status = users.update_email(data.uuid, data.email)
+    status = users.update_email(data.uuid, data.email.lower())
     if isinstance(status, str):
         return api_response(False, err_msg=status)
     return api_response(True)
@@ -182,7 +182,7 @@ async def post_fetch_my_groups(data: schemas.ProtectedModel, request: Request) -
 @api.post("/api/groups/fetch")
 @protected_endpoint
 @protect_group_endpoint()
-async def post_fecth_group(data: schemas.FetchGroupSchema, request: Request) -> JSONResponse:
+async def post_fecth_group(data: schemas.GroupIdSchema, request: Request) -> JSONResponse:
     group_data = groups.get_group_details(data.group_id, data.uuid)
     return api_response(True, group_data)
 
@@ -203,7 +203,7 @@ async def post_group_invite(data: schemas.GroupInviteSchema, request: Request) -
 @api.post("/api/groups/accept-invite")
 @protected_endpoint
 @protect_group_endpoint()
-async def post_accept_invite(data: schemas.GroupInviteStateSchema, request: Request) -> JSONResponse:
+async def post_accept_invite(data: schemas.GroupIdSchema, request: Request) -> JSONResponse:
     if not groups.is_user_invited(data.uuid, data.group_id):
         return api_response(False, err_msg="You are not invited :(")
 
@@ -215,7 +215,7 @@ async def post_accept_invite(data: schemas.GroupInviteStateSchema, request: Requ
 @api.post("/api/groups/reject-invite")
 @protected_endpoint
 @protect_group_endpoint()
-async def post_reject_invite(data: schemas.GroupInviteStateSchema, request: Request) -> JSONResponse:
+async def post_reject_invite(data: schemas.GroupIdSchema, request: Request) -> JSONResponse:
     if not groups.is_user_invited(data.uuid, data.group_id):
         return api_response(False, err_msg="You are not invited :(")
     
@@ -227,6 +227,22 @@ async def post_reject_invite(data: schemas.GroupInviteStateSchema, request: Requ
 @protect_group_endpoint(manager_only=True)
 async def post_group_rename(data: schemas.GroupRenameSchema, request: Request) -> JSONResponse:
     groups.rename_group(data.group_id, data.new_name)
+    return api_response(True)
+
+@api.post("/api/groups/leave")
+@protected_endpoint
+@protect_group_endpoint()
+async def post_leave_group(data: schemas.GroupIdSchema, request: Request) -> JSONResponse:
+    groups.remove_member_from_group(data.group_id, data.uuid)
+    users.remove_group_from_user_list(data.uuid, data.group_id)
+    return api_response(True)
+
+@api.post("/api/groups/kick")
+@protected_endpoint
+@protect_group_endpoint(manager_only=True)
+async def post_kick_member(data: schemas.KickMemberSchema, request: Request) -> JSONResponse:
+    groups.remove_member_from_group(data.group_id, data.member_uuid)
+    users.remove_group_from_user_list(data.member_uuid, data.group_id)
     return api_response(True)
 
 

@@ -74,6 +74,7 @@ def register_user(fullname: str, email: str, raw_password: str, user_ip: str) ->
 
 def set_trusted_ip(user_uuid: str, raw_ip: str) -> None:
     DB.execute(f"UPDATE users SET trusted_ip=? WHERE uuid=?", (hash_ip(raw_ip), user_uuid))
+    db_conn.commit()
 
 
 def validate_password(user_uuid: str, raw_password: str) -> bool:
@@ -99,6 +100,7 @@ def logout(user_uuid: str) -> None:
 
 def update_fullname(user_uuid: str, new_name: str) -> None:
     DB.execute(f"UPDATE users SET fullname=? WHERE uuid=?", (new_name, user_uuid))
+    db_conn.commit()
     
 
 def update_email(user_uuid: str, new_email: str) -> bool | str:
@@ -106,6 +108,7 @@ def update_email(user_uuid: str, new_email: str) -> bool | str:
         return "This email is already used by another user."
     
     DB.execute(f"UPDATE users SET email=? WHERE uuid=?", (new_email, user_uuid))
+    db_conn.commit()
     return True
     
 
@@ -115,6 +118,7 @@ def update_password(user_uuid: str, new_raw_password: str, current_password: str
     
     encrypted_password = bcrypt.hashpw(new_raw_password.encode(), bcrypt.gensalt()).decode()
     DB.execute(f"UPDATE users SET password=? WHERE uuid=?", (encrypted_password, user_uuid))
+    db_conn.commit()
     
 
 def add_group_to_user_list(user_uuid: str, group_id: str) -> None:
@@ -125,4 +129,10 @@ def add_group_to_user_list(user_uuid: str, group_id: str) -> None:
 
 
 def remove_group_from_user_list(user_uuid: str, group_id: str) -> None:
-    pass
+    user = get_user_by_uuid(user_uuid)
+    user_groups = user.groups.split("|")
+    new_groups = list(filter(lambda g_id: g_id != group_id, user_groups))
+    new_groups_list = "|".join(new_groups)
+    DB.execute("UPDATE users SET groups=? WHERE uuid=?", (new_groups_list, user.uuid))
+    db_conn.commit()
+    

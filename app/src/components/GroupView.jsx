@@ -1,14 +1,14 @@
 import { DangerButton, PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
 import { ClipboardList, Users, Bolt, Trash2, Settings, DoorOpen, Edit3, Mail } from 'lucide-react';
-import FormBrief from './FormBrief.jsx';
-import '../pages/styles/dashboard.css'
 import { Input, InputGroup, InputLabel } from '../ui/Input.jsx';
-import { Modal } from '../ui/Modal.jsx';
-import { useState, useEffect } from 'react';
 import { ErrorLabel } from '../ui/ErrorLabel.jsx';
+import { useState, useEffect } from 'react';
+import FormBrief from './FormBrief.jsx';
+import { Modal } from '../ui/Modal.jsx';
+import '../pages/styles/dashboard.css'
 
 
-function GroupMember({ name, memberUUID, isMemberManager, isUserManager }) {
+function GroupMember({ name, memberUUID, isMemberManager, isUserManager, onKick }) {
   const isSelf = memberUUID == String(localStorage.getItem("uuid"));
   
   return (
@@ -25,7 +25,7 @@ function GroupMember({ name, memberUUID, isMemberManager, isUserManager }) {
                 <Bolt color='var(--color-primary-muted)' />
               )
             }
-            <Trash2 color='red'/>
+            <Trash2 color='red' onClick={() => {onKick(memberUUID)}}/>
           </div>
         )
       }
@@ -33,7 +33,7 @@ function GroupMember({ name, memberUUID, isMemberManager, isUserManager }) {
   )
 }
 
-export default function GroupView({ groupNameSetter, groupId=null }) {
+export default function GroupView({ refreshPanel, groupNameSetter, groupId=null }) {
   if (!groupId) return <></>
 
   const [groupData, setGroupData] = useState([]);
@@ -41,31 +41,32 @@ export default function GroupView({ groupNameSetter, groupId=null }) {
   const [invitationOpen, setInvitationOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
 
+  const fetchGroupData = async () => {
+    try {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uuid: String(localStorage.getItem("uuid")),
+          group_id: groupId
+        }),
+      };
+
+      const response = await fetch(import.meta.env.VITE_API_URL + "/groups/fetch", requestOptions);
+      const data = await response.json();
+
+      if (data.status) setGroupData(data.data);
+    } catch (error) {
+      console.error("Error fetching group:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const requestOptions = {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            uuid: String(localStorage.getItem("uuid")),
-            group_id: groupId
-          }),
-        };
-
-        const response = await fetch(import.meta.env.VITE_API_URL + "/groups/fetch", requestOptions);
-        const data = await response.json();
-
-        if (data.status) setGroupData(data.data);
-      } catch (error) {
-        console.error("Error fetching group:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchGroups();
+    fetchGroupData();
   }, [groupId]);
+
 
   async function onInviteSend() {
     const email = document.getElementById("invite-email");
@@ -121,21 +122,50 @@ export default function GroupView({ groupNameSetter, groupId=null }) {
     setRenameOpen(false);
   }
 
-  if (loading) return <p>Loading...</p>;
+  async function onGroupLeave() {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        group_id: groupId,
+      }),
+    };
+
+    await fetch(import.meta.env.VITE_API_URL + "/groups/leave", requestOptions);
+    setLoading(true);
+    refreshPanel();
+  }
+
+  async function onKick(memberUUID) {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        group_id: groupId,
+        member_uuid: memberUUID
+      }),
+    };
+
+    await fetch(import.meta.env.VITE_API_URL + "/groups/kick", requestOptions);
+    setLoading(true);
+    await fetchGroupData()
+  }
+
+  if (loading) return <></>;
   
   return (
     <div className="group-view-container">
       <h2><ClipboardList/>Forms</h2>
       <div className='group-view-forms-container'>
         {
-          groupData.assigned_forms.map(formId => {
-            return (<FormBrief isAssigned formId={formId} key={formId}></FormBrief>)
-          })
+          groupData.assigned_forms.map(formId => (<FormBrief isAssigned formId={formId} key={formId}></FormBrief>))
         }
         {
-          groupData.draft_forms.map(formId => {
-            return groupData.is_manager && (<FormBrief isMyForm formId={formId} key={formId}></FormBrief>)
-          })
+          groupData.draft_forms.map(formId => (
+            groupData.is_manager && (<FormBrief isMyForm formId={formId} key={formId}></FormBrief>)
+          ))
         }
       </div>
       
@@ -144,13 +174,31 @@ export default function GroupView({ groupNameSetter, groupId=null }) {
         {
           groupData.managers.map(memberData => {
             let [memberName, memberUUID] = memberData;
-            return (<GroupMember name={memberName} memberUUID={memberUUID} isMemberManager={true} isUserManager={groupData.is_manager} key={memberUUID}></GroupMember>)
+            return (
+              <GroupMember
+                name={memberName}
+                memberUUID={memberUUID}
+                isMemberManager={true} 
+                isUserManager={groupData.is_manager} 
+                key={memberUUID}
+                onKick={onKick}
+              ></GroupMember>
+            )
           })
         }
         {
           groupData.members.map(memberData => {
             let [memberName, memberUUID] = memberData;
-            return (<GroupMember name={memberName} memberUUID={memberUUID} isMemberManager={false} isUserManager={groupData.is_manager} key={memberUUID}></GroupMember>)
+            return (
+              <GroupMember
+                name={memberName}
+                memberUUID={memberUUID}
+                isMemberManager={false}
+                isUserManager={groupData.is_manager}
+                key={memberUUID}
+                onKick={onKick}
+              ></GroupMember>
+            )
           })
         }
       </div>
@@ -197,13 +245,14 @@ export default function GroupView({ groupNameSetter, groupId=null }) {
           )
         }
         <div className='row'>
-          <DangerButton>
-            <DoorOpen/>Leave group
-          </DangerButton>
           {
-            groupData.is_owner && (
-              <DangerButton>
+            (groupData.is_owner) ? (
+              <DangerButton onClick={onGroupLeave}>
                 <Trash2/>Remove group
+              </DangerButton>
+            ) : (
+              <DangerButton onClick={onGroupLeave}>
+                <DoorOpen/>Leave group
               </DangerButton>
             )
           }
