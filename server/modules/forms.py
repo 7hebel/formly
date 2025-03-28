@@ -27,7 +27,7 @@ Saved form format:
 """
 
 
-def insert_form(author_uuid: str, structure: list[list[dict]], settings: dict) -> str:
+def create_form(author_uuid: str, structure: list[list[dict]], settings: dict) -> str:
     form_id = uuid.uuid4().hex
     form_filepath = f"./data/forms/{form_id}.json"
 

@@ -3,10 +3,12 @@ import os
 if not os.path.exists("./data/"): os.mkdir("./data/")
 if not os.path.exists("./data/forms"): os.mkdir("./data/forms/")
 if not os.path.exists("./data/groups"): os.mkdir("./data/groups/")
+if not os.path.exists("./data/logs"): os.mkdir("./data/logs/")
 
 from modules import schemas
 from modules import groups
 from modules import users
+from modules import logs
 
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -14,6 +16,9 @@ from fastapi import Request
 from functools import wraps
 import fastapi
 import uvicorn
+
+
+groups._purge_blank_groups()
 
 
 api = fastapi.FastAPI()
@@ -28,7 +33,7 @@ api.add_middleware(
 
 def api_response(success: bool, data: str | dict | list | None = None, err_msg: str | None = None) -> JSONResponse:
     if not success:
-        print(f"API: {err_msg}")
+        logs.error("API", f"Sending unsuccesful response: `{err_msg}`")
     
     status_code = 200 if success else 400
     return JSONResponse({
@@ -83,6 +88,7 @@ def protect_group_endpoint(manager_only: bool = False, owner_only: bool = False)
             return await endpoint_fn(*args, **kwargs)
         return wrapper
     return protect 
+
 
 
 # Login / Register
