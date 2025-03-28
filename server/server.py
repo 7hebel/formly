@@ -7,6 +7,7 @@ if not os.path.exists("./data/logs"): os.mkdir("./data/logs/")
 
 from modules import schemas
 from modules import groups
+from modules import forms
 from modules import users
 from modules import logs
 
@@ -84,6 +85,30 @@ def protect_group_endpoint(manager_only: bool = False, owner_only: bool = False)
                 
             if owner_only and user.uuid != group_content.get("owner_uuid"):
                 return api_response(False, err_msg=f"Validation failed: called owner-only group endpoint as non-owner. Group: `{group_id}` User: `{uuid}`")
+        
+            return await endpoint_fn(*args, **kwargs)
+        return wrapper
+    return protect 
+
+
+def protect_form_endpoint(author_only: bool = False):
+    def protect(endpoint_fn):
+        @wraps(endpoint_fn)
+        async def wrapper(*args, **kwargs):
+            data = kwargs.get("data")
+            uuid = data.uuid if data else kwargs.get("uuid")
+            form_id = data.form_id if data else kwargs.get("form_id")
+
+            user = users.get_user_by_uuid(uuid)
+            if user is None:
+                return api_response(False, err_msg=f"Validation failed: provided invalid uuid: `{uuid}` to protected form endpoint.")
+        
+            form = forms._get_form_content(form_id)
+            if form is None:
+                return api_response(False, err_msg=f"Validation failed: provided invalid form-id: `{form_id}` to protected form endpoint.")
+        
+            if author_only and form["author_uuid"] != user.uuid:
+                return api_response(False, err_msg=f"Validation failed: called author-only form endpoint as non-author. Form: `{form_id}` User: `{uuid}`")
         
             return await endpoint_fn(*args, **kwargs)
         return wrapper
@@ -270,6 +295,30 @@ async def post_demote_member(data: schemas.GroupMemberSchema, request: Request) 
     status = groups.demote_group_member(data.group_id, data.member_uuid, data.uuid)
     if isinstance(status, str):
         return api_response(False, err_msg=status)
+    return api_response(True)
+
+
+
+# Forms.
+
+@api.post("/api/forms/create")
+@protected_endpoint
+async def post_create_form(data: schemas.ProtectedModel, request: Request) -> JSONResponse:
+    form_id = forms.create_form(data.uuid)
+    return api_response(True, form_id)
+
+@api.post("/api/forms/fetch-form")
+@protected_endpoint
+@protect_form_endpoint()
+async def post_fetch_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
+    form_content = forms._get_form_content(data.form_id)
+    return api_response(True, form_content)
+
+@api.post("/api/forms/update-form")
+@protected_endpoint
+@protect_form_endpoint(author_only=True)
+async def post_update_form(data: schemas.UpdateFormSchema, request: Request) -> JSONResponse:
+    forms.update_form(data.form_id, data.settings, data.structure)
     return api_response(True)
 
 

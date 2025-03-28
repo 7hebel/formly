@@ -5,7 +5,7 @@ import { Modal } from '../ui/Modal.jsx';
 import DashboardCategorySwitcher from '../components/dashCategorySwitcher.jsx'
 import FormBrief from '../components/FormBrief.jsx'
 import GroupView from '../components/GroupView.jsx'
-import { useNavigate } from 'react-router-dom';
+import { data, useNavigate } from 'react-router-dom';
 import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle, Mail, Check, X, CodeSquare } from 'lucide-react';
 import { ErrorLabel } from "../ui/ErrorLabel.jsx"
 import { useEffect, useRef, useState } from 'react';
@@ -287,6 +287,27 @@ export default function Dashboard() {
     })
   }
 
+  function onCreateForm() {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid"))
+      })
+    };
+    
+    fetch(import.meta.env.VITE_API_URL + "/forms/create", requestOptions)
+    .then(response => response.json())
+    .then(response => {
+      if (response.status) {
+        const formId = response.data;
+        navigate("/builder/" + formId);
+      } else {
+        displayMessage(response.err_msg);
+      }
+    })
+  }
+
   const formsViewRef = useRef(0);
   const groupsViewRef = useRef(0);
   const accountViewRef = useRef(0);
@@ -363,7 +384,7 @@ export default function Dashboard() {
             <div className='dash-forms-category-container'>
               <h1>
                 My forms:
-                <PrimaryButton>
+                <PrimaryButton onClick={onCreateForm}>
                   <ClipboardPlus/>Create
                 </PrimaryButton>
               </h1>

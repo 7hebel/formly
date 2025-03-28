@@ -50,7 +50,7 @@ function App() {
         <Route path="/login" element={<LoginPanel />} />
         <Route path="/register" element={<RegisterPanel />}/>
         <Route path="/dash" element={<Dashboard />}/>
-        <Route path="/builder" element={<FormBuilder />}/>
+        <Route path="/builder/:formId" element={<FormBuilder />}/>
         </Routes>
       </BrowserRouter>
     </StrictMode>

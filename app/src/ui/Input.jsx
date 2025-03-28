@@ -11,7 +11,7 @@ export function InputLabel({ children }) {
   )
 }
 
-export function Input({ id, type="text", placeholder, pattern, minlen, maxlen, onChange }) {
+export function Input({ id, type="text", placeholder, value, pattern, minlen, maxlen, onChange }) {
   if (pattern==null && type=="number") pattern = "[\d]"
   
   return (
@@ -24,6 +24,7 @@ export function Input({ id, type="text", placeholder, pattern, minlen, maxlen, o
       minLength={minlen}
       maxLength={maxlen}
       onChange={onChange}
+      defaultValue={value}
       >
     </input>
   )

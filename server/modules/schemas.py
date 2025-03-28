@@ -46,3 +46,16 @@ class GroupInviteSchema(ProtectedModel):
 class GroupRenameSchema(ProtectedModel):
     group_id: str
     new_name: str
+    
+
+# Forms.
+
+class FormIdSchema(ProtectedModel):
+    form_id: str
+    
+class UpdateFormSchema(ProtectedModel):
+    form_id: str
+    settings: dict
+    structure: list
+    
+    
