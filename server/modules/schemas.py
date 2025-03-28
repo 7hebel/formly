@@ -34,3 +34,10 @@ class GroupCreateSchema(ProtectedModel):
 
 class FetchGroupSchema(ProtectedModel):
     group_id: str
+
+class GroupInviteSchema(ProtectedModel):
+    invite_email: str
+    group_id: str
+
+class GroupInviteStateSchema(ProtectedModel):
+    group_id: str

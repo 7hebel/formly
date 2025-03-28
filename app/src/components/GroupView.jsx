@@ -5,6 +5,7 @@ import '../pages/styles/dashboard.css'
 import { Input, InputGroup, InputLabel } from '../ui/Input.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useState, useEffect } from 'react';
+import { ErrorLabel } from '../ui/ErrorLabel.jsx';
 
 
 function GroupMember({ name, memberUUID, isMemberManager, isUserManager }) {
@@ -33,10 +34,11 @@ function GroupMember({ name, memberUUID, isMemberManager, isUserManager }) {
 }
 
 export default function GroupView({ groupId=null }) {
-  if (groupId==null) return <></>
+  if (!groupId) return <></>
 
   const [groupData, setGroupData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [invitationOpen, setInvitationOpen] = useState(false);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -53,7 +55,6 @@ export default function GroupView({ groupId=null }) {
         const response = await fetch(import.meta.env.VITE_API_URL + "/groups/fetch", requestOptions);
         const data = await response.json();
 
-        console.log(data)
         if (data.status) setGroupData(data.data);
       } catch (error) {
         console.error("Error fetching group:", error);
@@ -63,7 +64,41 @@ export default function GroupView({ groupId=null }) {
     };
 
     fetchGroups();
-  }, []);
+  }, [groupId]);
+
+  async function onInviteSend() {
+    const email = document.getElementById("invite-email");
+    const errorLabel = document.getElementById("invite-email-error");
+    if (!email.value || !email.validity.valid) {
+      errorLabel.textContent = "Invalid email.";
+      errorLabel.setAttribute("iserror", "1");
+      return;
+    };
+    
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        invite_email: email.value,
+        group_id: groupId,
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/groups/invite", requestOptions);
+    const data = await response.json();
+
+    if (data.status) {
+      errorLabel.setAttribute("iserror", "1");
+      errorLabel.textContent = "Invited " + data.data + " (TODO: change this msg)";
+      email.value = "";
+
+    } else {
+      errorLabel.textContent = data.err_msg;
+      errorLabel.setAttribute("iserror", "1");
+    }
+    
+  }
 
   if (loading) return <p>Loading...</p>;
   
@@ -105,14 +140,22 @@ export default function GroupView({ groupId=null }) {
           groupData.is_manager && (
             <>
               <div className='row'>
-                <InputGroup>
-                  <InputLabel>Send invitation</InputLabel>
-                  <Input type="email" id="invite-email" placeholder="user@email.com" minlen={3}></Input>
-                  <TertiaryButton>
-                    <Mail/>
-                    Invite
-                  </TertiaryButton>
-                </InputGroup>
+                <SecondaryButton onClick={() => {setInvitationOpen(true)}}>
+                  <Mail/>Invite members
+                </SecondaryButton>
+                {
+                  invitationOpen && (
+                    <Modal title="Invite member" close={setInvitationOpen}>
+                      <InputGroup>
+                        <InputLabel>Send invitation</InputLabel>
+                        <Input type="email" id="invite-email" placeholder="user@email.com" minlen={3}></Input>
+                      </InputGroup>
+                      <PrimaryButton wide onClick={onInviteSend}><Mail/>Invite</PrimaryButton>
+                      <ErrorLabel id='invite-email-error'></ErrorLabel>
+                    </Modal>
+                  )
+                }
+
                 <InputGroup>
                   <InputLabel>Rename group</InputLabel>
                   <Input type="text" id="new-group-name" placeholder="Fantastic group" minlen={3}></Input>
@@ -143,9 +186,5 @@ export default function GroupView({ groupId=null }) {
       </div>
     </div>
   )
-
-
-
-
 }
 

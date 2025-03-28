@@ -346,6 +346,7 @@
     border-radius: 6px;
     border: 1px solid var(--color-primary);
     box-shadow: 0px 18px 80px -44px var(--color-primary-muted);
+    margin-bottom: 12px;
 }
 
 .group-invitation > h4 {

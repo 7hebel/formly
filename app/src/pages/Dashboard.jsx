@@ -12,13 +12,55 @@ import { useEffect, useRef, useState } from 'react';
 import './styles/dashboard.css'
 
 
-function MyGroupsPanel({ groups, onSwitchGroup }) {
+function MyGroupsPanel({ refreshPanel, groups, onSwitchGroup }) {
   if (!groups) return <p>Loading...</p>;
   
+  async function onInviteAccept(groupId) {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        group_id: groupId,
+      }),
+    };
+
+    await fetch(import.meta.env.VITE_API_URL + "/groups/accept-invite", requestOptions);
+    refreshPanel();
+  }
+  
+  async function onInviteReject(groupId) {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        group_id: groupId,
+      }),
+    };
+
+    await fetch(import.meta.env.VITE_API_URL + "/groups/reject-invite", requestOptions);
+    refreshPanel();
+  }
+
   return (
     <>
       {
-        groups.map(([group_id, group_name], index) => {
+        groups.invites.map(([group_id, group_name], index) => {
+          return (
+            <div className='group-invitation' key={group_id}>
+              <small><Mail/>Invite</small>
+              <h4>{group_name}</h4>
+              <div className='row'>
+                <PrimaryButton wide onClick={() => {onInviteAccept(group_id)}}><Check/>Join</PrimaryButton>
+                <DangerButton wide onClick={() => {onInviteReject(group_id)}}><X/>Reject</DangerButton>
+              </div>
+            </div>
+          )
+        })
+      }
+      {
+        groups.groups.map(([group_id, group_name], index) => {
           return (
             <div key={group_id}>
               <div 
@@ -231,7 +273,7 @@ export default function Dashboard() {
   const accountViewRef = useRef(0);
   let [selectedGroup, setSelectedGroup] = useState(null);
   let [selectedGropName, setSelectedGroupName] = useState("-");
-  let [groups, setGroups] = useState(null);
+  let [groups, setMyGroups] = useState(null);
 
   const [isAddGroupOpen, setAddGroupOpen] = useState(false);
 
@@ -247,7 +289,7 @@ export default function Dashboard() {
     const response = await fetch(import.meta.env.VITE_API_URL + "/groups/my-groups", requestOptions);
     const data = await response.json();
 
-    if (data.status) setGroups(data.data);
+    if (data.status) setMyGroups(data.data);
   };
   useEffect(() => {fetchGroups()}, []);
 
@@ -352,26 +394,7 @@ export default function Dashboard() {
                 </div>
                 <div className='hzSepStrong'></div>
                 <div className='my-groups'>
-
-                  {/* <div className='group-invitation'>
-                    <small>
-                      <Mail/>
-                      Invite
-                    </small>
-                    <h4>Some group awjdiawoi iojaw diojwd aowija awdoijadoijwdaj doij dawj</h4>
-                    <div className='row'>
-                      <PrimaryButton wide>
-                        <Check/>
-                        Join
-                      </PrimaryButton>
-                      <DangerButton wide>
-                        <X/>
-                        Reject
-                      </DangerButton>
-                    </div>
-                  </div> */}
-
-                  <MyGroupsPanel groups={groups} onSwitchGroup={switchGroup}/>
+                  <MyGroupsPanel refreshPanel={fetchGroups} groups={groups} onSwitchGroup={switchGroup}/>
                 </div>
               </div>
               <div className='group-details'>

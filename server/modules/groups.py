@@ -8,6 +8,17 @@ import os
 GROUPS_DIR_PATH = "./data/groups/"
 
 
+def _get_group_content(group_id: str) -> dict:
+    group_file_path = GROUPS_DIR_PATH + group_id + ".json"
+    with open(group_file_path, "r") as file:
+        return json.load(file)
+
+def _save_group_content(group_id: str, content: dict) -> None:
+    group_file_path = GROUPS_DIR_PATH + group_id + ".json"
+    with open(group_file_path, "w") as file:
+        json.dump(content, file)
+
+
 def create_group(name: str, owner_uuid: str) -> str:
     group_id = uuid.uuid4().hex
 
@@ -35,21 +46,14 @@ def delete_group(group_id: str, deleter_uuid: str) -> str | bool:
 
 
 def add_member_to_group(group_id: str, user_uuid: str) -> None:
-    group_file_path = GROUPS_DIR_PATH + group_id + ".json"
-    with open(group_file_path, "r") as file:
-        content = json.load(file)
-
+    content = _get_group_content(group_id)
     if user_uuid not in content["members"]:
         content["members"].append(user_uuid)
-    
-    with open(group_file_path, "w") as file:
-        json.dump(content, file)
+        _save_group_content(group_id, content)
 
 
 def remove_member_from_group(group_id: str, user_uuid: str) -> bool:
-    group_file_path = GROUPS_DIR_PATH + group_id + ".json"
-    with open(group_file_path, "r") as file:
-        content = json.load(file)
+    content = _get_group_content(group_id)
 
     if user_uuid not in content["members"] and user_uuid not in content["managers"]:
         return False
@@ -67,16 +71,12 @@ def remove_member_from_group(group_id: str, user_uuid: str) -> bool:
         else:
             return delete_group(group_id, user_uuid)
     
-    with open(group_file_path, "w") as file:
-        json.dump(content, file)
-        
+    _save_group_content(group_id, content)
     return True
 
 
 def promote_group_member(group_id: str, promoted_uuid: str, promoter_uuid: str) -> bool | str:
-    group_file_path = GROUPS_DIR_PATH + group_id + ".json"
-    with open(group_file_path, "r") as file:
-        content = json.load(file)
+    content = _get_group_content(group_id)
 
     if promoted_uuid in content["managers"]:
         return "Promoted member is already a manager."
@@ -88,16 +88,12 @@ def promote_group_member(group_id: str, promoted_uuid: str, promoter_uuid: str) 
     content["members"].remove(promoted_uuid)
     content["managers"].append(promoted_uuid)
     
-    with open(group_file_path, "w") as file:
-        json.dump(content, file)
-
+    _save_group_content(group_id, content)
     return True
 
 
 def demote_group_member(group_id: str, demoted_uuid: str, demoter_uuid: str) -> bool | str:
-    group_file_path = GROUPS_DIR_PATH + group_id + ".json"
-    with open(group_file_path, "r") as file:
-        content = json.load(file)
+    content = _get_group_content(group_id)
 
     if demoted_uuid not in content["managers"]:
         return "Demoted member is not a group manager."
@@ -109,16 +105,12 @@ def demote_group_member(group_id: str, demoted_uuid: str, demoter_uuid: str) -> 
     content["managers"].remove(demoted_uuid)
     content["members"].append(demoted_uuid)
     
-    with open(group_file_path, "w") as file:
-        json.dump(content, file)
-
+    _save_group_content(group_id, content)
     return True
 
 
 def get_group_details(group_id: str, user_uuid: str) -> dict:
-    group_file_path = GROUPS_DIR_PATH + group_id + ".json"
-    with open(group_file_path, "r") as file:
-        content = json.load(file)
+    content = _get_group_content(group_id)
     
     managers = []
     members = []
@@ -148,12 +140,9 @@ def fetch_user_groups_names(groups_ids: list[str]) -> list[tuple[str, str]]:
     
     for group_id in groups_ids:
         if not group_id: continue
-        
-        group_file_path = GROUPS_DIR_PATH + group_id + ".json"
-        with open(group_file_path, "r") as file:
-            content = json.load(file)
-            name = content["name"]
-        
+        content = _get_group_content(group_id)
+        name = content["name"]
+    
         groups_data.append((group_id, name))        
     
     return groups_data
@@ -170,11 +159,20 @@ def add_group_invitation(user_uuid: str, group_id: str) -> bool | str:
     return True
 
 def delete_group_invitation(user_uuid: str, group_id: str) -> None:
-    users.DB.execute("DELETE FROM invitations WEHRE user_uuid=? AND group_id=?", (user_uuid, group_id))
+    users.DB.execute("DELETE FROM invitations WHERE user_uuid=? AND group_id=?", (user_uuid, group_id))
     users.db_conn.commit()
     return True
 
 def get_user_group_invitations(user_uuid: str) -> list[list[str, str]]:
-    users.DB.execute("SELECT * FROM invitations WHERE user_uuid=?", (user_uuid))
-    invitations = users.DB.fetchall()
-    return invitations
+    users.DB.execute("SELECT group_id FROM invitations WHERE user_uuid=?", (user_uuid,))
+
+    invites = [
+        (group_id[0], _get_group_content(group_id[0])["name"])
+        for group_id in users.DB.fetchall()
+    ]
+        
+    return invites
+
+def is_user_invited(user_uuid: str, group_id: str) -> bool:
+    users.DB.execute("SELECT * FROM invitations WHERE user_uuid=? AND group_id=?", (user_uuid, group_id))
+    return len(users.DB.fetchall()) > 0
