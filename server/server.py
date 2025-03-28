@@ -240,9 +240,30 @@ async def post_leave_group(data: schemas.GroupIdSchema, request: Request) -> JSO
 @api.post("/api/groups/kick")
 @protected_endpoint
 @protect_group_endpoint(manager_only=True)
-async def post_kick_member(data: schemas.KickMemberSchema, request: Request) -> JSONResponse:
+async def post_kick_member(data: schemas.GroupMemberSchema, request: Request) -> JSONResponse:
+    if data.member_uuid == groups._get_group_content(data.group_id)["owner_uuid"]:
+        return api_response(False, err_msg="Cannot kick a owner.")
+    
     groups.remove_member_from_group(data.group_id, data.member_uuid)
     users.remove_group_from_user_list(data.member_uuid, data.group_id)
+    return api_response(True)
+
+@api.post("/api/groups/promote")
+@protected_endpoint
+@protect_group_endpoint(manager_only=True)
+async def post_promote_member(data: schemas.GroupMemberSchema, request: Request) -> JSONResponse:
+    status = groups.promote_group_member(data.group_id, data.member_uuid, data.uuid)
+    if isinstance(status, str):
+        return api_response(False, err_msg=status)
+    return api_response(True)
+
+@api.post("/api/groups/demote")
+@protected_endpoint
+@protect_group_endpoint(manager_only=True)
+async def post_demote_member(data: schemas.GroupMemberSchema, request: Request) -> JSONResponse:
+    status = groups.demote_group_member(data.group_id, data.member_uuid, data.uuid)
+    if isinstance(status, str):
+        return api_response(False, err_msg=status)
     return api_response(True)
 
 

@@ -31,7 +31,11 @@ class PasswordUpdateSchema(ProtectedModel):
 
 class GroupIdSchema(ProtectedModel):
     group_id: str
-
+    
+class GroupMemberSchema(ProtectedModel):
+    group_id: str
+    member_uuid: str
+    
 class GroupCreateSchema(ProtectedModel):
     name: str
 
@@ -42,8 +46,3 @@ class GroupInviteSchema(ProtectedModel):
 class GroupRenameSchema(ProtectedModel):
     group_id: str
     new_name: str
-    
-class KickMemberSchema(ProtectedModel):
-    group_id: str
-    member_uuid: str
-    

@@ -8,7 +8,7 @@ import { Modal } from '../ui/Modal.jsx';
 import '../pages/styles/dashboard.css'
 
 
-function GroupMember({ name, memberUUID, isMemberManager, isUserManager, onKick }) {
+function GroupMember({ name, memberUUID, isMemberManager, isUserManager, onKick, onChangePromotion }) {
   const isSelf = memberUUID == String(localStorage.getItem("uuid"));
   
   return (
@@ -20,9 +20,9 @@ function GroupMember({ name, memberUUID, isMemberManager, isUserManager, onKick 
           <div className='group-member-manage-icons'>
             {
               (isMemberManager) ? (
-                <Bolt color='red' />
+                <Bolt color='red' onClick={() => {onChangePromotion(memberUUID)}} />
               ) : (
-                <Bolt color='var(--color-primary-muted)' />
+                <Bolt color='var(--color-primary-muted)' onClick={() => {onChangePromotion(memberUUID)}} />
               )
             }
             <Trash2 color='red' onClick={() => {onKick(memberUUID)}}/>
@@ -150,9 +150,34 @@ export default function GroupView({ refreshPanel, groupNameSetter, groupId=null 
 
     await fetch(import.meta.env.VITE_API_URL + "/groups/kick", requestOptions);
     setLoading(true);
-    await fetchGroupData()
+    await fetchGroupData();
   }
 
+  async function onChangePromotion(memberUUID, state=true) {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        group_id: groupId,
+        member_uuid: memberUUID
+      }),
+    };
+
+    console.log("change promo", memberUUID)
+    const endpoint = (state) ? "promote" : "demote";
+    const response = await fetch(import.meta.env.VITE_API_URL + "/groups/" + endpoint, requestOptions);
+    const data = await response.json();
+    if (data.status) {
+      setLoading(true);
+      await fetchGroupData();
+    } else {
+      console.error(data.err_msg);
+      // TODO: popup msg
+    }
+  }
+
+ 
   if (loading) return <></>;
   
   return (
@@ -182,8 +207,9 @@ export default function GroupView({ refreshPanel, groupNameSetter, groupId=null 
                 isUserManager={groupData.is_manager} 
                 key={memberUUID}
                 onKick={onKick}
-              ></GroupMember>
-            )
+                onChangePromotion={(memberUUID) => {onChangePromotion(memberUUID, false)}}
+                ></GroupMember>
+              )
           })
         }
         {
@@ -197,6 +223,7 @@ export default function GroupView({ refreshPanel, groupNameSetter, groupId=null 
                 isUserManager={groupData.is_manager}
                 key={memberUUID}
                 onKick={onKick}
+                onChangePromotion={(memberUUID) => {onChangePromotion(memberUUID, true)}}
               ></GroupMember>
             )
           })

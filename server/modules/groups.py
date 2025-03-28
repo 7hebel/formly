@@ -80,7 +80,7 @@ def remove_member_from_group(group_id: str, user_uuid: str) -> bool:
 def promote_group_member(group_id: str, promoted_uuid: str, promoter_uuid: str) -> bool | str:
     content = _get_group_content(group_id)
 
-    if promoted_uuid in content["managers"] or promoter_uuid == content["owner_uuid"]:
+    if promoted_uuid in content["managers"]:
         return "Promoted member is already a manager."
     if promoted_uuid not in content["members"]:
         return "Promoted member not found in group."
