@@ -84,6 +84,18 @@
     transition: opacity .1s;
     opacity: 0.8;
     padding-left: 2px;
+    position: relative;
+}
+
+.input-label > svg {
+    opacity: .8;
+    width: 14px;
+    height: 14px;
+    vertical-align: middle;
+    margin-bottom: 3px;
+    margin-right: 6px;
+    position: absolute;
+    right: 0;
 }
 
 .input-element {
@@ -118,6 +130,12 @@
     color: red;
 }
 
+.input-unit {
+    font-family: var(--ui-font);
+    font-size: 14px;
+    width: 100%;
+    text-align: center;
+}
 
 /* --- ERROR LABEL --- */
 

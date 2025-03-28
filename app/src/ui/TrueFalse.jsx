@@ -4,7 +4,6 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 export function TrueFalse({ qid }) {
   const trueRef = useRef(null);
   const falseRef = useRef(null);
-  const id = useRef(qid);
   
   function onTrue() {
     trueRef.current.checked = true;
@@ -20,14 +19,14 @@ export function TrueFalse({ qid }) {
     <div className="truefalse-container">
       <div className="truefalse-inputs">
         <label className="truefalse-radio">
-          <input type="radio" name={'tf-' + id.current} ref={trueRef} onClick={onTrue}/>
+          <input type="radio" name={'tf-' + qid} ref={trueRef} onClick={onTrue}/>
           <span className="truefalse-name">
             <CheckCircle2/>
             True
           </span>
         </label>
         <label className="truefalse-radio">
-          <input type="radio" name={'tf-' + id.current} ref={falseRef} onClick={onFalse}/>
+          <input type="radio" name={'tf-' + qid} ref={falseRef} onClick={onFalse}/>
           <span className="truefalse-name">
             <XCircle/>
             False

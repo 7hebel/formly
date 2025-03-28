@@ -11,7 +11,7 @@ export function InputLabel({ children }) {
   )
 }
 
-export function Input({ id, type="text", placeholder=null, pattern=null, minlen=null }) {
+export function Input({ id, type="text", placeholder, pattern, minlen, maxlen, onChange }) {
   if (pattern==null && type=="number") pattern = "[\d]"
   
   return (
@@ -22,6 +22,8 @@ export function Input({ id, type="text", placeholder=null, pattern=null, minlen=
       placeholder={placeholder}
       pattern={pattern}
       minLength={minlen}
+      maxLength={maxlen}
+      onChange={onChange}
       >
     </input>
   )
@@ -36,4 +38,9 @@ export function LongInput({ id, placeholder=null, minlen=null }) {
       minLength={minlen}
     ></textarea>
   )
+}
+
+export function DatetimeInput({ id }) {
+  <input type="datetime-local" className="input-element"></input>
+
 }

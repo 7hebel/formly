@@ -1,0 +1,123 @@
+.builder {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.builder-panels-container {
+    width: 100%;
+    height: 90dvh;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    padding-inline: 20px;
+    margin-top: 30px;
+}
+
+.builder-properties-panel {
+    height: 100%;
+    background-color: var(--color-panel);
+    border: 1px solid var(--color-border);
+    width: 30%;
+    max-width: 400px;
+    min-width: 320px;
+    border-radius: 8px;
+}
+
+.builder-form-panel {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+}
+
+.builder-panel-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: center;
+    font-family: var(--ui-font);
+    color: var(--color-text);
+    justify-content: center;
+    position: relative;
+    margin-block: 8px;
+}
+
+.builder-panel-header > h2 {
+    font-size: 20px;
+}
+
+.builder-panel-header > svg {
+    position: absolute;
+    left: 12px;
+    height: 20px;
+    opacity: .5;
+}
+
+.builder-properties-container {
+    display: flex;
+    flex-direction: column;
+    padding-inline: 8px;
+    
+}
+
+.builder-form-content {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.builder-new-blocks {
+    background-color: var(--color-bg-item);
+    border: 1px solid var(--color-bg-item);
+    border-radius: 6px;
+    padding: 12px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 12px
+}
+
+.add-component-btn {
+    font-family: var(--ui-font);
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text);
+    padding-inline: 8px;
+    padding-block: 6px;
+    width: max-content;
+    height: max-content;
+    border-radius: 4px;
+    background-color: var(--color-bg-item);
+    border: 1px solid var(--color-bg-item);
+    opacity: .7;
+    transition: opacity .2s;
+    cursor: pointer;
+    user-select: none;
+}   
+
+.add-component-btn > svg {
+    width: 16px;
+    height: 16px;
+    opacity: .6;
+}
+
+.add-component-btn:hover {
+    opacity: 1 !important;
+}
+
+

@@ -14,8 +14,6 @@ Saved form format:
         "title": STRING
         "is_open": True,
         "is_anonymous": True,  (If False and accountless respondent - ask for fullname before form)
-        "avb_since": TIMESTAMP | 0 for no limit,
-        "avb_to": TIMESTAMP | 0 for no limit,
         "time_limit_m": 60 | 0 for not limit (in minutes), 
         "password": BCRYPT_HEX | False for no password,
         "accounts_only": True  (Allow only user with accounts to answer),

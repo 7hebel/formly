@@ -12,3 +12,19 @@ header {
     font-family: var(--ui-font);
     color: var(--color-text);
 }
+
+.dash-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    font-family: var(--ui-font);
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+.dash-header > img {
+    cursor: pointer;
+}
