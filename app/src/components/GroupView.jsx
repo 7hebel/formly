@@ -6,6 +6,17 @@ import { useState, useEffect } from 'react';
 import FormBrief from './FormBrief.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import '../pages/styles/dashboard.css'
+import butterup from 'butteruptoasts';
+import 'butteruptoasts/src/butterup.css';
+
+
+function displayMessage(content) {
+    butterup.toast({
+      message: content,
+      location: 'bottom-center',
+      dismissable: true,
+    });
+}
 
 
 function GroupMember({ name, memberUUID, isMemberManager, isUserManager, onKick, onChangePromotion }) {
@@ -91,8 +102,8 @@ export default function GroupView({ refreshPanel, groupNameSetter, groupId=null 
     const data = await response.json();
 
     if (data.status) {
-      errorLabel.setAttribute("iserror", "1");
-      errorLabel.textContent = "Invited " + data.data + " (TODO: change this msg)";
+      errorLabel.setAttribute("iserror", "0");
+      displayMessage(`Invited ${data.data}`);
       email.value = "";
 
     } else {
@@ -148,7 +159,12 @@ export default function GroupView({ refreshPanel, groupNameSetter, groupId=null 
       }),
     };
 
-    await fetch(import.meta.env.VITE_API_URL + "/groups/kick", requestOptions);
+    const response = await fetch(import.meta.env.VITE_API_URL + "/groups/kick", requestOptions);
+    const data = await response.json();
+    if (!data.status) {
+      return displayMessage(data.err_msg);
+    }
+
     setLoading(true);
     await fetchGroupData();
   }
@@ -164,7 +180,6 @@ export default function GroupView({ refreshPanel, groupNameSetter, groupId=null 
       }),
     };
 
-    console.log("change promo", memberUUID)
     const endpoint = (state) ? "promote" : "demote";
     const response = await fetch(import.meta.env.VITE_API_URL + "/groups/" + endpoint, requestOptions);
     const data = await response.json();
@@ -172,8 +187,7 @@ export default function GroupView({ refreshPanel, groupNameSetter, groupId=null 
       setLoading(true);
       await fetchGroupData();
     } else {
-      console.error(data.err_msg);
-      // TODO: popup msg
+      displayMessage(data.err_msg);
     }
   }
 

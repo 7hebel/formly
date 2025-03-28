@@ -142,7 +142,7 @@
     min-height: 250px;
     background-color: var(--color-panel);
     border-radius: 8px;
-    border: 1px solid #35353552;
+    border: 1px solid var(--color-border);
     padding: 8px;
     flex-direction: column;
     display: flex;

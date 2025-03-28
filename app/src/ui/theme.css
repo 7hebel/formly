@@ -16,6 +16,7 @@
     --color-primary-muted: #BA9500;
     --color-text: #353535;
     --color-panel: #FFFCEE;
+    --color-border: #35353552;
 }
 
 body {
@@ -61,4 +62,22 @@ body {
 
 .bold-text {
     font-weight: 600;
+}
+
+
+/* Toast messages */
+
+.toaster {
+    font-family: var(--ui-font) !important;
+}
+
+.butteruptoast {
+    background-color: var(--color-panel) !important;
+    border: 1px solid var(--color-border) !important;
+}
+
+.notif .desc .message {
+    font-weight: 500 !important;
+    color: var(--color-text) !important;
+    font-size: 14px !important;
 }

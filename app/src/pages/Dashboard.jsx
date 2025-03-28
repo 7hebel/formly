@@ -9,7 +9,18 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle, Mail, Check, X, CodeSquare } from 'lucide-react';
 import { ErrorLabel } from "../ui/ErrorLabel.jsx"
 import { useEffect, useRef, useState } from 'react';
+import butterup from 'butteruptoasts';
+import 'butteruptoasts/src/butterup.css';
 import './styles/dashboard.css'
+
+
+function displayMessage(content) {
+    butterup.toast({
+      message: content,
+      location: 'bottom-center',
+      dismissable: true,
+    });
+}
 
 
 function MyGroupsPanel({ refreshPanel, groups, onSwitchGroup }) {
@@ -107,11 +118,13 @@ export default function Dashboard() {
     .then(response => {
       sessionStorage.clear();
       localStorage.clear();
+      displayMessage("Logged out.");
       navigate("/");
     })
     .catch(err => {
       sessionStorage.clear();
       localStorage.clear();
+      displayMessage("Logged out.");
       navigate("/");
     });
   }
@@ -145,12 +158,14 @@ export default function Dashboard() {
         localStorage.setItem("fullname", newName.value);
         newName.value = "";
         navigate("/dash");
+        displayMessage("Full name updated.");
       } else {
         errorLabel.textContent = response.err_msg;
         errorLabel.setAttribute("iserror", "1");
       }
     })
     .catch(err => {      
+      displayMessage("Failed to update full name.")
       errorLabel.textContent = "Failed to update fullname.";
       errorLabel.setAttribute("iserror", "1");
     });
@@ -184,6 +199,7 @@ export default function Dashboard() {
         errorLabel.setAttribute("iserror", "0");
         localStorage.setItem("email", newMail.value);
         newMail.value = "";
+        displayMessage("Email updated.");
         navigate("/dash");
       } else {
         errorLabel.textContent = response.err_msg;
@@ -191,6 +207,7 @@ export default function Dashboard() {
       }
     })
     .catch(err => {      
+      displayMessage("Failed to update email.");
       errorLabel.textContent = "Failed to update email.";
       errorLabel.setAttribute("iserror", "1");
     });
@@ -226,12 +243,14 @@ export default function Dashboard() {
         errorLabel.setAttribute("iserror", "0");
         newPassword.value = "";
         currentPassword.value = "";
+        displayMessage("Password updated.");
       } else {
         errorLabel.textContent = response.err_msg;
         errorLabel.setAttribute("iserror", "1");
       }
     })
     .catch(err => {      
+      displayMessage("Failed to update password.");
       errorLabel.textContent = "Failed to update password.";
       errorLabel.setAttribute("iserror", "1");
     });
@@ -261,7 +280,7 @@ export default function Dashboard() {
     .then(response => response.json())
     .then(response => {
       if (response.status) {
-        console.log("Created group ", name.value);
+        displayMessage(`Created group ${name.value}`);
         setAddGroupOpen(false);
         fetchGroups();
       }
@@ -345,8 +364,7 @@ export default function Dashboard() {
               <h1>
                 My forms:
                 <PrimaryButton>
-                  <ClipboardPlus/>
-                  Create
+                  <ClipboardPlus/>Create
                 </PrimaryButton>
               </h1>
               <div className="dash-forms-container">
