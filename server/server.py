@@ -307,12 +307,23 @@ async def post_create_form(data: schemas.ProtectedModel, request: Request) -> JS
     form_id = forms.create_form(data.uuid)
     return api_response(True, form_id)
 
+@api.post("/api/forms/load-list")
+@protected_endpoint
+async def post_load_forms(data: schemas.ProtectedModel, request: Request) -> JSONResponse:
+    user_forms = {
+        "assigned": [],
+        "my_forms": forms.get_user_forms(data.uuid),
+        "answered": []    
+    }
+    return api_response(True, user_forms)
+    
+
 @api.post("/api/forms/fetch-form")
 @protected_endpoint
 @protect_form_endpoint()
 async def post_fetch_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
-    form_content = forms._get_form_content(data.form_id)
-    return api_response(True, form_content)
+    enriched_content = forms.get_enriched_form_data(data.form_id, data.uuid)
+    return api_response(True, enriched_content)
 
 @api.post("/api/forms/update-form")
 @protected_endpoint
@@ -320,6 +331,7 @@ async def post_fetch_form(data: schemas.FormIdSchema, request: Request) -> JSONR
 async def post_update_form(data: schemas.UpdateFormSchema, request: Request) -> JSONResponse:
     forms.update_form(data.form_id, data.settings, data.structure)
     return api_response(True)
+
 
 
 uvicorn.run(api, host="0.0.0.0", port=50500)

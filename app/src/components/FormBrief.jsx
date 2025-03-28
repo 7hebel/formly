@@ -1,6 +1,8 @@
-import { KeyRound, LockKeyholeIcon, VenetianMask, Edit3, CornerDownRight, Eye, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass } from 'lucide-react';
+import { LockKeyholeIcon, VenetianMask, Edit3, CornerDownRight, Eye, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass } from 'lucide-react';
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
 import '../pages/styles/dashboard.css'
+import { useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
 
 
 const characteristicsIcons = {
@@ -16,28 +18,39 @@ const characteristicsIcons = {
 
 
 export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered=false, formId }) {
-  //TODO: fetch form data
-  const formName = "A long form name..."
+  const navigate = useNavigate();
+  
   let isResultHidden = false;
-  let myFormState = 0;
-  let characteristics = [
-    {
-      type: "author",
-      content: "Some author"
-    },
-    {
-      type: "date",
-      content: "Since [02 march 15:30]"
-    },
-    {
-      type: "anonymous",
-      content: "Answers are [anonymous]"
-    },
-    {
-      type: "grade",
-      content: "Manually graded"
+
+  const [formName, setFormName] = useState("");
+  const [characteristics, setCharacteristics] = useState([]);
+  const [myFormState, setMyFormState] = useState(0);
+
+  const fetchFormData = async () => {
+    if (!formId) return;
+    
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        form_id: formId
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/fetch-form", requestOptions);
+    const data = await response.json();
+
+    if (data.status) {
+      const settings = data.data.settings;
+      setCharacteristics(data.data.characteristics);
+      setFormName(settings.title);
+      if (settings.is_active) { setMyFormState(2); } // 1 for pending, not supported yet.
     }
-  ]
+  };
+  useEffect(() => {fetchFormData()}, []);
+  
+
 
   return (
     <div className="form-brief-view" isfinished={Number(isAnswered)} isfeatured={Number(isAssigned)}>
@@ -68,27 +81,23 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
         <div className='form-brief-btn-container'>
           {
             (isMyForm) ? (
-              <SecondaryButton>
-                <Edit3/>
-                Manage
+              <SecondaryButton onClick={() => {navigate('/builder/' + formId)}}>
+                <Edit3/>Manage
               </SecondaryButton>
             ) : (
               (isAnswered) ? (
                 (isResultHidden) ? (
                   <TertiaryButton>
-                    <Eye/>
-                    My response
+                    <Eye/>My response
                   </TertiaryButton>
                 ) : (
                   <TertiaryButton>
-                    <EyeOff/>
-                    Response hidden
+                    <EyeOff/>Response hidden
                   </TertiaryButton>
                 )
               ) : (
                 <PrimaryButton>
-                  <CornerDownRight/>
-                  Answer
+                  <CornerDownRight/>Answer
                 </PrimaryButton>
               )
             )

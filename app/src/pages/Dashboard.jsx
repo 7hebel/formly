@@ -311,9 +311,10 @@ export default function Dashboard() {
   const formsViewRef = useRef(0);
   const groupsViewRef = useRef(0);
   const accountViewRef = useRef(0);
-  let [selectedGroup, setSelectedGroup] = useState(null);
-  let [selectedGroupName, setSelectedGroupName] = useState("-");
-  let [groups, setMyGroups] = useState(null);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [selectedGroupName, setSelectedGroupName] = useState("-");
+  const [groups, setMyGroups] = useState(null);
+  const [forms, setForms] = useState(null);
 
   const [isAddGroupOpen, setAddGroupOpen] = useState(false);
 
@@ -332,6 +333,22 @@ export default function Dashboard() {
     if (data.status) setMyGroups(data.data);
   };
   useEffect(() => {fetchGroups()}, []);
+
+  const fetchForms = async () => {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/load-list", requestOptions);
+    const data = await response.json();
+
+    if (data.status) setForms(data.data);
+  };
+  useEffect(() => {fetchForms()}, []);
 
 
   return (
@@ -389,11 +406,11 @@ export default function Dashboard() {
                 </PrimaryButton>
               </h1>
               <div className="dash-forms-container">
-
-                <FormBrief isMyForm></FormBrief>
-                <FormBrief isMyForm></FormBrief>
-                <FormBrief isMyForm></FormBrief>
-
+                {
+                  forms && forms.my_forms.map((formId) => (
+                    <FormBrief isMyForm formId={formId} key={formId}></FormBrief>
+                  ))  
+                }
               </div>
             </div>
             <div className='dash-forms-category-container'>

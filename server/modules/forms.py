@@ -1,3 +1,4 @@
+from modules import users
 from modules import logs
 
 from dataclasses import dataclass, asdict
@@ -51,7 +52,7 @@ class FormSettings:
 def _get_form_content(form_id: str) -> dict | None:
     filepath = FORMS_DIR_PATH + form_id + ".json"
     if not os.path.exists(filepath):
-        logs.error("Forms", f"Failed to get content of form: ({form_id}) as file was not found")
+        logs.error("Forms", f"Failed to get content of form: ({form_id}) as file was not found: {filepath}")
         return None
     
     with open(filepath, "r") as file:
@@ -72,9 +73,10 @@ def get_user_forms(user_uuid: str) -> list[str]:
     """ Get list form ids created by user.   """
     user_forms = []
     
-    for form_id in os.listdir(FORMS_DIR_PATH):
+    for form_file in os.listdir(FORMS_DIR_PATH):
+        form_id = form_file.split(".")[0]
         form = _get_form_content(form_id)
-        if form["author_uuid"] == user_uuid:
+        if form and form["author_uuid"] == user_uuid:
             user_forms.append(form_id)
 
     return user_forms
@@ -123,3 +125,28 @@ def update_form(form_id: str, new_settings: dict, structure: list) -> None:
     form_data["structure"] = structure
     _save_form_content(form_id, form_data)
     logs.info("Forms", f"Updated form settings and structure ({form_id})")
+
+
+def get_enriched_form_data(form_id: str, user_uuid: str) -> dict:
+    form_data = _get_form_content(form_id)
+    form_settings = form_data["settings"]
+    if user_uuid != form_data["author_uuid"]:
+        form_settings["password"] = bool(form_settings["password"])
+    
+    characteristics = []
+    if user_uuid == form_data["author_uuid"]:
+        characteristics.append({"type": "author", "content": f"You are the [author]"})
+    else:
+        author_name = users.get_user_by_uuid(user_uuid).fullname
+        characteristics.append({"type": "author", "content": f"Made by [{author_name}]"})
+    if form_settings["is_anonymous"]:
+        characteristics.append({"type": "anonymous", "content": "Answers are [anonymous]"})
+    if form_settings["time_limit_m"] > 0:
+        characteristics.append({"type": "timelimit", "content": f"Time limit: [{form_settings['time_limit_m']} minutes]"})
+    if form_settings["password"]:
+        characteristics.append({"type": "password", "content": f"Form is secured with [password]"})
+    
+    form_data["characteristics"] = characteristics
+    return form_data
+    
+    
