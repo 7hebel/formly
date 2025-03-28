@@ -272,7 +272,7 @@ export default function Dashboard() {
   const groupsViewRef = useRef(0);
   const accountViewRef = useRef(0);
   let [selectedGroup, setSelectedGroup] = useState(null);
-  let [selectedGropName, setSelectedGroupName] = useState("-");
+  let [selectedGroupName, setSelectedGroupName] = useState("-");
   let [groups, setMyGroups] = useState(null);
 
   const [isAddGroupOpen, setAddGroupOpen] = useState(false);
@@ -312,24 +312,20 @@ export default function Dashboard() {
             Welcome, <span id='welcome-msg-name'>{fullname}</span>
         </h1>
         <TertiaryButton onClick={onLogout}>
-          <LogOut/>
-          Logout
+          <LogOut/>Logout
         </TertiaryButton>
       </header>
 
       <div className='dash-content-container'>
         <div className="dash-categories-container">
           <DashboardCategorySwitcher viewRef={formsViewRef} isActive>
-            <ClipboardList/>
-            Forms
+            <ClipboardList/>Forms
           </DashboardCategorySwitcher>
           <DashboardCategorySwitcher viewRef={groupsViewRef}>
-            <Users/>
-            Groups
+            <Users/>Groups
           </DashboardCategorySwitcher>
           <DashboardCategorySwitcher viewRef={accountViewRef}>
-            <Settings2/>
-            Account
+            <Settings2/>Account
           </DashboardCategorySwitcher>
         </div>
         
@@ -398,9 +394,9 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className='group-details'>
-                <h1>{selectedGropName}</h1>
+                <h1>{selectedGroupName}</h1>
                 <div className='hzSepStrong'></div>
-                <GroupView groupId={selectedGroup}/>
+                <GroupView groupNameSetter={(name) => {setSelectedGroupName(name); fetchGroups()}} groupId={selectedGroup}/>
               </div>
             </div>
           </div>

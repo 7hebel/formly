@@ -33,12 +33,13 @@ function GroupMember({ name, memberUUID, isMemberManager, isUserManager }) {
   )
 }
 
-export default function GroupView({ groupId=null }) {
+export default function GroupView({ groupNameSetter, groupId=null }) {
   if (!groupId) return <></>
 
   const [groupData, setGroupData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [invitationOpen, setInvitationOpen] = useState(false);
+  const [renameOpen, setRenameOpen] = useState(false);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -100,6 +101,26 @@ export default function GroupView({ groupId=null }) {
     
   }
 
+  async function onGroupRename() {
+    const newName = document.getElementById("new-group-name");
+    if (!newName.value || !newName.validity.valid) { return; };
+    
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        group_id: groupId,
+        new_name: newName.value
+      }),
+    };
+
+    await fetch(import.meta.env.VITE_API_URL + "/groups/rename", requestOptions);
+    groupNameSetter(newName.value);
+    newName.value = "";
+    setRenameOpen(false);
+  }
+
   if (loading) return <p>Loading...</p>;
   
   return (
@@ -155,15 +176,21 @@ export default function GroupView({ groupId=null }) {
                     </Modal>
                   )
                 }
-
-                <InputGroup>
-                  <InputLabel>Rename group</InputLabel>
-                  <Input type="text" id="new-group-name" placeholder="Fantastic group" minlen={3}></Input>
-                  <TertiaryButton>
-                    <Edit3/>
-                    Rename
-                  </TertiaryButton>
-                </InputGroup>
+                
+                <SecondaryButton onClick={() => {setRenameOpen(true)}}>
+                  <Edit3/>Rename group
+                </SecondaryButton>
+                {
+                  renameOpen && (
+                    <Modal title="Rename group" close={setRenameOpen}>
+                      <InputGroup>
+                        <InputLabel>New group name</InputLabel>
+                        <Input type="text" id="new-group-name" placeholder="My fantastic group" minlen={3}></Input>
+                      </InputGroup>
+                      <PrimaryButton wide onClick={onGroupRename}><Edit3/>Rename</PrimaryButton>
+                    </Modal>
+                  )
+                }
               </div>
               <div className='hzSepMid'></div>
             </>
@@ -171,14 +198,12 @@ export default function GroupView({ groupId=null }) {
         }
         <div className='row'>
           <DangerButton>
-            <DoorOpen></DoorOpen>
-            Leave group
+            <DoorOpen/>Leave group
           </DangerButton>
           {
             groupData.is_owner && (
               <DangerButton>
-                <Trash2></Trash2>
-                Remove group
+                <Trash2/>Remove group
               </DangerButton>
             )
           }

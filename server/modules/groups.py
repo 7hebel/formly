@@ -8,8 +8,10 @@ import os
 GROUPS_DIR_PATH = "./data/groups/"
 
 
-def _get_group_content(group_id: str) -> dict:
+def _get_group_content(group_id: str) -> dict | None:
     group_file_path = GROUPS_DIR_PATH + group_id + ".json"
+    if not os.path.exists(group_file_path): return None
+
     with open(group_file_path, "r") as file:
         return json.load(file)
 
@@ -147,6 +149,13 @@ def fetch_user_groups_names(groups_ids: list[str]) -> list[tuple[str, str]]:
     
     return groups_data
         
+
+def rename_group(group_id: str, new_name: str) -> None:
+    if len(new_name) < 3: return
+    content = _get_group_content(group_id)
+    content["name"] = new_name
+    _save_group_content(group_id, content)
+    
         
 # Invitations
 

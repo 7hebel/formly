@@ -42,11 +42,8 @@ def protected_endpoint(endpoint_fn):
     @wraps(endpoint_fn)
     async def wrapper(*args, **kwargs):
         data = kwargs.get("data")
-        if data:
-            uuid = data.uuid
-        else:
-            uuid = kwargs["uuid"]
-            
+        uuid = data.uuid if data else kwargs.get("uuid")
+
         request = kwargs["request"]
         caller_ip = request.client.host
         
@@ -60,6 +57,32 @@ def protected_endpoint(endpoint_fn):
         return await endpoint_fn(*args, **kwargs)
     return wrapper
 
+
+def protect_group_endpoint(manager_only: bool = False, owner_only: bool = False):
+    def protect(endpoint_fn):
+        @wraps(endpoint_fn)
+        async def wrapper(*args, **kwargs):
+            data = kwargs.get("data")
+            uuid = data.uuid if data else kwargs.get("uuid")
+            group_id = data.group_id if data else kwargs.get("group_id")
+
+            user = users.get_user_by_uuid(uuid)
+            if user is None:
+                return api_response(False, err_msg=f"Validation failed: provided invalid uuid: `{uuid}` to protected group endpoint.")
+
+            group_content = groups._get_group_content(group_id)
+            if group_content is None:
+                return api_response(False, err_msg=f"Validation failed: provided invalid group_id: `{group_id}` to protected group endpoint.")
+
+            if manager_only and user.uuid not in group_content.get("managers", []):
+                return api_response(False, err_msg=f"Validation failed: called manager-only group endpoint as non-manager. Group: `{group_id}` User: `{uuid}`")
+                
+            if owner_only and user.uuid != group_content.get("owner_uuid"):
+                return api_response(False, err_msg=f"Validation failed: called owner-only group endpoint as non-owner. Group: `{group_id}` User: `{uuid}`")
+        
+            return await endpoint_fn(*args, **kwargs)
+        return wrapper
+    return protect 
 
 
 # Login / Register
@@ -138,6 +161,13 @@ async def post_account_update_password(data: schemas.PasswordUpdateSchema, reque
 
 # Groups.
 
+@api.post("/api/groups/create")
+@protected_endpoint
+async def post_group_create(data: schemas.GroupCreateSchema, request: Request) -> JSONResponse:
+    group_id = groups.create_group(data.name, data.uuid)
+    users.add_group_to_user_list(data.uuid, group_id)
+    return api_response(True)
+
 @api.post("/api/groups/my-groups")
 @protected_endpoint
 async def post_fetch_my_groups(data: schemas.ProtectedModel, request: Request) -> JSONResponse:
@@ -151,19 +181,14 @@ async def post_fetch_my_groups(data: schemas.ProtectedModel, request: Request) -
 
 @api.post("/api/groups/fetch")
 @protected_endpoint
+@protect_group_endpoint()
 async def post_fecth_group(data: schemas.FetchGroupSchema, request: Request) -> JSONResponse:
     group_data = groups.get_group_details(data.group_id, data.uuid)
     return api_response(True, group_data)
 
-@api.post("/api/groups/create")
-@protected_endpoint
-async def post_group_create(data: schemas.GroupCreateSchema, request: Request) -> JSONResponse:
-    group_id = groups.create_group(data.name, data.uuid)
-    users.add_group_to_user_list(data.uuid, group_id)
-    return api_response(True)
-
 @api.post("/api/groups/invite")
 @protected_endpoint
+@protect_group_endpoint()
 async def post_group_invite(data: schemas.GroupInviteSchema, request: Request) -> JSONResponse:
     invited_user = users.get_user_by_email(data.invite_email)
     if invited_user is None:
@@ -177,6 +202,7 @@ async def post_group_invite(data: schemas.GroupInviteSchema, request: Request) -
 
 @api.post("/api/groups/accept-invite")
 @protected_endpoint
+@protect_group_endpoint()
 async def post_accept_invite(data: schemas.GroupInviteStateSchema, request: Request) -> JSONResponse:
     if not groups.is_user_invited(data.uuid, data.group_id):
         return api_response(False, err_msg="You are not invited :(")
@@ -188,11 +214,19 @@ async def post_accept_invite(data: schemas.GroupInviteStateSchema, request: Requ
 
 @api.post("/api/groups/reject-invite")
 @protected_endpoint
+@protect_group_endpoint()
 async def post_reject_invite(data: schemas.GroupInviteStateSchema, request: Request) -> JSONResponse:
     if not groups.is_user_invited(data.uuid, data.group_id):
         return api_response(False, err_msg="You are not invited :(")
     
     groups.delete_group_invitation(data.uuid, data.group_id)
+    return api_response(True)
+
+@api.post("/api/groups/rename")
+@protected_endpoint
+@protect_group_endpoint(manager_only=True)
+async def post_group_rename(data: schemas.GroupRenameSchema, request: Request) -> JSONResponse:
+    groups.rename_group(data.group_id, data.new_name)
     return api_response(True)
 
 

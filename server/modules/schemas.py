@@ -41,3 +41,8 @@ class GroupInviteSchema(ProtectedModel):
 
 class GroupInviteStateSchema(ProtectedModel):
     group_id: str
+    
+class GroupRenameSchema(ProtectedModel):
+    group_id: str
+    new_name: str
+    
