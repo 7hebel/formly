@@ -22,11 +22,26 @@ export function FormBuilderOptions({ componentId, formComponents, setFormCompone
     setFormComponents(newComponents);
   }
 
+  function moveComponent(direction) {
+    const index = formComponents.findIndex(c => c.componentId === componentId);
+  
+    if (index === -1) return formComponents;
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= formComponents.length) return formComponents;
+  
+    const newFormComponents = [...formComponents];
+    [newFormComponents[index], newFormComponents[newIndex]] = 
+      [newFormComponents[newIndex], newFormComponents[index]];
+  
+    setFormComponents(newFormComponents);
+  }
+
+
   return (
     <div className='form-component-builder-options'>
       <div className='row'>
-        <ChevronUp/>
-        <ChevronDown/>
+        <ChevronUp onClick={() => {moveComponent("up")}}/>
+        <ChevronDown onClick={() => {moveComponent("down")}}/>
       </div>
       <div className='row'>
         <Trash2 onClick={handleDeleteFormComponent}/>

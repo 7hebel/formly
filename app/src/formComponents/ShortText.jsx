@@ -12,9 +12,9 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
     let newQuestion = questionChangerRef.current.value;
     setQuestion(newQuestion);
     setFormComponents(prevComponents =>
-        prevComponents.map(c =>
-          c.componentId === props.componentId ? { ...c, question: newQuestion } : c
-        )
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, question: newQuestion } : c
+      )
     );
   }
 
