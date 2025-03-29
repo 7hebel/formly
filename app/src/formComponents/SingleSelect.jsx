@@ -1,10 +1,11 @@
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
+import { SingleSelect } from '../ui/Select.jsx';
 import { FormComponentBase, FormBuilderOptions } from './FormComponentBase.jsx';
 import { useRef, useState } from 'react';
 import './formComponents.css';
 
 
-export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...props}) {
+export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
   const questionChangerRef = useRef(null);
 
@@ -20,7 +21,7 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
 
   return (
     <div className='form-component-builder-group'>
-      <ShortTextAnswer question={question} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></ShortTextAnswer>
+      <SignleSelectAnswer question={question} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></SignleSelectAnswer>
       <div className='form-component-builder-editor'>
         <FormBuilderOptions componentId={props.componentId} formComponents={formComponents} setFormComponents={setFormComponents}></FormBuilderOptions>
         <div className='hzSepMid'></div>
@@ -33,14 +34,11 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
   )
 }
 
-export function ShortTextAnswer({formComponents, setFormComponents, ...props}) {
+export function SignleSelectAnswer({formComponents, setFormComponents, ...props}) {
+  //TODO: options props
   return (
     <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} {...props}>
-      <InputGroup>
-        <InputLabel>Your short answer</InputLabel>
-        <Input placeholder="Maximum 80 characters..." maxlen={80}></Input>
-      </InputGroup>
+        <SingleSelect qid={props.componentId}></SingleSelect>
     </FormComponentBase>
   )
 }
-

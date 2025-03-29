@@ -11,8 +11,8 @@ export function InputLabel({ children }) {
   )
 }
 
-export function Input({ id, type="text", placeholder, value, pattern, minlen, maxlen, onChange, ref }) {
-  if (pattern==null && type=="number") pattern = "[\d]"
+export function Input({ id, type="text", placeholder, value, pattern, minlen, maxlen, onChange, ref, min, max }) {
+  if (pattern==null && type=="number") pattern = "^\d*\.?\d*$"
   
   return (
     <input 
@@ -26,6 +26,9 @@ export function Input({ id, type="text", placeholder, value, pattern, minlen, ma
       onChange={onChange}
       defaultValue={value}
       ref={ref}
+      step="any"
+      min={min || undefined}
+      max={max || undefined}
     ></input>
   )
 }

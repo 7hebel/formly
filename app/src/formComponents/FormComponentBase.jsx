@@ -36,7 +36,6 @@ export function FormBuilderOptions({ componentId, formComponents, setFormCompone
     setFormComponents(newFormComponents);
   }
 
-
   return (
     <div className='form-component-builder-options'>
       <div className='row'>

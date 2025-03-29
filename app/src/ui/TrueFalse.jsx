@@ -8,13 +8,13 @@ export function TrueFalse({ qid, defValueState, setter }) {
   function onTrue() {
     trueRef.current.checked = true;
     falseRef.current.checked = false;
-    setter(true);
+    if (setter) setter(true);
   }
   
   function onFalse() {
     falseRef.current.checked = true;
     trueRef.current.checked = false;
-    setter(false);
+    if (setter) setter(false);
   }
   
   return (

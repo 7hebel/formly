@@ -1,10 +1,11 @@
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
+import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { FormComponentBase, FormBuilderOptions } from './FormComponentBase.jsx';
 import { useRef, useState } from 'react';
 import './formComponents.css';
 
 
-export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...props}) {
+export function TrueFalseAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
   const questionChangerRef = useRef(null);
 
@@ -20,7 +21,7 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
 
   return (
     <div className='form-component-builder-group'>
-      <ShortTextAnswer question={question} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></ShortTextAnswer>
+      <TrueFalseAnswer question={question} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></TrueFalseAnswer>
       <div className='form-component-builder-editor'>
         <FormBuilderOptions componentId={props.componentId} formComponents={formComponents} setFormComponents={setFormComponents}></FormBuilderOptions>
         <div className='hzSepMid'></div>
@@ -33,14 +34,10 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
   )
 }
 
-export function ShortTextAnswer({formComponents, setFormComponents, ...props}) {
+export function TrueFalseAnswer({formComponents, setFormComponents, ...props}) {
   return (
     <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} {...props}>
-      <InputGroup>
-        <InputLabel>Your short answer</InputLabel>
-        <Input placeholder="Maximum 80 characters..." maxlen={80}></Input>
-      </InputGroup>
+        <TrueFalse qid={props.componentId}></TrueFalse>
     </FormComponentBase>
   )
 }
-
