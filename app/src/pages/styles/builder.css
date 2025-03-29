@@ -24,6 +24,8 @@
     max-width: 400px;
     min-width: 320px;
     border-radius: 8px;
+    display: flex;
+    flex-direction: column;
 }
 
 .builder-form-panel {
@@ -45,7 +47,7 @@
     color: var(--color-text);
     justify-content: center;
     position: relative;
-    margin-block: 8px;
+    margin-top: 12px;
 }
 
 .builder-panel-header > h2 {
@@ -63,7 +65,6 @@
     display: flex;
     flex-direction: column;
     padding-inline: 8px;
-    
 }
 
 .builder-form-content {
@@ -87,7 +88,8 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 12px
+    gap: 12px;
+    margin-top: 40px;
 }
 
 .add-component-btn {

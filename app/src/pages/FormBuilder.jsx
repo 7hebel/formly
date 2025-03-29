@@ -5,8 +5,8 @@ import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, DoorClosed } from 'lucide-react';
-import { ErrorLabel } from "../ui/ErrorLabel.jsx"
 import { useEffect, useRef, useState } from 'react';
+import { ShortTextAnswer, ShortTextAnswerBuilder } from '../formComponents/ShortText.jsx';
 import butterup from 'butteruptoasts';
 import 'butteruptoasts/src/butterup.css';
 import './styles/builder.css'
@@ -18,6 +18,15 @@ function displayMessage(content) {
     location: 'bottom-center',
     dismissable: true,
   });
+}
+
+function generateComponentId() {
+  return Date.now() + "" + Math.random();
+}
+
+
+const formComponentsBuilders = {
+  "short-text-answer": ShortTextAnswerBuilder
 }
 
 
@@ -52,7 +61,7 @@ export default function FormBuilder() {
       setIsAnon(data.data.settings.is_anonymous);
       setIsAccountRequired(data.data.settings.accounts_only);
       setFormPassword(data.data.settings.password);
-  
+      setFormComponents(data.data.structure);
       
     } catch (error) {
       displayMessage("Failed to load form.");
@@ -71,14 +80,23 @@ export default function FormBuilder() {
   const [isAnon, setIsAnon] = useState(false);
   const [isAccountRequired, setIsAccountRequired] = useState(true);
   const [formPassword, setFormPassword] = useState(null);
-  
+  const [formComponents, setFormComponents] = useState([]);
+
   function updateName(event) {
     if (!event.target.value || !event.target.validity.valid) return;
     setFormName(event.target.value);
   }
-  
+
+  function grabComponentsData() {
+    const data = [];
+    document.querySelectorAll(".form-component").forEach((componentEl) => {
+      data.push(JSON.parse(componentEl.getAttribute("_componentdata")));
+    })
+    return data;
+  }
+
   async function sendSave() {
-    const structure = [];
+    const structure = grabComponentsData();
     const settings = {
       "title": formName,
       "is_anonymous": isAnon,
@@ -100,18 +118,15 @@ export default function FormBuilder() {
 
     const response = await fetch(import.meta.env.VITE_API_URL + "/forms/update-form", requestOptions);
     const data = await response.json();
-    if (data.status) {
-      displayMessage("Saved!");
-    } else {
-      displayMessage("Failed to save, " + data.err_msg);
-    }
+    if (data.status) { displayMessage("Saved!"); }
+    else { displayMessage("Failed to save, " + data.err_msg); }
 
   }
 
-  async function onLeave() {
-    //TODO: alert - no save
-
+  function addFormComponent(componentType) {
+    setFormComponents([...formComponents, {"componentType": componentType, "componentId": generateComponentId()}]);
   }
+
 
   if (loading) return <>Loading {formId}</>;
   
@@ -205,14 +220,28 @@ export default function FormBuilder() {
 
         <div className='builder-form-panel'>
           <div className='builder-panel-header'>
-            <ClipboardList/>
-            <h2>{formName}</h2>
+            <ClipboardList/><h2>{formName}</h2>
           </div>
           <div className='hzSepMid'></div>
           <div className='builder-form-content'>
 
+            {
+              formComponents.map((componentData, qIndex) => {
+                const DynamicComponentBuilder = formComponentsBuilders[componentData.componentType];
+                return (
+                  <DynamicComponentBuilder 
+                    key={componentData.componentId} 
+                    questionNo={qIndex + 1} 
+                    formComponents={formComponents}
+                    setFormComponents={setFormComponents}
+                    {...componentData}
+                  ></DynamicComponentBuilder>
+                )
+              })
+            }
+
             <div className='builder-new-blocks'>
-              <div className='add-component-btn'>
+              <div className='add-component-btn' onClick={() => {addFormComponent("short-text-answer")}}>
                 <TextCursorInput/>Short text answer
               </div>
               <div className='add-component-btn'>

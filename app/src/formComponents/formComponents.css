@@ -1,0 +1,68 @@
+
+.form-component {
+    width: 50%;
+    min-width: 450px;
+    margin-block: 40px;
+    padding: 8px;
+    background-color: var(--color-bg-main);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+
+.form-component > h3 {
+    font-family: var(--ui-font);
+    color: var(--color-text);
+    word-wrap: break-word;
+    white-space-collapse: preserve-breaks;
+ 
+}
+
+.form-component > h3 > span {
+    color: var(--color-primary-muted);
+    margin-right: 8px;;
+}
+
+.form-component-builder-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.form-component-builder-editor {
+    z-index: 0;
+    background-color: var(--color-panel);
+    width: 50%;
+    margin-top: -46px;
+    border: 1px solid var(--color-border);
+    border-radius: 0px 0px 6px 6px;
+    padding: 8px;
+    padding-top: 20px;
+}
+
+.form-component-builder-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-inline: 8px;
+}
+
+.form-component-builder-options > .row > svg {
+    color: var(--color-text);
+    width: 18px;
+    height: 18px;
+    opacity: .7;
+    transition: opacity .2s;
+    padding: 4px;
+    box-sizing: content-box;
+}
+
+.form-component-builder-options > .row > svg:hover {
+    cursor: pointer;
+    opacity: 1;
+}
+
+
