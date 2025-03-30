@@ -1,7 +1,7 @@
 
 .form-component {
     width: 50%;
-    min-width: 450px;
+    min-width: 480px;
     margin-block: 40px;
     padding: 8px;
     background-color: var(--color-bg-main);
@@ -41,7 +41,7 @@
     border-radius: 0px 0px 6px 6px;
     padding: 8px;
     padding-top: 20px;
-    min-width: 450px;
+    min-width: 480px;
 }
 
 .form-component-builder-options {

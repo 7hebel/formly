@@ -6,6 +6,7 @@ import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, DoorClosed } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { SignleSelectAnswerBuilder } from '../formComponents/SingleSelect.jsx';
 import { ShortTextAnswerBuilder } from '../formComponents/ShortText.jsx';
 import { TrueFalseAnswerBuilder } from '../formComponents/TrueFalse.jsx';
 import { LongTextAnswerBuilder } from '../formComponents/LongText.jsx';
@@ -32,7 +33,8 @@ const formComponentsBuilders = {
   "short-text-answer": ShortTextAnswerBuilder,
   "long-text-answer": LongTextAnswerBuilder,
   "numeric-answer": NumericAnswerBuilder,
-  "truefalse-answer": TrueFalseAnswerBuilder
+  "truefalse-answer": TrueFalseAnswerBuilder,
+  "single-select-answer": SignleSelectAnswerBuilder,
 }
 
 
@@ -259,7 +261,7 @@ export default function FormBuilder() {
               <div className='add-component-btn' onClick={() => {addFormComponent("truefalse-answer")}}>
                 <ToggleRight/>True / False
               </div>
-              <div className='add-component-btn'>
+              <div className='add-component-btn' onClick={() => {addFormComponent("single-select-answer")}}>
                 <CircleCheck/>Select single option
               </div>
               <div className='add-component-btn'>
