@@ -1,13 +1,13 @@
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
-import { SingleSelect } from '../ui/Select.jsx';
+import { MultiSelect } from '../ui/Select.jsx';
 import { FormComponentBase, FormBuilderOptions } from './FormComponentBase.jsx';
 import { useRef, useState } from 'react';
-import { PlusCircle, MinusCircle } from 'lucide-react';
+import { PlusSquare, MinusSquare } from 'lucide-react';
 import './formComponents.css';
 import { TertiaryButton } from '../ui/Button.jsx';
 
 
-export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ...props}) {
+export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
   const [options, setOptions] = useState(props.options || ["Answer 1"]);
   const questionChangerRef = useRef(null);
@@ -40,7 +40,7 @@ export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ..
 
   return (
     <div className='form-component-builder-group'>
-      <SignleSelectAnswer question={question} options={options} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></SignleSelectAnswer>
+      <MultiSelectAnswer question={question} options={options} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></MultiSelectAnswer>
       <div className='form-component-builder-editor'>
         <FormBuilderOptions componentId={props.componentId} formComponents={formComponents} setFormComponents={setFormComponents}></FormBuilderOptions>
         <div className='hzSepMid'></div>
@@ -56,7 +56,7 @@ export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ..
                 <InputLabel>Option {index + 1}</InputLabel>
                 <div className='input-with-action'>
                   <Input value={option} onChange={(ev) => {onOptionContentChange(index, ev.target.value)}}></Input>
-                  <MinusCircle className='form-builder-option-delete' onClick={() => {onOptionDelete(index)}}/>
+                  <MinusSquare className='form-builder-option-delete' onClick={() => {onOptionDelete(index)}}/>
                 </div>
               </InputGroup>
             ))
@@ -64,17 +64,17 @@ export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ..
         </div>
         <div className='hzSep'></div>
         <TertiaryButton onClick={onAddOption}>
-          <PlusCircle/>Add option
+          <PlusSquare/>Add option
         </TertiaryButton>
       </div>
     </div>
   )
 }
 
-export function SignleSelectAnswer({formComponents, setFormComponents, ...props}) {
+export function MultiSelectAnswer({formComponents, setFormComponents, ...props}) {
   return (
     <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} {...props}>
-      <SingleSelect qid={props.componentId} options={props.options}></SingleSelect>
+      <MultiSelect qid={props.componentId} options={props.options}></MultiSelect>
     </FormComponentBase>
   )
 }
