@@ -26,16 +26,32 @@ export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ..
     const newOptions = [...options]; 
     newOptions[index] = value; 
     setOptions(newOptions);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, options: newOptions } : c
+      )
+    );
   }
 
   function onAddOption() {
-    setOptions([...options, `Answer ${options.length + 1}`]);
+    const newOptions = [...options, `Answer ${options.length + 1}`]
+    setOptions(newOptions);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, options: newOptions } : c
+      )
+    );
   }
 
   function onOptionDelete(index) {
     const newOptions = [...options];
     newOptions.splice(index, 1);
     setOptions(newOptions);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, options: newOptions } : c
+      )
+    );
   }
 
   return (

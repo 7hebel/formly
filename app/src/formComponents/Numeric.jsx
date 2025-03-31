@@ -6,8 +6,10 @@ import './formComponents.css';
 
 export function NumericAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
-  const [minRange, setMinRange] = useState(props.minrange || "0");
-  const [maxRange, setMaxRange] = useState(props.maxrange || "0");
+  const [minRange, setMinRange] = useState(props.minrange || null);
+  const [maxRange, setMaxRange] = useState(props.maxrange || null);
+  if (minRange == 0) setMinRange(null);
+  if (maxRange == 0) setMaxRange(null);
 
   const questionChangerRef = useRef(null);
   const minRangeChangerRef = useRef(null);
@@ -44,14 +46,13 @@ export function NumericAnswerBuilder({formComponents, setFormComponents, ...prop
     minRangeChangerRef.current.reportValidity();
     maxRangeChangerRef.current.reportValidity();
 
-
-    console.log(newMin, newMax)
-    
     setFormComponents(prevComponents =>
       prevComponents.map(c =>
         c.componentId === props.componentId ? { ...c, minrange: newMin, maxrange: newMax } : c
       )
     );
+    setMinRange(newMin);
+    setMaxRange(newMax);
   }
 
   return (

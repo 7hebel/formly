@@ -13,7 +13,8 @@ const characteristicsIcons = {
   grade: Medal,
   assign: Users,
   submitted: CheckCheck,
-  timelimit: Hourglass
+  timelimit: Hourglass,
+  hidden_answers: EyeOff
 }
 
 

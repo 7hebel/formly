@@ -6,7 +6,7 @@ export function SingleSelect({ qid, options }) {
     <div className="select-container">
       {
         options?.map((option, index) => (
-          <label key={option + "" + index} className='select-radio-label'>
+          <label key={index} className='select-radio-label'>
             <input type="radio" name={'ssel-' + qid} className='select-radio'/>
             {option}
           </label>

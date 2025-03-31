@@ -22,6 +22,7 @@ Saved form format:
         "time_limit_m": 60 | 0 for not limit (in minutes), 
         "password": BCRYPT_HEX | False for no password,
         "accounts_only": True  (Allow only user with accounts to answer),
+        "hide_answers": False 
     },
     "assigned": {
         "groups": [],
@@ -43,6 +44,7 @@ class FormSettings:
     time_limit_m: int = 0
     password: str | None = None
     accounts_only: bool = False
+    hide_answers: bool = False
     
     @staticmethod
     def from_dict(settings: dict) -> "FormSettings":
@@ -193,6 +195,8 @@ def get_enriched_form_data(form_id: str, user_uuid: str) -> dict:
         characteristics.append({"type": "timelimit", "content": f"Time limit: [{form_settings['time_limit_m']} minutes]"})
     if form_settings["password"]:
         characteristics.append({"type": "password", "content": f"Form is secured with [password]"})
+    if form_settings["hide_answers"]:
+        characteristics.append({"type": "hidden_answers", "content": f"You response will be [hidden]"})
     if assigned_groups or assigned_emails:
         if assigned_groups:
             content = f"Assigned to [{len(assigned_groups)} groups]"

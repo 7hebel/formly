@@ -5,7 +5,7 @@ import { MultiSelect } from '../ui/Select.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle } from 'lucide-react';
+import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { SignleSelectAnswerBuilder } from '../formComponents/SingleSelect.jsx';
 import { MultiSelectAnswerBuilder } from '../formComponents/MultiSelect.jsx';
@@ -98,6 +98,7 @@ export default function FormBuilder() {
       
       setFormName(data.data.settings.title);
       setIsAnon(data.data.settings.is_anonymous);
+      setHideAnswers(data.data.settings.hide_answers);
       setIsAccountRequired(data.data.settings.accounts_only);
       setFormPassword(data.data.settings.password);
       setFormComponents(data.data.structure);
@@ -118,6 +119,7 @@ export default function FormBuilder() {
   
   const [formName, setFormName] = useState("Form");
   const [isAnon, setIsAnon] = useState(false);
+  const [hideAnswers, setHideAnswers] = useState(false);
   const [isAccountRequired, setIsAccountRequired] = useState(true);
   const [formPassword, setFormPassword] = useState(null);
   const [formComponents, setFormComponents] = useState([]);
@@ -165,7 +167,8 @@ export default function FormBuilder() {
       "is_anonymous": isAnon,
       "time_limit_m": parseInt(document.getElementById("form-ans-time-limit").value) || 0,
       "password": document.getElementById("form-password").value,
-      "accounts_only": isAccountRequired
+      "accounts_only": isAccountRequired,
+      "hide_answers": hideAnswers
     };
     const assigned = {
       "groups": assignedGroups,
@@ -300,6 +303,13 @@ export default function FormBuilder() {
                   <UserCheck/>Require Formly account
                 </InputLabel>
                 <TrueFalse qid="require-account" defValueState={isAccountRequired} setter={setIsAccountRequired}></TrueFalse>
+              </InputGroup>
+              <div className='hzSep'></div>
+              <InputGroup>
+                <InputLabel>
+                  <EyeOff/>Hide asnwers
+                </InputLabel>
+                <TrueFalse qid="hide-answers" defValueState={hideAnswers} setter={setHideAnswers}></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
