@@ -59,3 +59,11 @@ class UpdateFormSchema(ProtectedModel):
     structure: list
     assigned: dict[str, list[str]]
     
+class FormRespondentSchema(BaseModel):
+    form_id: str
+    is_account: bool
+    uuid: str = None
+    fullname: str = None
+    email: str = None
+    password: str = None
+    

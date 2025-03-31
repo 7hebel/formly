@@ -8,7 +8,7 @@
 
 .builder-panels-container {
     width: 100%;
-    height: 90dvh;
+    height: 88dvh;
     display: flex;
     flex-direction: row;
     gap: 10px;

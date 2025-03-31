@@ -3,6 +3,7 @@ import { useState, useEffect, StrictMode } from 'react';
 import { LoginPanel, RegisterPanel } from './pages/SignIn.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import FormBuilder from './pages/FormBuilder.jsx';
+import Answer from './pages/Answer.jsx';
 import Home from './pages/Home.jsx';
 import butterup from "butteruptoasts";
 
@@ -54,6 +55,7 @@ function App() {
         <Route path="/register" element={<RegisterPanel />}/>
         <Route path="/dash" element={<Dashboard />}/>
         <Route path="/builder/:formId" element={<FormBuilder />}/>
+        <Route path="/form/:formId" element={<Answer />}/>
         </Routes>
       </BrowserRouter>
     </StrictMode>

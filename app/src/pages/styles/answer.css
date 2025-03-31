@@ -1,0 +1,105 @@
+.answer {
+    width: 100%;
+    margin-top: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+
+.form-info-panel {
+    width: 500px;
+    min-height: 150px;
+    background-color: var(--color-bg-main);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    padding: 8px;
+}
+
+.form-info-panel > h1 {
+    font-family: var(--ui-font);
+    color: var(--color-text);
+    font-size: 20px;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-left: 26px;
+    word-break: break-all;
+}
+
+.form-info-panel > h1 > svg {
+    position: absolute;
+    left: -26px;
+    color: var(--color-border);
+    width: 20px;
+    height: 20px;
+}
+
+.respondent-info {
+    width: 500px;
+    min-height: 150px;
+    background-color: var(--color-panel);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    padding: 8px;
+}
+
+.respondent-account {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-family: var(--ui-font);
+    color: var(--color-text);
+    font-weight: 500;
+    font-size: 14px;
+    position: relative;
+    text-wrap-mode: nowrap;
+}
+
+.respondent-account > svg {
+    min-width: 20px;
+    min-height: 20px;
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    color: var(--color-primary-muted);
+}
+
+#respondent-name {
+    font-weight: 700;
+    margin-left: 1ch;
+    text-decoration: underline 2px var(--color-primary);
+    text-underline-offset: 2px;
+    word-break: break-all;
+    margin-right: 60px;
+    text-wrap-mode: wrap;
+}
+
+#change-logged-respondent {
+    font-size: 12px;
+    position: absolute;
+    right: 0px;
+    color: var(--color-text);
+    opacity: .7;
+    cursor: pointer;
+}
+
+.respondent-no-account {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#already-user {
+    font-family: var(--ui-font);
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: underline 2px var(--color-primary);
+    cursor: pointer;
+    width: max-content;
+}
+

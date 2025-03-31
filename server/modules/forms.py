@@ -108,6 +108,28 @@ def get_assigned_to_user(user_uuid: str) -> list[str]:
     return assigned_forms
 
 
+def is_assigned_to_user(form_id: str, user_uuid: str) -> bool:
+    user = users.get_user_by_uuid(user_uuid)
+    user_groups = user.groups.split("|")
+    
+    form = _get_form_content(form_id)
+    if form is None:
+        logs.error(f"Failed to check if form: ({form_id}) is assigned to user: <{user_uuid}> (form not found)")
+        return False
+    
+    if form["author_uuid"] == user_uuid:
+        return True
+    
+    if user.email in form["assigned"]["emails"]:
+        return True
+    
+    for assigned_group in form["assigned"]["groups"]:
+        if assigned_group in user_groups:
+            return True
+        
+    return False
+
+
 def get_forms_in_group(group_id: str, author_uuid: str) -> tuple[list[str], list[str]]:
     assigned_forms = []
     draft_forms = []
@@ -175,19 +197,18 @@ def update_form(form_id: str, new_settings: dict, structure: list, assigned: dic
     logs.info("Forms", f"Updated form settings and structure ({form_id})")
 
 
-def get_enriched_form_data(form_id: str, user_uuid: str) -> dict:
+def get_sharable_form_data(form_id: str, user_uuid: str) -> dict:
     form_data = _get_form_content(form_id)
     form_settings = form_data["settings"]
     assigned_groups = form_data["assigned"]["groups"]
     assigned_emails = form_data["assigned"]["emails"]
-    if user_uuid != form_data["author_uuid"]:
-        form_settings["password"] = bool(form_settings["password"])
+    form_settings["password"] = bool(form_settings["password"])
     
     characteristics = []
     if user_uuid == form_data["author_uuid"]:
         characteristics.append({"type": "author", "content": f"You are the [author]"})
     else:
-        author_name = users.get_user_by_uuid(user_uuid).fullname
+        author_name = users.get_user_by_uuid(form_data["author_uuid"]).fullname
         characteristics.append({"type": "author", "content": f"Made by [{author_name}]"})
     if form_settings["is_anonymous"]:
         characteristics.append({"type": "anonymous", "content": "Answers are [anonymous]"})
@@ -197,6 +218,7 @@ def get_enriched_form_data(form_id: str, user_uuid: str) -> dict:
         characteristics.append({"type": "password", "content": f"Form is secured with [password]"})
     if form_settings["hide_answers"]:
         characteristics.append({"type": "hidden_answers", "content": f"You response will be [hidden]"})
+    characteristics.append({"type": "questions_count", "content": f"{len(form_data["structure"])} questions"})
     if assigned_groups or assigned_emails:
         if assigned_groups:
             content = f"Assigned to [{len(assigned_groups)} groups]"
@@ -207,7 +229,7 @@ def get_enriched_form_data(form_id: str, user_uuid: str) -> dict:
         elif assigned_emails:
             characteristics.append({"type": "assign", "content": f"Assigned to [{len(assigned_emails)}] emails"})
         
-    
+    form_data.pop("structure")
     form_data["characteristics"] = characteristics
     return form_data
     

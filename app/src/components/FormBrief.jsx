@@ -1,4 +1,4 @@
-import { LockKeyholeIcon, VenetianMask, Edit3, CornerDownRight, Eye, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass } from 'lucide-react';
+import { LockKeyholeIcon, VenetianMask, Edit3, CornerDownRight, Eye, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash } from 'lucide-react';
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
 import '../pages/styles/dashboard.css'
 import { useState, useEffect} from 'react';
@@ -14,7 +14,8 @@ const characteristicsIcons = {
   assign: Users,
   submitted: CheckCheck,
   timelimit: Hourglass,
-  hidden_answers: EyeOff
+  hidden_answers: EyeOff,
+  questions_count: Hash,
 }
 
 
@@ -39,7 +40,7 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
       }),
     };
 
-    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/fetch-form", requestOptions);
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/get-brief", requestOptions);
     const data = await response.json();
 
     if (data.status) {
@@ -51,7 +52,6 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
   };
   useEffect(() => {fetchFormData()}, []);
   
-
 
   return (
     <div className="form-brief-view" isfinished={Number(isAnswered)} isfeatured={Number(isAssigned)}>

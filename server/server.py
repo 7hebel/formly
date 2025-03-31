@@ -324,10 +324,10 @@ async def post_load_forms(data: schemas.ProtectedModel, request: Request) -> JSO
     
 @api.post("/api/forms/fetch-form")
 @protected_endpoint
-@protect_form_endpoint()
+@protect_form_endpoint(author_only=True)
 async def post_fetch_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
-    enriched_content = forms.get_enriched_form_data(data.form_id, data.uuid)
-    return api_response(True, enriched_content)
+    content = forms._get_form_content(data.form_id)
+    return api_response(True, content)
 
 @api.post("/api/forms/update-form")
 @protected_endpoint
@@ -336,5 +336,28 @@ async def post_update_form(data: schemas.UpdateFormSchema, request: Request) -> 
     forms.update_form(data.form_id, data.settings, data.structure, data.assigned)
     return api_response(True)
 
+
+@api.post("/api/forms/get-brief")
+async def post_get_brief_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
+    enriched_content = forms.get_sharable_form_data(data.form_id, data.uuid)
+    return api_response(True, enriched_content)
+
+@api.post("/api/forms/validate-respondent")
+async def post_validate_respondent(data: schemas.FormRespondentSchema, request: Request) -> JSONResponse:
+    form_data = forms._get_form_content(data.form_id)
+    if form_data is None:
+        return api_response(False, err_msg="Form not found.")
+    
+    if form_data["settings"]["assigned_only"]:
+        if data.is_account and not forms.is_assigned_to_user(data.form_id, data.uuid):
+            return api_response(False, err_msg="This form is not assigned to Your account.")
+        if not data.is_account and data.email not in form_data["assigned"]["emails"]:
+            return api_response(False, err_msg="Provided email has not been assigned to this form.")
+        
+    if form_data["settings"]["password"]:
+        if data.password != form_data["settings"]["password"]:
+            return api_response(False, err_msg="Incorrect password.")
+    
+    return api_response(True, form_data["structure"])
 
 uvicorn.run(api, host="0.0.0.0", port=50500)
