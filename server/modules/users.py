@@ -112,17 +112,7 @@ def update_fullname(user_uuid: str, new_name: str) -> None:
     DB.execute(f"UPDATE users SET fullname=? WHERE uuid=?", (new_name, user_uuid))
     db_conn.commit()
     logs.info("Users", f"Changed user's fullname to: `{new_name}` <{user_uuid}>")
-    
 
-def update_email(user_uuid: str, new_email: str) -> bool | str:
-    if is_email_used(new_email):
-        return "This email is already used by another user."
-    
-    DB.execute(f"UPDATE users SET email=? WHERE uuid=?", (new_email, user_uuid))
-    db_conn.commit()
-    logs.info("Users", f"Changed user's email to: `{new_email}` <{user_uuid}>")
-    return True
-    
 
 def update_password(user_uuid: str, new_raw_password: str, current_password: str) -> bool | str:
     if not validate_password(user_uuid, current_password):

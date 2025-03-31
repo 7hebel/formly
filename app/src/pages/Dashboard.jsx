@@ -171,48 +171,6 @@ export default function Dashboard() {
     });
   }
 
-  function onEmailUpdate() {
-    const newMail = document.getElementById("update-email");
-    const errorLabel = document.getElementById("update-email-errlabel");
-
-    if (!newMail.value || !newMail.validity.valid) {
-      errorLabel.textContent = "Invalid email.";
-      errorLabel.setAttribute("iserror", "1");
-      return;
-    }
-    
-    errorLabel.setAttribute("iserror", "0");
-
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        uuid: String(localStorage.getItem("uuid")),
-        email: newMail.value
-      })
-    };
-    
-    fetch(import.meta.env.VITE_API_URL + "/account-update/email", requestOptions)
-    .then(response => response.json())
-    .then(response => {
-      if (response.status) {
-        errorLabel.setAttribute("iserror", "0");
-        localStorage.setItem("email", newMail.value);
-        newMail.value = "";
-        displayMessage("Email updated.");
-        navigate("/dash");
-      } else {
-        errorLabel.textContent = response.err_msg;
-        errorLabel.setAttribute("iserror", "1");
-      }
-    })
-    .catch(err => {      
-      displayMessage("Failed to update email.");
-      errorLabel.textContent = "Failed to update email.";
-      errorLabel.setAttribute("iserror", "1");
-    });
-  }
-
   function onPasswordUpdate() {
     const newPassword = document.getElementById("update-password");
     const currentPassword = document.getElementById("update-password-current");
@@ -469,15 +427,6 @@ export default function Dashboard() {
                     <TertiaryButton onClick={onFullnameUpdate}>Update</TertiaryButton>
                   </InputGroup>
                   <ErrorLabel id="update-fullname-errlabel"/>
-                </div>
-                <div className='vSep'></div>
-                <div className='dash-account-edit-panel'>
-                  <InputGroup>
-                    <InputLabel>Email</InputLabel>
-                    <Input id='update-email' type="email" placeholder={email} minlen={3}></Input>
-                    <TertiaryButton onClick={onEmailUpdate}>Update</TertiaryButton>
-                  </InputGroup>
-                  <ErrorLabel id="update-email-errlabel"/>
                 </div>
                 <div className='vSep'></div>
                 <div className='dash-account-edit-panel'>

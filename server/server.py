@@ -169,14 +169,6 @@ async def post_account_update_fullname(data: schemas.FullnameUpdateSchema, reque
     users.update_fullname(data.uuid, data.fullname)
     return api_response(True)
 
-@api.post("/api/account-update/email")
-@protected_endpoint
-async def post_account_update_email(data: schemas.EmailUpdateSchema, request: Request) -> JSONResponse:
-    status = users.update_email(data.uuid, data.email.lower())
-    if isinstance(status, str):
-        return api_response(False, err_msg=status)
-    return api_response(True)
-
 @api.post("/api/account-update/password")
 @protected_endpoint
 async def post_account_update_password(data: schemas.PasswordUpdateSchema, request: Request) -> JSONResponse:
