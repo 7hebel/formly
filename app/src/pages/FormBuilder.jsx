@@ -7,6 +7,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, DoorClosed } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { SignleSelectAnswerBuilder } from '../formComponents/SingleSelect.jsx';
+<<<<<<< HEAD
+=======
+import { MultiSelectAnswerBuilder } from '../formComponents/MultiSelect.jsx';
+>>>>>>> b6063fbc8f3a8393583b374a5b5ec3163890ccfd
 import { ShortTextAnswerBuilder } from '../formComponents/ShortText.jsx';
 import { TrueFalseAnswerBuilder } from '../formComponents/TrueFalse.jsx';
 import { LongTextAnswerBuilder } from '../formComponents/LongText.jsx';
@@ -35,6 +39,10 @@ const formComponentsBuilders = {
   "numeric-answer": NumericAnswerBuilder,
   "truefalse-answer": TrueFalseAnswerBuilder,
   "single-select-answer": SignleSelectAnswerBuilder,
+<<<<<<< HEAD
+=======
+  "multi-select-answer": MultiSelectAnswerBuilder,
+>>>>>>> b6063fbc8f3a8393583b374a5b5ec3163890ccfd
 }
 
 
@@ -203,7 +211,7 @@ export default function FormBuilder() {
               <InputLabel>
                <Hourglass/>Answer time limit
               </InputLabel>
-              <div className='row'>
+              <div className='input-with-action'>
                 <Input type='number' id='form-ans-time-limit' value={formData.settings.time_limit_m}></Input>
                 <p className='input-unit'>Minutes.</p>
               </div>
@@ -264,7 +272,7 @@ export default function FormBuilder() {
               <div className='add-component-btn' onClick={() => {addFormComponent("single-select-answer")}}>
                 <CircleCheck/>Select single option
               </div>
-              <div className='add-component-btn'>
+              <div className='add-component-btn' onClick={() => {addFormComponent("multi-select-answer")}}>
                 <SquareCheck/>Select multiple options
               </div>
             </div>

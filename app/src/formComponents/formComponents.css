@@ -51,7 +51,8 @@
     padding-inline: 8px;
 }
 
-.form-component-builder-options > .row > svg {
+.form-component-builder-options > .row > svg,
+.form-builder-option-delete {
     color: var(--color-text);
     width: 18px;
     height: 18px;
@@ -61,9 +62,20 @@
     box-sizing: content-box;
 }
 
-.form-component-builder-options > .row > svg:hover {
+.form-component-builder-options > .row > svg:hover,
+.form-builder-option-delete:hover {
     cursor: pointer;
     opacity: 1;
 }
 
+.form-builder-options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-builder-option-delete {
+    width: 22px;
+    height: 22px;
+}
 

@@ -133,8 +133,21 @@
 .input-unit {
     font-family: var(--ui-font);
     font-size: 14px;
-    width: 100%;
     text-align: center;
+}
+
+.input-with-action {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-right: 4px;
+}
+
+.input-with-action > input {
+    width: 100%;
 }
 
 /* --- ERROR LABEL --- */
@@ -229,7 +242,7 @@
 
 .select-container {
     width: min-content;
-    margin-top: 12px;
+    margin-block: 12px;
     display: flex;
     flex-direction: column;
     gap: 8px;

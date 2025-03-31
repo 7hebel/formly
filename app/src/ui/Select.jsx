@@ -7,8 +7,8 @@ export function SingleSelect({ qid, options }) {
   return (
     <div className="select-container">
       {
-        options?.map(option => (
-          <label key={option} className='select-radio-label'>
+        options?.map((option, index) => (
+          <label key={option + "" + index} className='select-radio-label'>
             <input type="radio" name={'ssel-' + id.current} className='select-radio'/>
             {option}
           </label>
@@ -24,8 +24,8 @@ export function MultiSelect({ qid, options }) {
   return (
     <div className="select-container">
       {
-        options?.map(option => (
-          <label key={option} className='select-radio-label'>
+        options?.map((option, index) => (
+          <label key={option + "" + index} className='select-radio-label'>
             <input type="checkbox" name={'msel-' + id.current} className='select-radio multi-radio'/>
             {option}
           </label>
