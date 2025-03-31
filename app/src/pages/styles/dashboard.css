@@ -305,6 +305,8 @@
 }
 
 .my-group > svg {
+    min-height: 16px;
+    min-width: 16px;
     height: 16px;
     width: 16px;
     color: var(--color-primary-muted);

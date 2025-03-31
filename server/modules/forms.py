@@ -103,7 +103,7 @@ def create_form(author_uuid: str) -> str:
         "settings": asdict(form_settings),
         "assigned": {
             "groups": [],
-            "users": []
+            "emails": []
         },
         "answers": []
     }
@@ -114,7 +114,7 @@ def create_form(author_uuid: str) -> str:
     return form_id
 
 
-def update_form(form_id: str, new_settings: dict, structure: list) -> None:
+def update_form(form_id: str, new_settings: dict, structure: list, assigned: dict[str, list[str]]) -> None:
     form_data = _get_form_content(form_id)
     form_settings = FormSettings.from_dict(form_data["settings"])
     
@@ -123,6 +123,7 @@ def update_form(form_id: str, new_settings: dict, structure: list) -> None:
         
     form_data["settings"] = asdict(form_settings)
     form_data["structure"] = structure
+    form_data["assigned"] = assigned
     _save_form_content(form_id, form_data)
     logs.info("Forms", f"Updated form settings and structure ({form_id})")
 

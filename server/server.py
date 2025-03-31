@@ -19,9 +19,6 @@ import fastapi
 import uvicorn
 
 
-groups._purge_blank_groups()
-
-
 api = fastapi.FastAPI()
 api.add_middleware(
     CORSMiddleware,
@@ -297,6 +294,21 @@ async def post_demote_member(data: schemas.GroupMemberSchema, request: Request) 
         return api_response(False, err_msg=status)
     return api_response(True)
 
+@api.post("/api/groups/get-assignable")
+@protected_endpoint
+async def post_get_assignable(data: schemas.ProtectedModel, request: Request) -> JSONResponse:
+    user = users.get_user_by_uuid(data.uuid)
+    user_groups_ids = user.groups.split("|")
+    assignable = []
+    
+    for group_id in user_groups_ids:
+        if not group_id: continue
+        group_data = groups.get_group_details(group_id, data.uuid)
+        
+        if group_data is not None and group_data["is_manager"]:
+            assignable.append((group_id, group_data["name"]))
+
+    return api_response(True, assignable)
 
 
 # Forms.
@@ -317,7 +329,6 @@ async def post_load_forms(data: schemas.ProtectedModel, request: Request) -> JSO
     }
     return api_response(True, user_forms)
     
-
 @api.post("/api/forms/fetch-form")
 @protected_endpoint
 @protect_form_endpoint()
@@ -329,9 +340,8 @@ async def post_fetch_form(data: schemas.FormIdSchema, request: Request) -> JSONR
 @protected_endpoint
 @protect_form_endpoint(author_only=True)
 async def post_update_form(data: schemas.UpdateFormSchema, request: Request) -> JSONResponse:
-    forms.update_form(data.form_id, data.settings, data.structure)
+    forms.update_form(data.form_id, data.settings, data.structure, data.assigned)
     return api_response(True)
-
 
 
 uvicorn.run(api, host="0.0.0.0", port=50500)

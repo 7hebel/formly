@@ -22,18 +22,8 @@ def _save_group_content(group_id: str, content: dict) -> None:
     group_file_path = GROUPS_DIR_PATH + group_id + ".json"
     with open(group_file_path, "w") as file:
         json.dump(content, file)
-
-
-def _purge_blank_groups() -> None:
-    """ Remove all groups with no members and managers. """
-    for file in os.listdir(GROUPS_DIR_PATH):
-        group_id = file.split(".")[0]
-        content = _get_group_content(group_id)
-        if not content["members"] and not content["managers"]:
-            logs.warn("Groups", f"Purging blank group: [{group_id}]")
-            os.remove(GROUPS_DIR_PATH + file)
-
-
+        
+            
 def create_group(name: str, owner_uuid: str) -> str:
     group_id = uuid.uuid4().hex
 
@@ -138,8 +128,10 @@ def demote_group_member(group_id: str, demoted_uuid: str, demoter_uuid: str) -> 
     return True
 
 
-def get_group_details(group_id: str, user_uuid: str) -> dict:
+def get_group_details(group_id: str, user_uuid: str) -> dict | None:
     content = _get_group_content(group_id)
+    if content is None:
+        return 
     
     managers = []
     members = []
@@ -155,6 +147,7 @@ def get_group_details(group_id: str, user_uuid: str) -> dict:
             members.append([user.fullname, user.uuid])
     
     return {
+        "name": content["name"],
         "is_owner": user_uuid == content["owner_uuid"],
         "is_manager": user_uuid in content["managers"],
         "managers": managers,

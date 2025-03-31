@@ -2,14 +2,12 @@ import { useRef } from 'react';
 
 
 export function SingleSelect({ qid, options }) {
-  const id = useRef(qid);
-  
   return (
     <div className="select-container">
       {
         options?.map((option, index) => (
           <label key={option + "" + index} className='select-radio-label'>
-            <input type="radio" name={'ssel-' + id.current} className='select-radio'/>
+            <input type="radio" name={'ssel-' + qid} className='select-radio'/>
             {option}
           </label>
         ))
@@ -18,15 +16,27 @@ export function SingleSelect({ qid, options }) {
   )
 }
 
-export function MultiSelect({ qid, options }) {
-  const id = useRef(qid);
+export function MultiSelect({ qid, onOptionChange, options, keys, states }) {
+  if (keys !== undefined && options.length !== keys.length) {
+    throw new Error("Created MultiSelect with keys array not matching options.");
+  }
+  if (states !== undefined && options.length !== states.length) {
+    throw new Error("Created MultiSelect with states array not matching options.");
+  }
   
   return (
     <div className="select-container">
       {
         options?.map((option, index) => (
-          <label key={option + "" + index} className='select-radio-label'>
-            <input type="checkbox" name={'msel-' + id.current} className='select-radio multi-radio'/>
+          <label key={option + "" + index + (keys? keys[index] : "")} className='select-radio-label'>
+            <input 
+              type="checkbox"
+              name={'msel-' + qid}
+              optionkey={keys? keys[index] : null}
+              className='select-radio multi-radio'
+              onInput={onOptionChange}
+              defaultChecked={states? states[index] : false}
+            />
             {option}
           </label>
         ))

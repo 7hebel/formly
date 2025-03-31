@@ -57,5 +57,5 @@ class UpdateFormSchema(ProtectedModel):
     form_id: str
     settings: dict
     structure: list
-    
+    assigned: dict[str, list[str]]
     

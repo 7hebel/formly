@@ -1,16 +1,14 @@
 import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { PrimaryButton, SecondaryButton, TertiaryButton, DangerButton } from '../ui/Button.jsx';
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
+import { MultiSelect } from '../ui/Select.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, DoorClosed } from 'lucide-react';
+import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { SignleSelectAnswerBuilder } from '../formComponents/SingleSelect.jsx';
-<<<<<<< HEAD
-=======
 import { MultiSelectAnswerBuilder } from '../formComponents/MultiSelect.jsx';
->>>>>>> b6063fbc8f3a8393583b374a5b5ec3163890ccfd
 import { ShortTextAnswerBuilder } from '../formComponents/ShortText.jsx';
 import { TrueFalseAnswerBuilder } from '../formComponents/TrueFalse.jsx';
 import { LongTextAnswerBuilder } from '../formComponents/LongText.jsx';
@@ -39,10 +37,7 @@ const formComponentsBuilders = {
   "numeric-answer": NumericAnswerBuilder,
   "truefalse-answer": TrueFalseAnswerBuilder,
   "single-select-answer": SignleSelectAnswerBuilder,
-<<<<<<< HEAD
-=======
   "multi-select-answer": MultiSelectAnswerBuilder,
->>>>>>> b6063fbc8f3a8393583b374a5b5ec3163890ccfd
 }
 
 
@@ -56,7 +51,35 @@ export default function FormBuilder() {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [authorGroups, setAuthorGroups] = useState([[], []]);
 
+  const fetchAuthorGroups = async () => {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/groups/get-assignable", requestOptions);
+    const data = await response.json();
+
+    if (data.status) {
+      let names = [];
+      let keys = [];
+
+      for (let [groupKey, groupName] of data.data) {
+        names.push(groupName);
+        keys.push(groupKey);
+      }
+
+      setAuthorGroups([names, keys]);
+    }
+
+  };
+  
   const fetchFormData = async () => {
     try {
       const requestOptions = {
@@ -78,7 +101,9 @@ export default function FormBuilder() {
       setIsAccountRequired(data.data.settings.accounts_only);
       setFormPassword(data.data.settings.password);
       setFormComponents(data.data.structure);
-      
+      setAssignedEmails(data.data.assigned.emails);
+      setAssignedGroups(data.data.assigned.groups);
+
     } catch (error) {
       displayMessage("Failed to load form.");
       navigate("/dash");
@@ -88,15 +113,37 @@ export default function FormBuilder() {
     }
   };
   
-  useEffect(() => {
-    fetchFormData();
-  }, [formId]);
+  useEffect(() => {fetchAuthorGroups()}, []);
+  useEffect(() => {fetchFormData()}, [formId]);
   
   const [formName, setFormName] = useState("Form");
   const [isAnon, setIsAnon] = useState(false);
   const [isAccountRequired, setIsAccountRequired] = useState(true);
   const [formPassword, setFormPassword] = useState(null);
   const [formComponents, setFormComponents] = useState([]);
+  const [assignedEmails, setAssignedEmails] = useState([]);
+  const [assignedGroups, setAssignedGroups] = useState([]);
+
+  function handleAssignEmail() {
+    const email = document.getElementById("assign-email");
+    if (!email.value || !email.validity.valid) return;
+
+    if (assignedEmails.includes(email.value)) {
+      email.value = "";
+      return;
+    }
+
+    setAssignedEmails([...assignedEmails, email.value]);
+    email.value = "";
+  }
+
+  function handleUnassignEmail(email) {
+    const newAssignedEmails = [];
+    for (const assignedEmail of assignedEmails) {
+      if (assignedEmail !== email) newAssignedEmails.push(assignedEmail);
+    }
+    setAssignedEmails(newAssignedEmails);
+  }
 
   function updateName(event) {
     if (!event.target.value || !event.target.validity.valid) return;
@@ -119,6 +166,10 @@ export default function FormBuilder() {
       "time_limit_m": parseInt(document.getElementById("form-ans-time-limit").value) || 0,
       "password": document.getElementById("form-password").value,
       "accounts_only": isAccountRequired
+    };
+    const assigned = {
+      "groups": assignedGroups,
+      "emails": assignedEmails
     }
 
     const requestOptions = {
@@ -128,7 +179,8 @@ export default function FormBuilder() {
         uuid: String(localStorage.getItem("uuid")),
         form_id: formId,
         settings: settings,
-        structure: structure
+        structure: structure,
+        assigned: assigned
       }),
     };
 
@@ -143,6 +195,31 @@ export default function FormBuilder() {
     setFormComponents([...formComponents, {"componentType": componentType, "componentId": generateComponentId()}]);
   }
 
+  function onGroupAssignChange(event) {
+    const groupId = event.target.getAttribute("optionkey");
+    const state = event.target.checked;
+
+    if (state && !assignedGroups.includes(groupId)) {
+      const newAssignedGroups = [...assignedGroups, groupId];
+      setAssignedGroups(newAssignedGroups); 
+    }
+
+    if (!state && assignedGroups.includes(groupId)) {
+      const newAssignedGroups = [];
+      for (const assignedGroup of assignedGroups) {
+        if (assignedGroup !== groupId) newAssignedGroups.push(assignedGroup);
+      }
+      setAssignedGroups(newAssignedGroups);
+    }
+  }
+
+  function getGroupSelectStates() {
+    const states = [];
+    for (const groupId of authorGroups[1]) {
+      states.push(assignedGroups.includes(groupId))
+    }
+    return states;
+  }
 
   if (loading) return <>Loading {formId}</>;
   
@@ -193,44 +270,103 @@ export default function FormBuilder() {
           </div>
           <div className='hzSepMid'></div>
           <div className='builder-properties-container'>
-            <InputGroup>
-              <InputLabel>
-               <Type/>Form name
-              </InputLabel>
-              <Input onChange={updateName} placeholder={formData.settings.title} minlen={1} maxlen={32}></Input>
-            </InputGroup>
-            <div className='hzSep'></div>
-            <InputGroup>
-              <InputLabel>
-                <VenetianMask/>Anonymous answers
-              </InputLabel>
-              <TrueFalse qid="anon-answers" defValueState={isAnon} setter={setIsAnon}></TrueFalse>
-            </InputGroup>
-            <div className='hzSep'></div>
-            <InputGroup>
-              <InputLabel>
-               <Hourglass/>Answer time limit
-              </InputLabel>
-              <div className='input-with-action'>
-                <Input type='number' id='form-ans-time-limit' value={formData.settings.time_limit_m}></Input>
-                <p className='input-unit'>Minutes.</p>
-              </div>
-            </InputGroup>
-            <div className='hzSep'></div>
-            <InputGroup>
-              <InputLabel>
-                <UserCheck/>Require Formly account
-              </InputLabel>
-              <TrueFalse qid="require-account" defValueState={isAccountRequired} setter={setIsAccountRequired}></TrueFalse>
-            </InputGroup>
-            <div className='hzSep'></div>
-            <InputGroup>
-              <InputLabel>
-                <LockKeyhole/>Password
-              </InputLabel>
-              <Input type='password' id='form-password' value={formPassword}></Input>
-            </InputGroup>
-            <div className='hzSep'></div>
+            <div className='builder-properties-top'>
+              <InputGroup>
+                <InputLabel>
+                  <Type/>Form name
+                </InputLabel>
+                <Input onChange={updateName} placeholder={formData.settings.title} minlen={1} maxlen={32}></Input>
+              </InputGroup>
+              <div className='hzSep'></div>
+              <InputGroup>
+                <InputLabel>
+                  <VenetianMask/>Anonymous answers
+                </InputLabel>
+                <TrueFalse qid="anon-answers" defValueState={isAnon} setter={setIsAnon}></TrueFalse>
+              </InputGroup>
+              <div className='hzSep'></div>
+              <InputGroup>
+                <InputLabel>
+                  <Hourglass/>Answer time limit
+                </InputLabel>
+                <div className='input-with-action'>
+                  <Input type='number' id='form-ans-time-limit' value={formData.settings.time_limit_m}></Input>
+                  <p className='input-unit'>Minutes.</p>
+                </div>
+              </InputGroup>
+              <div className='hzSep'></div>
+              <InputGroup>
+                <InputLabel>
+                  <UserCheck/>Require Formly account
+                </InputLabel>
+                <TrueFalse qid="require-account" defValueState={isAccountRequired} setter={setIsAccountRequired}></TrueFalse>
+              </InputGroup>
+              <div className='hzSep'></div>
+              <InputGroup>
+                <InputLabel>
+                  <LockKeyhole/>Password
+                </InputLabel>
+                <Input type='password' id='form-password' value={formPassword}></Input>
+              </InputGroup>
+              <div className='hzSep'></div>
+            </div>
+          </div>
+          <div className='builder-properties-bottom row'>
+            <TertiaryButton wide onClick={() => {setIsAssignModalOpen(true)}}>
+              <UserPlus/>Assign
+            </TertiaryButton>
+            {
+              isAssignModalOpen && (
+                <Modal title="Assign form." close={setIsAssignModalOpen}>
+                  <div className='assign-categories-container'>
+                    <div className='assign-category'>
+                      <h3>
+                        <Users/>Groups
+                      </h3>
+                      <div className='hzSep'></div>
+                      <div className='assignees-container'>
+                        <MultiSelect
+                          qid="assign-groups"
+                          options={authorGroups[0]}
+                          keys={authorGroups[1]}
+                          states={getGroupSelectStates()}
+                          onOptionChange={onGroupAssignChange}
+                        ></MultiSelect>
+                      </div>
+                    </div>
+                    <div className='assign-category'>
+                      <h3>
+                        <Mail/>Emails
+                      </h3>
+                      <div className='hzSep'></div>
+                      <div className='assignees-container'>
+                        {
+                          assignedEmails.map((email) => (
+                            <div className='assignee-item' key={email}>
+                              <p>{email}</p>
+                              <MinusCircle onClick={() => {handleUnassignEmail(email)}}/>
+                            </div>
+                          ))
+                        }
+                      </div>
+                      <InputGroup>
+                        <InputLabel>Assign to email</InputLabel>
+                        <div className='input-with-action'>
+                          <Input type='email' id="assign-email"></Input>
+                          <div className='assign-btn' onClick={handleAssignEmail}>
+                            <PlusCircle/>
+                          </div>
+                        </div>
+                      </InputGroup>
+                    </div>
+                  </div>
+                </Modal>
+              )
+            }
+
+            <PrimaryButton wide>
+              <Send/>Deploy
+            </PrimaryButton>
           </div>
         </div>
 
