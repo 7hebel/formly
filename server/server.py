@@ -303,6 +303,7 @@ async def post_get_assignable(data: schemas.ProtectedModel, request: Request) ->
     return api_response(True, assignable)
 
 
+
 # Forms.
 
 @api.post("/api/forms/create")
@@ -315,7 +316,7 @@ async def post_create_form(data: schemas.ProtectedModel, request: Request) -> JS
 @protected_endpoint
 async def post_load_forms(data: schemas.ProtectedModel, request: Request) -> JSONResponse:
     user_forms = {
-        "assigned": [],
+        "assigned": forms.get_assigned_to_user(data.uuid),
         "my_forms": forms.get_user_forms(data.uuid),
         "answered": []    
     }

@@ -11,7 +11,7 @@ const characteristicsIcons = {
   anonymous: VenetianMask,
   password: LockKeyholeIcon,
   grade: Medal,
-  target: Users,
+  assign: Users,
   submitted: CheckCheck,
   timelimit: Hourglass
 }

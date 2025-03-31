@@ -351,9 +351,11 @@ export default function Dashboard() {
             <div className='dash-forms-category-container'>
               <h1>Assigned to me:</h1>
               <div className="dash-forms-container">
-
-                <FormBrief isAssigned></FormBrief>
-
+                {
+                  forms && forms.assigned.map((formId) => (
+                    <FormBrief isAssigned formId={formId} key={formId}></FormBrief>
+                  ))  
+                }
               </div>
             </div>
             <div className='dash-forms-category-container'>

@@ -1,3 +1,4 @@
+from modules import forms
 from modules import users
 from modules import logs
 
@@ -146,14 +147,15 @@ def get_group_details(group_id: str, user_uuid: str) -> dict | None:
         if user:
             members.append([user.fullname, user.uuid])
     
+    assigned, drafts = forms.get_forms_in_group(group_id, user_uuid)
     return {
         "name": content["name"],
         "is_owner": user_uuid == content["owner_uuid"],
         "is_manager": user_uuid in content["managers"],
         "managers": managers,
         "members": members,
-        "assigned_forms": [],
-        "draft_forms": [],
+        "assigned_forms": assigned,
+        "draft_forms": drafts
     }
         
         
