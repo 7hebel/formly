@@ -99,7 +99,7 @@ export default function FormBuilder() {
       setFormName(data.data.settings.title);
       setIsAnon(data.data.settings.is_anonymous);
       setHideAnswers(data.data.settings.hide_answers);
-      setIsAccountRequired(data.data.settings.accounts_only);
+      setIsAssignedOnly(data.data.settings.assigned_only);
       setFormPassword(data.data.settings.password);
       setFormComponents(data.data.structure);
       setAssignedEmails(data.data.assigned.emails);
@@ -120,7 +120,7 @@ export default function FormBuilder() {
   const [formName, setFormName] = useState("Form");
   const [isAnon, setIsAnon] = useState(false);
   const [hideAnswers, setHideAnswers] = useState(false);
-  const [isAccountRequired, setIsAccountRequired] = useState(true);
+  const [isAssignedOnly, setIsAssignedOnly] = useState(true);
   const [formPassword, setFormPassword] = useState(null);
   const [formComponents, setFormComponents] = useState([]);
   const [assignedEmails, setAssignedEmails] = useState([]);
@@ -167,7 +167,7 @@ export default function FormBuilder() {
       "is_anonymous": isAnon,
       "time_limit_m": parseInt(document.getElementById("form-ans-time-limit").value) || 0,
       "password": document.getElementById("form-password").value,
-      "accounts_only": isAccountRequired,
+      "assigned_only": isAssignedOnly,
       "hide_answers": hideAnswers
     };
     const assigned = {
@@ -300,13 +300,6 @@ export default function FormBuilder() {
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
-                  <UserCheck/>Require Formly account
-                </InputLabel>
-                <TrueFalse qid="require-account" defValueState={isAccountRequired} setter={setIsAccountRequired}></TrueFalse>
-              </InputGroup>
-              <div className='hzSep'></div>
-              <InputGroup>
-                <InputLabel>
                   <EyeOff/>Hide asnwers
                 </InputLabel>
                 <TrueFalse qid="hide-answers" defValueState={hideAnswers} setter={setHideAnswers}></TrueFalse>
@@ -317,6 +310,13 @@ export default function FormBuilder() {
                   <LockKeyhole/>Password
                 </InputLabel>
                 <Input type='password' id='form-password' value={formPassword}></Input>
+              </InputGroup>
+              <div className='hzSep'></div>
+              <InputGroup>
+                <InputLabel>
+                  <UserCheck/>Assigned respondents only
+                </InputLabel>
+                <TrueFalse qid="assigned-only" defValueState={isAssignedOnly} setter={setIsAssignedOnly}></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
             </div>
@@ -422,7 +422,6 @@ export default function FormBuilder() {
                 <SquareCheck/>Select multiple options
               </div>
             </div>
-
           </div>
         </div>
       </div>

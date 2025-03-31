@@ -21,7 +21,7 @@ Saved form format:
         "is_anonymous": True,  (If False and accountless respondent - ask for fullname before form)
         "time_limit_m": 60 | 0 for not limit (in minutes), 
         "password": BCRYPT_HEX | False for no password,
-        "accounts_only": True  (Allow only user with accounts to answer),
+        "assigned_only": True  (Allow only user with accounts to answer),
         "hide_answers": False 
     },
     "assigned": {
@@ -43,7 +43,7 @@ class FormSettings:
     is_anonymous: bool = False
     time_limit_m: int = 0
     password: str | None = None
-    accounts_only: bool = False
+    assigned_only: bool = False
     hide_answers: bool = False
     
     @staticmethod
