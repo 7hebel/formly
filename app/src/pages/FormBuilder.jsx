@@ -5,7 +5,7 @@ import { MultiSelect } from '../ui/Select.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy } from 'lucide-react';
+import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { getComponentBuilder } from "../formComponents/AllComponents.jsx"
 import butterup from 'butteruptoasts';
@@ -34,6 +34,7 @@ export default function FormBuilder() {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isResponsesModalOpen, setIsResponsesModalOpen] = useState(false);
   const [authorGroups, setAuthorGroups] = useState([]);
 
   const fetchAuthorGroups = async () => {
@@ -78,7 +79,7 @@ export default function FormBuilder() {
       const data = await response.json();
       
       if (data.status) setFormData(data.data);
-      
+      console.log(data.data)
       setFormName(data.data.settings.title);
       setIsAnon(data.data.settings.is_anonymous);
       setHideAnswers(data.data.settings.hide_answers);
@@ -88,6 +89,8 @@ export default function FormBuilder() {
       setIsActive(data.data.settings.is_active);
       setAssignedEmails(data.data.assigned.emails);
       setAssignedGroups(data.data.assigned.groups);
+      setCurrentlyResponding(data.data.responding);
+      setResponses(data.data.answers);
 
     } catch (error) {
       displayMessage("Failed to load form.");
@@ -110,6 +113,8 @@ export default function FormBuilder() {
   const [formComponents, setFormComponents] = useState([]);
   const [assignedEmails, setAssignedEmails] = useState([]);
   const [assignedGroups, setAssignedGroups] = useState([]);
+  const [currentlyResponding, setCurrentlyResponding] = useState({});
+  const [responses, setResponses] = useState({});
 
   function handleAssignEmail() {
     const email = document.getElementById("assign-email");
@@ -336,10 +341,40 @@ export default function FormBuilder() {
               <div className='hzSep'></div>
             </div>
           </div>
-          <div className='builder-properties-bottom row'>
-            <TertiaryButton wide onClick={() => {setIsAssignModalOpen(true)}}>
-              <UserPlus/>Assign
+          <div className='builder-properties-bottom'>
+            <TertiaryButton wide onClick={() => {setIsResponsesModalOpen(true)}}>
+              <Eye/>View {Object.keys(responses).length} responses
             </TertiaryButton>
+            {
+              !isResponsesModalOpen && (
+                <Modal title="View form responses." close={setIsResponsesModalOpen}>
+                  <div className='responses-content'>
+                    <div className='responses-type-header'>Currently responding: <span className='header-value'>{Object.keys(currentlyResponding).length}</span></div>
+                    <div className='currently-responding-container'>
+                      {
+                        Object.entries(currentlyResponding).map(([email, data]) => (
+                          <span className='currently-responding' key={email}>{data.fullname} ({email})</span>
+                        ))
+                      }
+                    </div>
+                    <div className='hzSep'></div>
+                    <div className='responses-type-header'>Submitted responses: <span className='header-value'>{Object.keys(responses).length}</span></div>
+                    <div className='submitted-responses-container'>
+                      {
+                        Object.entries(responses).map(([email, data]) => (
+                          <span className='currently-responding' key={email}>{data.fullname} ({email})</span>
+                        ))
+                      }
+                    </div>
+                  </div>
+                </Modal>
+              )
+            }
+          </div>
+          <div className='builder-properties-bottom row'>
+            <SecondaryButton wide onClick={() => {setIsAssignModalOpen(true)}}>
+              <UserPlus/>Assign
+            </SecondaryButton>
             {
               isAssignModalOpen && (
                 <Modal title="Assign form." close={setIsAssignModalOpen}>
