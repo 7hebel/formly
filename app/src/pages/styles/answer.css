@@ -41,7 +41,6 @@
 
 .respondent-info {
     width: 500px;
-    min-height: 150px;
     background-color: var(--color-panel);
     border-radius: 8px;
     border: 1px solid var(--color-border);

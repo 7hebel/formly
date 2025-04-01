@@ -197,8 +197,11 @@ def update_form(form_id: str, new_settings: dict, structure: list, assigned: dic
     logs.info("Forms", f"Updated form settings and structure ({form_id})")
 
 
-def get_sharable_form_data(form_id: str, user_uuid: str) -> dict:
+def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
     form_data = _get_form_content(form_id)
+    if form_data is None:
+        return
+    
     form_settings = form_data["settings"]
     assigned_groups = form_data["assigned"]["groups"]
     assigned_emails = form_data["assigned"]["emails"]

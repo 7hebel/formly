@@ -85,7 +85,7 @@ export function NumericAnswer({formComponents, setFormComponents, ...props}) {
   return (
     <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} {...props}>
       <InputGroup>
-        <InputLabel>Your long answer</InputLabel>
+        <InputLabel>Your numeric answer</InputLabel>
         <Input type="number" min={props.minrange} max={props.maxrange}></Input>
       </InputGroup>
     </FormComponentBase>

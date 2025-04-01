@@ -7,12 +7,7 @@ import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { SignleSelectAnswerBuilder } from '../formComponents/SingleSelect.jsx';
-import { MultiSelectAnswerBuilder } from '../formComponents/MultiSelect.jsx';
-import { ShortTextAnswerBuilder } from '../formComponents/ShortText.jsx';
-import { TrueFalseAnswerBuilder } from '../formComponents/TrueFalse.jsx';
-import { LongTextAnswerBuilder } from '../formComponents/LongText.jsx';
-import { NumericAnswerBuilder } from '../formComponents/Numeric.jsx';
+import { getComponentBuilder } from "../formComponents/AllComponents.jsx"
 import butterup from 'butteruptoasts';
 import 'butteruptoasts/src/butterup.css';
 import './styles/builder.css'
@@ -28,16 +23,6 @@ function displayMessage(content) {
 
 function generateComponentId() {
   return Date.now() + "" + Math.random();
-}
-
-
-const formComponentsBuilders = {
-  "short-text-answer": ShortTextAnswerBuilder,
-  "long-text-answer": LongTextAnswerBuilder,
-  "numeric-answer": NumericAnswerBuilder,
-  "truefalse-answer": TrueFalseAnswerBuilder,
-  "single-select-answer": SignleSelectAnswerBuilder,
-  "multi-select-answer": MultiSelectAnswerBuilder,
 }
 
 
@@ -389,7 +374,7 @@ export default function FormBuilder() {
 
             {
               formComponents.map((componentData, qIndex) => {
-                const DynamicComponentBuilder = formComponentsBuilders[componentData.componentType];
+                const DynamicComponentBuilder = getComponentBuilder(componentData.componentType)  ;
                 return (
                   <DynamicComponentBuilder 
                     key={componentData.componentId} 

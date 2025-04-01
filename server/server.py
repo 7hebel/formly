@@ -340,6 +340,8 @@ async def post_update_form(data: schemas.UpdateFormSchema, request: Request) -> 
 @api.post("/api/forms/get-brief")
 async def post_get_brief_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
     enriched_content = forms.get_sharable_form_data(data.form_id, data.uuid)
+    if enriched_content is None:
+        return api_response(False, err_msg="Form not found.")
     return api_response(True, enriched_content)
 
 @api.post("/api/forms/validate-respondent")

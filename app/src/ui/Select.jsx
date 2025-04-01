@@ -6,9 +6,9 @@ export function SingleSelect({ qid, options }) {
     <div className="select-container">
       {
         options?.map((option, index) => (
-          <label key={index} className='select-radio-label'>
+          <label key={option.id} className='select-radio-label'>
             <input type="radio" name={'ssel-' + qid} className='select-radio'/>
-            {option}
+            {option.value}
           </label>
         ))
       }
@@ -28,7 +28,7 @@ export function MultiSelect({ qid, onOptionChange, options, keys, states }) {
     <div className="select-container">
       {
         options?.map((option, index) => (
-          <label key={option + "" + index + (keys? keys[index] : "")} className='select-radio-label'>
+          <label key={option.id} className='select-radio-label'>
             <input 
               type="checkbox"
               name={'msel-' + qid}
@@ -37,7 +37,7 @@ export function MultiSelect({ qid, onOptionChange, options, keys, states }) {
               onInput={onOptionChange}
               defaultChecked={states? states[index] : false}
             />
-            {option}
+            {option.value}
           </label>
         ))
       }

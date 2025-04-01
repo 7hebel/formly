@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import './styles/answer.css'
+import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx"
 import butterup from 'butteruptoasts';
 import 'butteruptoasts/src/butterup.css';
 
@@ -37,7 +38,7 @@ export default function Answer() {
   
   const [formSettings, setFormSettings] = useState("");
   const [characteristics, setCharacteristics] = useState([]);
-  const [formStructure, setFormStructure] = useState([])
+  const [formStructure, setFormStructure] = useState(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const fetchFormData = async () => {
@@ -154,42 +155,59 @@ export default function Answer() {
           }
         </div>
       </div>
-      <div className='respondent-info'>
-        {
-          (isLoggedIn) ? (
-            <div className='respondent-account'>
-              <User/>Responding as: <span id='respondent-name'>{localStorage.getItem("fullname")}</span>
-              <span id='change-logged-respondent' onClick={() => {setIsLoggedIn(false)}}>(change)</span>
-            </div>
-          ) : (
-            <div className='respondent-no-account'>
-              <InputGroup>
-                <InputLabel>Full name</InputLabel>
-                <Input type="text" id="resp-fullname" minlen={3}></Input>
-              </InputGroup>
-              <InputGroup>
-                <InputLabel>Your email</InputLabel>
-                <Input type="email" id="resp-email" minlen={3}></Input>
-              </InputGroup>
-              <span id='already-user' onClick={() => {navigate('/login')}}>Login instead.</span>
-            </div>
-          )
-        }
-        <div className='hzSep'></div>
-        {
-          (formSettings.password) ? (
-            <>
-              <InputGroup>
-                <InputLabel>Form password</InputLabel>
-                <Input type='password' id="form-password"></Input>
-              </InputGroup>
-              <div className='hzSep'></div>
-            </>
-          ) : (<></>)
-        }
-
-        <PrimaryButton wide onClick={validateRespondent}>Start</PrimaryButton>
-      </div>
+      {
+        (formStructure === null) ? (
+          <div className='respondent-info'>
+            {
+              (isLoggedIn) ? (
+                <div className='respondent-account'>
+                  <User/>Responding as: <span id='respondent-name'>{localStorage.getItem("fullname")}</span>
+                  <span id='change-logged-respondent' onClick={() => {setIsLoggedIn(false)}}>(change)</span>
+                </div>
+              ) : (
+                <div className='respondent-no-account'>
+                  <InputGroup>
+                    <InputLabel>Full name</InputLabel>
+                    <Input type="text" id="resp-fullname" minlen={3}></Input>
+                  </InputGroup>
+                  <InputGroup>
+                    <InputLabel>Your email</InputLabel>
+                    <Input type="email" id="resp-email" minlen={3}></Input>
+                  </InputGroup>
+                  <span id='already-user' onClick={() => {navigate('/login')}}>Login instead.</span>
+                </div>
+              )
+            }
+            <div className='hzSep'></div>
+            {
+              (formSettings.password) ? (
+                <>
+                  <InputGroup>
+                    <InputLabel>Form password</InputLabel>
+                    <Input type='password' id="form-password"></Input>
+                  </InputGroup>
+                  <div className='hzSep'></div>
+                </>
+              ) : (<></>)
+            }
+    
+            <PrimaryButton wide onClick={validateRespondent}>Start</PrimaryButton>
+          </div>
+        ) : (
+          formStructure.map((componentData, qIndex) => {
+            const DynamicComponentBuilder = getAnswerComponentBuilder(componentData.componentType)  ;
+            return (
+              <DynamicComponentBuilder 
+                key={componentData.componentId} 
+                questionNo={qIndex + 1} 
+                formComponents={formStructure}
+                setFormComponents={setFormStructure}
+                {...componentData}
+              ></DynamicComponentBuilder>
+            )
+          })
+        )
+      }
 
     </main>
   )
