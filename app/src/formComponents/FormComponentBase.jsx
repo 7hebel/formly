@@ -8,7 +8,7 @@ export function FormComponentBase({ questionNo, formComponents, setFormComponent
   const componentData = JSON.stringify(props);
 
   return (
-    <div className="form-component" _componentdata={componentData} _answer={userAnswer}>
+    <div className="form-component" _componentid={props.componentId} _componentdata={componentData} _answer={userAnswer}>
       <h3><span>{questionNo}.</span> {props.question}</h3>
       <div className='hzSepMid'></div>
       {children}

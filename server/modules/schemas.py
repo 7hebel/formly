@@ -67,3 +67,8 @@ class FormRespondentSchema(BaseModel):
     email: str = None
     password: str = None
     
+class FormResponse(BaseModel):
+    form_id: str
+    response_id: str
+    answers: dict
+    

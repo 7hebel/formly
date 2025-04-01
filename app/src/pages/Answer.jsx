@@ -4,10 +4,10 @@ import { InputGroup, InputLabel, Input } from '../ui/Input.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList,CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import './styles/answer.css'
 import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx"
 import butterup from 'butteruptoasts';
 import 'butteruptoasts/src/butterup.css';
+import './styles/answer.css'
 
 function displayMessage(content) {
     butterup.toast({
@@ -16,7 +16,6 @@ function displayMessage(content) {
       dismissable: true,
     });
 }
-
 
 const characteristicsIcons = {
   author: User,
@@ -38,8 +37,9 @@ export default function Answer() {
   
   const [formSettings, setFormSettings] = useState("");
   const [characteristics, setCharacteristics] = useState([]);
-  const [formStructure, setFormStructure] = useState(null)
+  const [formStructure, setFormStructure] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [responseID, setResponseID] = useState(null);
 
   const fetchFormData = async () => {
     if (!formId) return;
@@ -119,12 +119,54 @@ export default function Answer() {
     if (!data.status) {
       displayMessage(data.err_msg);
     } else {
-      setFormStructure(data.data);
+      setResponseID(data.data.response_id);
+      setFormStructure(data.data.structure);
+      console.log(`Responding with ID: ${data.data.response_id}`)
     }
   };
 
   function grabRespondentAnswers() {
+    const respondentAnswers = {};
+    let questionNum = 1;
     
+    for (const component of document.getElementsByClassName("form-component")) {
+      const id = component.getAttribute("_componentid");
+      const answer = component.getAttribute("_answer");
+      
+      if (answer === null || !answer) {
+        displayMessage(`Answer question ${questionNum}.`);
+        return null;
+      }
+
+      respondentAnswers[id] = answer;
+      questionNum++;
+    }
+
+    return respondentAnswers;
+  }
+
+  async function finishForm() {
+    const answers = grabRespondentAnswers();
+    if (answers == null) return;
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        form_id: formId,
+        response_id: responseID,
+        answers: answers
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/respond", requestOptions);
+    const data = await response.json();
+    if (data.status) {
+      console.log("OK")
+    } else {
+      displayMessage(data.err_msg);
+    }
+
   }
 
   return (
@@ -213,7 +255,7 @@ export default function Answer() {
               })
             }
 
-            <PrimaryButton>
+            <PrimaryButton onClick={finishForm}>
               <CheckCircle></CheckCircle>Finish
             </PrimaryButton>       
           </>

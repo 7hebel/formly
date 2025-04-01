@@ -349,6 +349,12 @@ async def post_validate_respondent(data: schemas.FormRespondentSchema, request: 
     form_data = forms._get_form_content(data.form_id)
     if form_data is None:
         return api_response(False, err_msg="Form not found.")
+
+    user = None
+    if data.is_account:
+        user = users.get_user_by_uuid(data.uuid)
+        if user is None:
+            return api_response(False, err_msg="User not found.")
     
     if form_data["settings"]["assigned_only"]:
         if data.is_account and not forms.is_assigned_to_user(data.form_id, data.uuid):
@@ -360,6 +366,24 @@ async def post_validate_respondent(data: schemas.FormRespondentSchema, request: 
         if data.password != form_data["settings"]["password"]:
             return api_response(False, err_msg="Incorrect password.")
     
-    return api_response(True, form_data["structure"])
+    email = data.email
+    fullname = data.fullname
+    if data.is_account:
+        email = user.email
+        fullname = user.fullname
+    
+    status, id_or_err = forms.create_responder_entry(data.form_id, email, fullname)
+    if not status:
+        return api_response(False, err_msg=id_or_err)
+
+    return api_response(True, {"response_id": id_or_err, "structure": form_data["structure"]})
+
+@api.post("/api/forms/respond")
+async def post_form_answer(data: schemas.FormResponse, request: Request) -> JSONResponse:
+    status = forms.handle_response(data.form_id, data.response_id, data.answers)
+    if isinstance(status, str):
+        return api_response(False, err_msg=status)
+
+    return api_response(True)
 
 uvicorn.run(api, host="0.0.0.0", port=50500)

@@ -3,6 +3,7 @@ from modules import logs
 
 from dataclasses import dataclass, asdict
 import json
+import time
 import uuid
 import os
 
@@ -27,9 +28,22 @@ Saved form format:
     "assigned": {
         "groups": [],
         "emails": []
+    },
+    "responding" {
+        EMAIL: {
+            fullname: ...
+            started_at: timestamp
+            response_id: ...
+        }
     }
-    "answers": [
-    ]
+    "answers": {
+        EMAIL: {
+            fullname: ...
+            started_at: ...
+            finished_at: timestamp
+            answers: []
+        }
+    }
 }
 """
 
@@ -174,7 +188,8 @@ def create_form(author_uuid: str) -> str:
             "groups": [],
             "emails": []
         },
-        "answers": []
+        "responding": {},
+        "answers": {}
     }
 
     with open(form_filepath, "a+") as form_file:
@@ -200,6 +215,7 @@ def update_form(form_id: str, new_settings: dict, structure: list, assigned: dic
 def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
     form_data = _get_form_content(form_id)
     if form_data is None:
+        logs.error("Forms", f"Failed to create form brief as form was not found ({form_id})")
         return
     
     form_settings = form_data["settings"]
@@ -235,5 +251,58 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
     form_data.pop("structure")
     form_data["characteristics"] = characteristics
     return form_data
+   
+def create_responder_entry(form_id: str, email: str, fullname: str) -> tuple[bool, str]:
+    form_data = _get_form_content(form_id)
+    if form_data is None:
+        logs.error("Forms", f"Failed to create responder entry for: {email} - {fullname} at form: ({form_id}) - form not found")
+        return (False, "Form not found")
     
+    form_responding = form_data["responding"]
+    if email in form_responding:
+        logs.error("Forms", f"Failed to create responder entry for: {email} - {fullname} at form: ({form_id}) - email already responding...")
+        return (False, "Person with this email is already responding.")
+
+    if email in form_data["answers"]:
+        logs.error("Forms", f"Failed to create responder entry for: {email} - {fullname} at form: ({form_id}) - email already responded...")
+        return (False, "Person with this email has already answered this form.")
+
+    timestamp = int(time.time())
+    response_id = uuid.uuid4().hex
+    entry = {
+        "fullname": fullname,
+        "started_at": timestamp,
+        "response_id": response_id
+    }
+
+    form_data["responding"][email] = entry
+    _save_form_content(form_id, form_data)
+    logs.info("Forms", f"Created `responding` entry for: {email} - {fullname} at form: ({form_id}). ResponseID: {response_id}")
+    return (True, response_id)    
+    
+def handle_response(form_id: str, response_id: str, answers: dict) -> bool | str:
+    form_data = _get_form_content(form_id)
+    if form_data is None:
+        logs.error("Forms", f"Failed to handle response: {response_id} at form: ({form_id}) - form not found")
+        return "Form not found"
+    
+    form_responding = form_data["responding"]
+    for email in form_responding:
+        if form_responding[email]["response_id"] == response_id:
+            break
+    else:
+        logs.error("Forms", f"Failed to handle response: {response_id} at form: ({form_id}) - response id not found.")
+        return "Response not found"
+
+    response_data = form_data["responding"].pop(email)
+    form_data["answers"][email] = {
+        "fullname": response_data["fullname"],
+        "started_at": response_data["started_at"],
+        "finished_at": int(time.time()),
+        "answers": answers
+    }
+    
+    _save_form_content(form_id, form_data)
+    logs.info("Forms", f"Saved response: {response_id} at form: ({form_id}) for respondent: {email} - {response_data['fullname']}")
+    return True
     

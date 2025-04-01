@@ -21,10 +21,6 @@ function displayMessage(content) {
   });
 }
 
-function generateComponentId() {
-  return Date.now() + "" + Math.random();
-}
-
 
 export default function FormBuilder() {
   const navigate = useNavigate();
@@ -181,7 +177,7 @@ export default function FormBuilder() {
   }
 
   function addFormComponent(componentType) {
-    setFormComponents([...formComponents, {"componentType": componentType, "componentId": generateComponentId()}]);
+    setFormComponents([...formComponents, {"componentType": componentType, "componentId": crypto.randomUUID()}]);
   }
 
   function onGroupAssignChange(event) {
@@ -278,7 +274,7 @@ export default function FormBuilder() {
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
-                  <EyeOff/>Hide asnwers
+                  <EyeOff/>Hide answers after response
                 </InputLabel>
                 <TrueFalse qid="hide-answers" defValueState={hideAnswers} setter={setHideAnswers}></TrueFalse>
               </InputGroup>
