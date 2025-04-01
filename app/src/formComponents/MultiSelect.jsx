@@ -9,7 +9,7 @@ import { TertiaryButton } from '../ui/Button.jsx';
 
 export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
-  const [options, setOptions] = useState(props.options || [{id: crypto.randomUUID(), value: "Answer 1"}]);
+  const [options, setOptions] = useState(props.options || [{id: crypto.randomUUID(), value: "Option 1"}]);
   const questionChangerRef = useRef(null);
 
   function onQuestionChange() {
@@ -23,7 +23,7 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
   }
 
   function onAddOption() {
-    const addedOption = {id: crypto.randomUUID(), value: `Answer ${options.length + 1}`};
+    const addedOption = {id: crypto.randomUUID(), value: `Option ${options.length + 1}`};
     const newOptions = [...options, addedOption];
     setOptions(newOptions);
     setFormComponents(prevComponents =>
@@ -77,7 +77,6 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
               </InputGroup>
             ))
           }
-
         </div>
         <div className='hzSep'></div>
         <TertiaryButton onClick={onAddOption}>
@@ -89,9 +88,11 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
 }
 
 export function MultiSelectAnswer({formComponents, setFormComponents, ...props}) {
+  const [answers, setAnswers] = useState([]);
+  
   return (
-    <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} {...props}>
-      <MultiSelect qid={props.componentId} options={props.options}></MultiSelect>
+    <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} userAnswer={answers} {...props}>
+      <MultiSelect qid={props.componentId} answersReporter={setAnswers} options={props.options}></MultiSelect>
     </FormComponentBase>
   )
 }

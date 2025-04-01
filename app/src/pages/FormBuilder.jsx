@@ -37,7 +37,7 @@ export default function FormBuilder() {
   const [loading, setLoading] = useState(true);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [authorGroups, setAuthorGroups] = useState([[], []]);
+  const [authorGroups, setAuthorGroups] = useState([]);
 
   const fetchAuthorGroups = async () => {
     const requestOptions = {
@@ -52,15 +52,16 @@ export default function FormBuilder() {
     const data = await response.json();
 
     if (data.status) {
-      let names = [];
-      let keys = [];
+      let authorGroupsOptions = [];
 
       for (let [groupKey, groupName] of data.data) {
-        names.push(groupName);
-        keys.push(groupKey);
+        authorGroupsOptions.push({
+          id: groupKey,
+          value: groupName
+        })
       }
 
-      setAuthorGroups([names, keys]);
+      setAuthorGroups(authorGroupsOptions);
     }
 
   };
@@ -201,14 +202,6 @@ export default function FormBuilder() {
     }
   }
 
-  function getGroupSelectStates() {
-    const states = [];
-    for (const groupId of authorGroups[1]) {
-      states.push(assignedGroups.includes(groupId))
-    }
-    return states;
-  }
-
   if (loading) return <>Loading {formId}</>;
   
   return (
@@ -322,9 +315,8 @@ export default function FormBuilder() {
                       <div className='assignees-container'>
                         <MultiSelect
                           qid="assign-groups"
-                          options={authorGroups[0]}
-                          keys={authorGroups[1]}
-                          states={getGroupSelectStates()}
+                          options={authorGroups}
+                          selectedIds={assignedGroups}
                           onOptionChange={onGroupAssignChange}
                         ></MultiSelect>
                       </div>

@@ -2,7 +2,7 @@ import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
 import { InputGroup, InputLabel, Input } from '../ui/Input.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList } from 'lucide-react';
+import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList,CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import './styles/answer.css'
 import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx"
@@ -90,7 +90,7 @@ export default function Answer() {
       });
   }, []);
 
-  const validateRespondent = async () => {
+  async function validateRespondent() {
     const fullname = document.getElementById("resp-fullname");
     const email = document.getElementById("resp-email");
     const password = document.getElementById("form-password")?.value;
@@ -119,10 +119,13 @@ export default function Answer() {
     if (!data.status) {
       displayMessage(data.err_msg);
     } else {
-      //TODO: continue...
       setFormStructure(data.data);
     }
   };
+
+  function grabRespondentAnswers() {
+    
+  }
 
   return (
     <main className='answer'>
@@ -194,21 +197,28 @@ export default function Answer() {
             <PrimaryButton wide onClick={validateRespondent}>Start</PrimaryButton>
           </div>
         ) : (
-          formStructure.map((componentData, qIndex) => {
-            const DynamicComponentBuilder = getAnswerComponentBuilder(componentData.componentType)  ;
-            return (
-              <DynamicComponentBuilder 
-                key={componentData.componentId} 
-                questionNo={qIndex + 1} 
-                formComponents={formStructure}
-                setFormComponents={setFormStructure}
-                {...componentData}
-              ></DynamicComponentBuilder>
-            )
-          })
+          <>
+            {
+              formStructure.map((componentData, qIndex) => {
+                const DynamicComponentBuilder = getAnswerComponentBuilder(componentData.componentType)  ;
+                return (
+                  <DynamicComponentBuilder 
+                    key={componentData.componentId} 
+                    questionNo={qIndex + 1} 
+                    formComponents={formStructure}
+                    setFormComponents={setFormStructure}
+                    {...componentData}
+                  ></DynamicComponentBuilder>
+                )
+              })
+            }
+
+            <PrimaryButton>
+              <CheckCircle></CheckCircle>Finish
+            </PrimaryButton>       
+          </>
         )
       }
-
     </main>
   )
 }

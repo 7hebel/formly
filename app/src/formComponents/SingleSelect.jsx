@@ -23,7 +23,7 @@ export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ..
   }
 
   function onAddOption() {
-    const addedOption = {id: crypto.randomUUID(), value: `Answer ${options.length + 1}`};
+    const addedOption = {id: crypto.randomUUID(), value: `Option ${options.length + 1}`};
     const newOptions = [...options, addedOption];
     setOptions(newOptions);
     setFormComponents(prevComponents =>
@@ -87,9 +87,11 @@ export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ..
 }
 
 export function SignleSelectAnswer({formComponents, setFormComponents, ...props}) {
+  const [answer, setAnswer] = useState(null);
+  
   return (
-    <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} {...props}>
-      <SingleSelect qid={props.componentId} options={props.options}></SingleSelect>
+    <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} userAnswer={answer} {...props}>
+      <SingleSelect qid={props.componentId} options={props.options} answerReporter={setAnswer}></SingleSelect>
     </FormComponentBase>
   )
 }
