@@ -252,7 +252,7 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
     form_data["characteristics"] = characteristics
     return form_data
    
-def create_responder_entry(form_id: str, email: str, fullname: str) -> tuple[bool, str]:
+def create_responder_entry(form_id: str, email: str, fullname: str, host: str) -> tuple[bool, str]:
     form_data = _get_form_content(form_id)
     if form_data is None:
         logs.error("Forms", f"Failed to create responder entry for: {email} - {fullname} at form: ({form_id}) - form not found")
@@ -260,8 +260,11 @@ def create_responder_entry(form_id: str, email: str, fullname: str) -> tuple[boo
     
     form_responding = form_data["responding"]
     if email in form_responding:
-        logs.error("Forms", f"Failed to create responder entry for: {email} - {fullname} at form: ({form_id}) - email already responding...")
-        return (False, "Person with this email is already responding.")
+        if form_responding[email]["host"] != users.hash_ip(host):
+            logs.error("Forms", f"Failed to create responder entry for: {email} - {fullname} at form: ({form_id}) - email already responding...")
+            return (False, "Person with this email is already responding.")
+
+        logs.warn("Forms", f"Allowed respondent: {email} - {fullname} re-entrace to the form: ({form_id}) as the host is the same as previous.")
 
     if email in form_data["answers"]:
         logs.error("Forms", f"Failed to create responder entry for: {email} - {fullname} at form: ({form_id}) - email already responded...")
@@ -272,7 +275,8 @@ def create_responder_entry(form_id: str, email: str, fullname: str) -> tuple[boo
     entry = {
         "fullname": fullname,
         "started_at": timestamp,
-        "response_id": response_id
+        "response_id": response_id,
+        "host": users.hash_ip(host)
     }
 
     form_data["responding"][email] = entry

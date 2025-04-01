@@ -5,7 +5,7 @@ import { MultiSelect } from '../ui/Select.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff } from 'lucide-react';
+import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { getComponentBuilder } from "../formComponents/AllComponents.jsx"
 import butterup from 'butteruptoasts';
@@ -33,6 +33,7 @@ export default function FormBuilder() {
   const [loading, setLoading] = useState(true);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [authorGroups, setAuthorGroups] = useState([]);
 
   const fetchAuthorGroups = async () => {
@@ -84,6 +85,7 @@ export default function FormBuilder() {
       setIsAssignedOnly(data.data.settings.assigned_only);
       setFormPassword(data.data.settings.password);
       setFormComponents(data.data.structure);
+      setIsActive(data.data.settings.is_active);
       setAssignedEmails(data.data.assigned.emails);
       setAssignedGroups(data.data.assigned.groups);
 
@@ -103,6 +105,7 @@ export default function FormBuilder() {
   const [isAnon, setIsAnon] = useState(false);
   const [hideAnswers, setHideAnswers] = useState(false);
   const [isAssignedOnly, setIsAssignedOnly] = useState(true);
+  const [isActive, setIsActive] = useState(false);
   const [formPassword, setFormPassword] = useState(null);
   const [formComponents, setFormComponents] = useState([]);
   const [assignedEmails, setAssignedEmails] = useState([]);
@@ -196,6 +199,44 @@ export default function FormBuilder() {
       }
       setAssignedGroups(newAssignedGroups);
     }
+  }
+
+  async function startForm() {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        form_id: formId,
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/start", requestOptions);
+    const data = await response.json();
+    if (data.status) { 
+      setIsActive(true);
+      displayMessage("Form is now active.");
+    }
+    else { displayMessage("Failed to start, " + data.err_msg); }
+  }
+
+  async function endForm() {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        form_id: formId,
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/end", requestOptions);
+    const data = await response.json();
+    if (data.status) { 
+      setIsActive(false);
+      displayMessage("Form is now: not active.");
+    }
+    else { displayMessage("Failed to end, " + data.err_msg); }
   }
 
   if (loading) return <>Loading {formId}</>;
@@ -347,9 +388,41 @@ export default function FormBuilder() {
               )
             }
 
-            <PrimaryButton wide>
-              <Send/>Deploy
+            <PrimaryButton wide onClick={() => {setIsShareModalOpen(true)}}>
+              <Send/>Share
             </PrimaryButton>
+            {
+              isShareModalOpen && (
+                <Modal title="Share form." close={setIsShareModalOpen}>
+                  <div className='share-form-content'>
+                    <span className='is-active-info'>Form is {(isActive) ? 'active' : 'not active'}</span>
+                    <div className='hzSep'></div>
+                    <div className='link-container'>
+                      <span className='link-header row'>
+                        <Link/>URL
+                      </span>
+                      <span className='link-content'>{window.location.host}/form/{formId}</span>
+                      <span className='link-copy row' onClick={() => {navigator.clipboard.writeText(window.location.host + "/form/" + formId); displayMessage("Copied!")}}>
+                        <Copy/>Copy
+                      </span>
+                    </div>
+                    <InputLabel>Assigned Formly users can access this form from their dashboards.</InputLabel>
+                    <div className='hzSep'></div>
+                    {
+                      !isActive? (
+                        <PrimaryButton wide onClick={startForm}>
+                          <Send/>Start now
+                        </PrimaryButton>
+                      ) : (
+                        <DangerButton wide onClick={endForm}>
+                          <Ban/>End now
+                        </DangerButton>
+                      )
+                    }
+                  </div>
+                </Modal>
+              )
+            }
           </div>
         </div>
 

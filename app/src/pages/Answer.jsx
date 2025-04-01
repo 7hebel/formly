@@ -2,7 +2,7 @@ import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
 import { InputGroup, InputLabel, Input } from '../ui/Input.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList,CheckCircle } from 'lucide-react';
+import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList,CheckCircle, LayoutDashboard } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx"
 import butterup from 'butteruptoasts';
@@ -39,6 +39,7 @@ export default function Answer() {
   const [characteristics, setCharacteristics] = useState([]);
   const [formStructure, setFormStructure] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isResponded, setIsResponded] = useState(false);
   const [responseID, setResponseID] = useState(null);
 
   const fetchFormData = async () => {
@@ -162,7 +163,7 @@ export default function Answer() {
     const response = await fetch(import.meta.env.VITE_API_URL + "/forms/respond", requestOptions);
     const data = await response.json();
     if (data.status) {
-      console.log("OK")
+      setIsResponded(true);
     } else {
       displayMessage(data.err_msg);
     }
@@ -238,7 +239,7 @@ export default function Answer() {
     
             <PrimaryButton wide onClick={validateRespondent}>Start</PrimaryButton>
           </div>
-        ) : (
+        ) : !isResponded? (
           <>
             {
               formStructure.map((componentData, qIndex) => {
@@ -258,6 +259,15 @@ export default function Answer() {
             <PrimaryButton onClick={finishForm}>
               <CheckCircle></CheckCircle>Finish
             </PrimaryButton>       
+          </>
+        ) : (
+          <>
+            <div className='responded-panel'>
+              <CheckCircle/>Response sent.
+            </div>
+            <PrimaryButton onClick={() => {navigate('/dash')}}>
+              <LayoutDashboard/>Back to dashboard
+            </PrimaryButton>
           </>
         )
       }

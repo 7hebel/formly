@@ -101,3 +101,28 @@
     width: max-content;
 }
 
+.responded-panel {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--ui-font);
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 20px;
+    margin-top: 8px;
+
+    width: 500px;
+    height: 100px;
+    background-color: var(--color-panel);
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+}
+
+.responded-panel > svg {
+    color: var(--color-primary);
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
