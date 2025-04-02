@@ -16,6 +16,7 @@ export function TrueFalse({ qid, defValueState, setter, locked }) {
     trueRef.current.checked = false;
     if (setter) setter(false);
   }
+
   
   return (
     <div className="truefalse-container">

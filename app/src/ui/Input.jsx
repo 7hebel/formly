@@ -27,8 +27,8 @@ export function Input({ id, type="text", placeholder, value, pattern, minlen, ma
       defaultValue={value}
       ref={ref}
       step="any"
-      min={min || undefined}
-      max={max || undefined}
+      min={min ?? undefined}
+      max={max ?? undefined}
       disabled={locked}
     ></input>
   )

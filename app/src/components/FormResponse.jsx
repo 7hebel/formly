@@ -104,7 +104,6 @@ export function FormResponse({formId, responseData, formComponents, onRemoved}) 
         {
           Object.entries(responseData.answers).map(([componentId, answer], qIndex) => {
             const componentData = getComponentById(componentId);
-            console.log(responseData.answers)
   
             const DynamicComponentBuilder = getAnswerComponentBuilder(componentData.componentType)  ;
             return (

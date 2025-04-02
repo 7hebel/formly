@@ -126,3 +126,28 @@
     margin-right: 8px;
 }
 
+#timer {
+    position: fixed;
+    right: 12px;
+    top: 12px;
+    color: var(--color-text);
+    padding: 12px;
+    background-color: var(--color-panel);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    font-family: var(--ui-font);
+    font-weight: 600;
+}
+
+#timer > svg {
+    color: var(--color-primary-muted);
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+
+

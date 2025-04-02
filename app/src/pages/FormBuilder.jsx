@@ -155,7 +155,7 @@ export default function FormBuilder() {
     const settings = {
       "title": formName,
       "is_anonymous": isAnon,
-      "time_limit_m": parseInt(document.getElementById("form-ans-time-limit").value) || 0,
+      "time_limit_m": Math.max(parseInt(document.getElementById("form-ans-time-limit").value), 0) || 0,
       "password": document.getElementById("form-password").value,
       "assigned_only": isAssignedOnly,
       "hide_answers": hideAnswers
@@ -337,7 +337,7 @@ export default function FormBuilder() {
                   <Hourglass/>Answer time limit
                 </InputLabel>
                 <div className='input-with-action'>
-                  <Input type='number' id='form-ans-time-limit' value={formData.settings.time_limit_m}></Input>
+                  <Input type='number' id='form-ans-time-limit' value={formData.settings.time_limit_m} min={0}></Input>
                   <p className='input-unit'>Minutes.</p>
                 </div>
               </InputGroup>

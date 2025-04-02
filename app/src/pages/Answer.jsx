@@ -2,7 +2,7 @@ import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
 import { InputGroup, InputLabel, Input } from '../ui/Input.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList,CheckCircle, LayoutDashboard } from 'lucide-react';
+import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList,CheckCircle, LayoutDashboard, AlarmClock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx"
 import butterup from 'butteruptoasts';
@@ -41,6 +41,7 @@ export default function Answer() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isResponded, setIsResponded] = useState(false);
   const [responseID, setResponseID] = useState(null);
+  const [minutesLeft, setMinutesLeft] = useState(null);
 
   const fetchFormData = async () => {
     if (!formId) return;
@@ -60,6 +61,9 @@ export default function Answer() {
     if (data.status) {
       setCharacteristics(data.data.characteristics);
       setFormSettings(data.data.settings);
+      if (data.data.settings.time_limit_m > 0) {
+        setMinutesLeft(data.data.settings.time_limit_m);
+      }
     }
   };
   useEffect(() => {fetchFormData()}, []);
@@ -122,11 +126,25 @@ export default function Answer() {
     } else {
       setResponseID(data.data.response_id);
       setFormStructure(data.data.structure);
-      console.log(`Responding with ID: ${data.data.response_id}`)
+
+      if (minutesLeft !== null) {
+        const timer = setInterval(() => {
+          const newMinutesLeft = minutesLeft - 1;
+          setMinutesLeft(newMinutesLeft);
+          if (newMinutesLeft <= 0) {
+            finishForm(data.data.response_id, true);
+            displayMessage("Time is up!");
+            clearInterval(timer);
+          }
+
+        }, 60 * 1000)
+      }
+
+      console.log(`Responding with ID: ${data.data.response_id}`);
     }
   };
 
-  function grabRespondentAnswers() {
+  function grabRespondentAnswers(force) {
     const respondentAnswers = {};
     let questionNum = 1;
     
@@ -134,9 +152,11 @@ export default function Answer() {
       const id = component.getAttribute("_componentid");
       const answer = component.getAttribute("_answer");
       
-      if (answer === null || !answer) {
-        displayMessage(`Answer question ${questionNum}.`);
-        return null;
+      if (!force) {
+        if (answer === null || !answer) {
+          displayMessage(`Answer question ${questionNum}.`);
+          return null;
+        }
       }
 
       respondentAnswers[id] = answer;
@@ -146,8 +166,8 @@ export default function Answer() {
     return respondentAnswers;
   }
 
-  async function finishForm() {
-    const answers = grabRespondentAnswers();
+  async function finishForm(responseId, force=false) {
+    const answers = grabRespondentAnswers(force);
     if (answers == null) return;
 
     const requestOptions = {
@@ -155,7 +175,7 @@ export default function Answer() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         form_id: formId,
-        response_id: responseID,
+        response_id: responseId,
         answers: answers
       }),
     };
@@ -241,6 +261,7 @@ export default function Answer() {
           </div>
         ) : !isResponded? (
           <>
+            { (minutesLeft > 0) ? (<div id='timer'><AlarmClock/>{minutesLeft || ' - '} min</div>) : <></> }
             {
               formStructure.map((componentData, qIndex) => {
                 const DynamicComponentBuilder = getAnswerComponentBuilder(componentData.componentType)  ;
@@ -256,7 +277,7 @@ export default function Answer() {
               })
             }
 
-            <PrimaryButton onClick={finishForm}>
+            <PrimaryButton onClick={() => {finishForm(responseID)}}>
               <CheckCircle></CheckCircle>Finish
             </PrimaryButton>       
           </>

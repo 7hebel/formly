@@ -280,15 +280,13 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
         characteristics.append({"type": "timelimit", "content": f"Answered in [{total_time}]"})
         
     else:
-        
         if form_settings["time_limit_m"] > 0:
             characteristics.append({"type": "timelimit", "content": f"Time limit: [{form_settings['time_limit_m']} minutes]"})
         if form_settings["password"]:
             characteristics.append({"type": "password", "content": f"Form is secured with [password]"})
         if form_settings["hide_answers"]:
-            characteristics.append({"type": "hidden_answers", "content": f"You response will be [hidden]"})
+            characteristics.append({"type": "hidden_answers", "content": f"Your answers will be [hidden] after submission."})
 
-        characteristics.append({"type": "questions_count", "content": f"{len(form_data["structure"])} questions"})
         form_data.pop("structure")
 
     form_data["characteristics"] = characteristics
