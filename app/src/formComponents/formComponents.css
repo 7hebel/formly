@@ -53,7 +53,8 @@
 }
 
 .form-component-builder-options > .row > svg,
-.form-builder-option-delete {
+.form-builder-option-delete,
+.form-builder-option-correct {
     color: var(--color-text);
     width: 18px;
     height: 18px;
@@ -64,7 +65,8 @@
 }
 
 .form-component-builder-options > .row > svg:hover,
-.form-builder-option-delete:hover {
+.form-builder-option-delete:hover,
+.form-builder-option-correct:hover {
     cursor: pointer;
     opacity: 1;
 }
@@ -78,5 +80,19 @@
 .form-builder-option-delete {
     width: 22px;
     height: 22px;
+}
+
+.form-builder-option-correct {
+    width: 22px;
+    height: 22px;
+}
+
+.form-builder-option-correct[checked="1"] {
+    color: var(--color-primary-muted);
+}
+
+.points-info {
+    font-size: 16px;
+    margin-left: 1ch;
 }
 

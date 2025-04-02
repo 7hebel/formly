@@ -1,20 +1,39 @@
-import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { FormComponentBase, FormBuilderOptions } from './FormComponentBase.jsx';
 import { useRef, useState } from 'react';
 import './formComponents.css';
+import { InputGroup, InputLabel } from '../ui/Input.jsx';
+import { X } from 'lucide-react';
 
 
 export function TrueFalseAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
-  const questionChangerRef = useRef(null);
+  const [points, setPoints] = useState(props.points || "");
+  const [correct, setCorrect] = useState(props.correct || null);
 
-  function onQuestionChange() {
-    let newQuestion = questionChangerRef.current.value;
-    setQuestion(newQuestion);
+  function changeQuestion(value) {
+    setQuestion(value);
     setFormComponents(prevComponents =>
       prevComponents.map(c =>
-        c.componentId === props.componentId ? { ...c, question: newQuestion } : c
+        c.componentId === props.componentId ? { ...c, question: value } : c
+      )
+    );
+  }
+
+  function changePoints(value) {
+    setPoints(value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, points: value } : c
+      )
+    );
+  }
+
+  function changeCorrect(value) {
+    setCorrect(value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, correct: value } : c
       )
     );
   }
@@ -23,12 +42,18 @@ export function TrueFalseAnswerBuilder({formComponents, setFormComponents, ...pr
     <div className='form-component-builder-group'>
       <TrueFalseAnswer question={question} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></TrueFalseAnswer>
       <div className='form-component-builder-editor'>
-        <FormBuilderOptions componentId={props.componentId} formComponents={formComponents} setFormComponents={setFormComponents}></FormBuilderOptions>
-        <div className='hzSepMid'></div>
-        <InputGroup>
-          <InputLabel>Question</InputLabel>
-          <LongInput ref={questionChangerRef} onChange={onQuestionChange} defaultValue={question}></LongInput>
-        </InputGroup>
+        <FormBuilderOptions
+          componentId={props.componentId}
+          formComponents={formComponents}
+          setFormComponents={setFormComponents}
+          question={question}
+          onQuestionChange={changeQuestion}
+          points={points}
+          onPointsChange={changePoints}
+        ></FormBuilderOptions>
+        <div className='hzSep'></div>
+        <InputLabel>Correct answer</InputLabel>
+        <TrueFalse qid={'correct-'+props.componentId} setter={changeCorrect} defValueState={correct}></TrueFalse>
       </div>
     </div>
   )

@@ -6,28 +6,39 @@ import './formComponents.css';
 
 export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
-  const questionChangerRef = useRef(null);
+  const [points, setPoints] = useState(props.points || "");
 
-  function onQuestionChange() {
-    let newQuestion = questionChangerRef.current.value;
-    setQuestion(newQuestion);
+  function changeQuestion(value) {
+    setQuestion(value);
     setFormComponents(prevComponents =>
       prevComponents.map(c =>
-        c.componentId === props.componentId ? { ...c, question: newQuestion } : c
+        c.componentId === props.componentId ? { ...c, question: value } : c
       )
     );
   }
 
+  function changePoints(value) {
+    setPoints(value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, points: value } : c
+      )
+    );
+  }
+  
   return (
     <div className='form-component-builder-group'>
       <ShortTextAnswer question={question} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></ShortTextAnswer>
       <div className='form-component-builder-editor'>
-        <FormBuilderOptions componentId={props.componentId} formComponents={formComponents} setFormComponents={setFormComponents}></FormBuilderOptions>
-        <div className='hzSepMid'></div>
-        <InputGroup>
-          <InputLabel>Question</InputLabel>
-          <LongInput ref={questionChangerRef} onChange={onQuestionChange} defaultValue={question}></LongInput>
-        </InputGroup>
+        <FormBuilderOptions
+          componentId={props.componentId}
+          formComponents={formComponents}
+          setFormComponents={setFormComponents}
+          question={question}
+          onQuestionChange={changeQuestion}
+          points={points}
+          onPointsChange={changePoints}
+        ></FormBuilderOptions>
       </div>
     </div>
   )

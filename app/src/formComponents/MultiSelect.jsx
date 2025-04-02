@@ -2,7 +2,7 @@ import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import { MultiSelect } from '../ui/Select.jsx';
 import { FormComponentBase, FormBuilderOptions } from './FormComponentBase.jsx';
 import { useRef, useState } from 'react';
-import { PlusSquare, MinusSquare } from 'lucide-react';
+import { PlusSquare, MinusSquare, CheckSquare } from 'lucide-react';
 import './formComponents.css';
 import { TertiaryButton } from '../ui/Button.jsx';
 
@@ -10,16 +10,48 @@ import { TertiaryButton } from '../ui/Button.jsx';
 export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
   const [options, setOptions] = useState(props.options || [{id: crypto.randomUUID(), value: "Option 1"}]);
-  const questionChangerRef = useRef(null);
+  const [points, setPoints] = useState(props.points || "");
+  const [correct, setCorrect] = useState(props.correct || []);
 
-  function onQuestionChange() {
-    let newQuestion = questionChangerRef.current.value;
-    setQuestion(newQuestion);
+  function changeQuestion(value) {
+    setQuestion(value);
     setFormComponents(prevComponents =>
       prevComponents.map(c =>
-        c.componentId === props.componentId ? { ...c, question: newQuestion } : c
+        c.componentId === props.componentId ? { ...c, question: value } : c
       )
     );
+  }
+
+  function changePoints(value) {
+    setPoints(value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, points: value } : c
+      )
+    );
+  }
+
+  function changeCorrect(value) {
+    if (correct.includes(value)) {
+      document.getElementById(value).setAttribute("checked", "");
+      const newCorrect = correct.filter(v => v !== value);
+      setCorrect(newCorrect);
+      setFormComponents(prevComponents =>
+        prevComponents.map(c =>
+          c.componentId === props.componentId ? { ...c, correct: newCorrect } : c
+        )
+      )
+      return;
+    }
+    
+    const newCorrect = [...correct, value];
+    setCorrect(newCorrect);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, correct: newCorrect } : c
+      )
+    );
+    document.getElementById(value).setAttribute("checked", "1");
   }
 
   function onAddOption() {
@@ -37,12 +69,15 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
     <div className='form-component-builder-group'>
       <MultiSelectAnswer question={question} options={options} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></MultiSelectAnswer>
       <div className='form-component-builder-editor'>
-        <FormBuilderOptions componentId={props.componentId} formComponents={formComponents} setFormComponents={setFormComponents}></FormBuilderOptions>
-        <div className='hzSepMid'></div>
-        <InputGroup>
-          <InputLabel>Question</InputLabel>
-          <LongInput ref={questionChangerRef} onChange={onQuestionChange} defaultValue={question}></LongInput>
-        </InputGroup>
+        <FormBuilderOptions
+          componentId={props.componentId}
+          formComponents={formComponents}
+          setFormComponents={setFormComponents}
+          question={question}
+          onQuestionChange={changeQuestion}
+          points={points}
+          onPointsChange={changePoints}
+        ></FormBuilderOptions>
         <div className='hzSep'></div>
         <div className='form-builder-options-container'>
           {
@@ -64,6 +99,7 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
                       );
                     }}
                   />
+                  <CheckSquare className='form-builder-option-correct' id={option.id} name={props.componentId} onClick={() => {changeCorrect(option.id)}} checked={Number(correct.includes(option.id))}/>
                   <MinusSquare className='form-builder-option-delete' onClick={() => {
                     const newOptions = options.filter(opt => opt.id !== option.id);
                     setOptions(newOptions);

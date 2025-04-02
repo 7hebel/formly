@@ -8,19 +8,38 @@ export function NumericAnswerBuilder({formComponents, setFormComponents, ...prop
   const [question, setQuestion] = useState(props.question || "Question?");
   const [minRange, setMinRange] = useState(props.minrange || null);
   const [maxRange, setMaxRange] = useState(props.maxrange || null);
+  const [points, setPoints] = useState(props.points || "");
+  const [correct, setCorrect] = useState(props.correct || "");
   if (minRange == 0) setMinRange(null);
   if (maxRange == 0) setMaxRange(null);
 
-  const questionChangerRef = useRef(null);
   const minRangeChangerRef = useRef(null);
   const maxRangeChangerRef = useRef(null);
 
-  function onQuestionChange() {
-    let newQuestion = questionChangerRef.current.value;
-    setQuestion(newQuestion);
+
+  function changeQuestion(value) {
+    setQuestion(value);
     setFormComponents(prevComponents =>
       prevComponents.map(c =>
-        c.componentId === props.componentId ? { ...c, question: newQuestion } : c
+        c.componentId === props.componentId ? { ...c, question: value } : c
+      )
+    );
+  }
+
+  function changePoints(value) {
+    setPoints(value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, points: value } : c
+      )
+    );
+  }
+
+  function onCorrectChange(change) {
+    setCorrect(change.target.value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, correct: change.target.value } : c
       )
     );
   }
@@ -59,11 +78,19 @@ export function NumericAnswerBuilder({formComponents, setFormComponents, ...prop
     <div className='form-component-builder-group'>
       <NumericAnswer question={question} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></NumericAnswer>
       <div className='form-component-builder-editor'>
-        <FormBuilderOptions componentId={props.componentId} formComponents={formComponents} setFormComponents={setFormComponents}></FormBuilderOptions>
-        <div className='hzSepMid'></div>
+        <FormBuilderOptions
+          componentId={props.componentId}
+          formComponents={formComponents}
+          setFormComponents={setFormComponents}
+          question={question}
+          onQuestionChange={changeQuestion}
+          points={points}
+          onPointsChange={changePoints}
+        ></FormBuilderOptions>
+        <div className='hzSep'></div>
         <InputGroup>
-          <InputLabel>Question</InputLabel>
-          <LongInput ref={questionChangerRef} onChange={onQuestionChange} defaultValue={question}></LongInput>
+          <InputLabel>Correct answer</InputLabel>
+          <Input type="number" onChange={onCorrectChange} placeholder="Used for auto grading. Hidden from respondent." value={correct}></Input>
         </InputGroup>
         <div className='hzSep'></div>
         <div className='row'>

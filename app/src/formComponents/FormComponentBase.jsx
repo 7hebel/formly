@@ -1,22 +1,24 @@
 import { Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input';
 import "./formComponents.css";
-
 
 export function FormComponentBase({ questionNo, formComponents, setFormComponents, userAnswer, children, ...props }) {
   if (props.componentType === undefined) { throw new Error("Used FromComponentBase without specifying 'componentType'. It makes component unexportable."); }
   if (props.componentId === undefined) { throw new Error("Used FromComponentBase without specifying 'componentId'. It makes component unexportable."); }
   const componentData = JSON.stringify(props);
 
+  const pointsInfo = (props.points > 0) ? `${props.points} p.` : '';
+
   return (
     <div className="form-component" _componentid={props.componentId} _componentdata={componentData} _answer={userAnswer}>
-      <h3><span>{questionNo}.</span> {props.question}</h3>
+      <h3><span>{questionNo}.</span> {props.question} <span className='points-info'>{pointsInfo}</span></h3>
       <div className='hzSepMid'></div>
       {children}
     </div>
   )
 }
 
-export function FormBuilderOptions({ componentId, formComponents, setFormComponents }) {
+export function FormBuilderOptions({ componentId, formComponents, setFormComponents, onQuestionChange, question, onPointsChange, points }) {
   function handleDeleteFormComponent() {
     const newComponents = formComponents.filter(c => c.componentId != componentId);
     setFormComponents(newComponents);
@@ -36,16 +38,38 @@ export function FormBuilderOptions({ componentId, formComponents, setFormCompone
     setFormComponents(newFormComponents);
   }
 
+  function updateQuestion(change) {
+    onQuestionChange(change.target.value);
+  }
+
+  function updatePoints(change) {
+    if (!change.target.value || change.target.value >= 0) {
+      onPointsChange(change.target.value);
+    }
+  }
+
   return (
-    <div className='form-component-builder-options'>
-      <div className='row'>
-        <ChevronUp onClick={() => {moveComponent("up")}}/>
-        <ChevronDown onClick={() => {moveComponent("down")}}/>
+    <>
+      <div className='form-component-builder-options'>
+        <div className='row'>
+          <ChevronUp onClick={() => {moveComponent("up")}}/>
+          <ChevronDown onClick={() => {moveComponent("down")}}/>
+        </div>
+        <div className='row'>
+          <Trash2 onClick={handleDeleteFormComponent}/>
+        </div>
       </div>
-      <div className='row'>
-        <Trash2 onClick={handleDeleteFormComponent}/>
-      </div>
-    </div>
+      <div className='hzSepMid'></div>
+      <InputGroup>
+        <InputLabel>Question</InputLabel>
+        <LongInput onChange={updateQuestion} defaultValue={question}></LongInput>
+      </InputGroup>
+      <div className='hzSep'></div>
+      <InputGroup>
+        <InputLabel>Points</InputLabel>
+        <Input type='number' min={0} value={points} onChange={updatePoints}></Input>
+      </InputGroup>
+    </>
   )
 }
 
