@@ -267,6 +267,22 @@ export default function FormBuilder() {
     setResponses(data.data.answers);
     displayMessage("Refreshed");
   }
+  
+  async function removeForm() {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        form_id: formId
+      }),
+    };
+  
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/remove-form", requestOptions);
+    navigate("/dash");
+    displayMessage(`Deleted ${formName}`);
+
+  }
 
   if (loading) return <>Loading {formId}</>;
   
@@ -364,6 +380,11 @@ export default function FormBuilder() {
               </InputGroup>
               <div className='hzSep'></div>
             </div>
+          </div>
+          <div className='builder-properties-bottom'>
+            <DangerButton onClick={removeForm} wide>
+              <Trash2/>Delete form
+            </DangerButton>
           </div>
           <div className='builder-properties-bottom'>
             <TertiaryButton wide onClick={() => {setIsAnswersView(true)}}>

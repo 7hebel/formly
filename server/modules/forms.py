@@ -369,4 +369,12 @@ def remove_response(form_id: str, response_id: str) -> bool | str:
     logs.warn("Forms", f"Removed response: {response_id} from form: ({form_id}) for respondent: {email}")
     return True
     
+def remove_form(form_id: str) -> bool | str:
+    if _get_form_content(form_id) is None:
+        return "Form not found."
+    
+    os.remove(FORMS_DIR_PATH + form_id + ".json")
+    logs.warn("Forms", f"Removed form: ({form_id})")
+    return True
+    
     

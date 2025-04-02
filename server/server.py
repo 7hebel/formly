@@ -374,6 +374,16 @@ async def post_remove_response(data: schemas.DeleteFormResponse, request: Reques
 
     return api_response(True)
 
+@api.post("/api/forms/remove-form")
+@protected_endpoint
+@protect_form_endpoint(author_only=True)
+async def post_remove_response(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
+    status = forms.remove_form(data.form_id)
+    if isinstance(status, str):
+        return api_response(False, err_msg=status)
+
+    return api_response(True)
+
 @api.post("/api/forms/get-brief")
 async def post_get_brief_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
     enriched_content = forms.get_sharable_form_data(data.form_id, data.uuid)
