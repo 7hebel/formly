@@ -7,7 +7,7 @@ import './formComponents.css';
 import { TertiaryButton } from '../ui/Button.jsx';
 
 
-export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ...props}) {
+export function SingleSelectAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
   const [options, setOptions] = useState(props.options || [{id: crypto.randomUUID(), value: "Option 1"}]);
   const questionChangerRef = useRef(null);
@@ -86,12 +86,12 @@ export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ..
   )
 }
 
-export function SignleSelectAnswer({formComponents, setFormComponents, ...props}) {
-  const [answer, setAnswer] = useState(null);
+export function SignleSelectAnswer({formComponents, setFormComponents, userAnswer, locked, ...props}) {
+  const [answer, setAnswer] = useState(userAnswer);
   
   return (
     <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} userAnswer={answer} {...props}>
-      <SingleSelect qid={props.componentId} options={props.options} answerReporter={setAnswer}></SingleSelect>
+      <SingleSelect qid={props.componentId} options={props.options} answerReporter={setAnswer} selectedId={userAnswer} locked={locked}></SingleSelect>
     </FormComponentBase>
   )
 }

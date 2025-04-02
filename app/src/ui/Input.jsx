@@ -11,7 +11,7 @@ export function InputLabel({ children }) {
   )
 }
 
-export function Input({ id, type="text", placeholder, value, pattern, minlen, maxlen, onChange, ref, min, max }) {
+export function Input({ id, type="text", placeholder, value, pattern, minlen, maxlen, onChange, ref, min, max, locked }) {
   if (pattern==null && type=="number") pattern = "^\d*\.?\d*$"
   
   return (
@@ -29,11 +29,12 @@ export function Input({ id, type="text", placeholder, value, pattern, minlen, ma
       step="any"
       min={min || undefined}
       max={max || undefined}
+      disabled={locked}
     ></input>
   )
 }
 
-export function LongInput({ id, placeholder, minlen, onChange, ref, defaultValue }) {
+export function LongInput({ id, placeholder, minlen, onChange, ref, defaultValue, locked }) {
   return (
     <textarea
       id={id}
@@ -43,6 +44,7 @@ export function LongInput({ id, placeholder, minlen, onChange, ref, defaultValue
       ref={ref}
       onChange={onChange}
       defaultValue={defaultValue}
+      disabled={locked}
     ></textarea>
   )
 }

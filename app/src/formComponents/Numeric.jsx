@@ -81,8 +81,8 @@ export function NumericAnswerBuilder({formComponents, setFormComponents, ...prop
   )
 }
 
-export function NumericAnswer({formComponents, setFormComponents, ...props}) {
-  const [answer, setAnswer] = useState(null);
+export function NumericAnswer({formComponents, setFormComponents, userAnswer, locked, ...props}) {
+  const [answer, setAnswer] = useState(userAnswer);
   
   function reportValidAnswer(change) {
     if (change.target.value && change.target.validity.valid) {
@@ -96,7 +96,7 @@ export function NumericAnswer({formComponents, setFormComponents, ...props}) {
     <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} userAnswer={answer} {...props}>
       <InputGroup>
         <InputLabel>Your numeric answer</InputLabel>
-        <Input onChange={reportValidAnswer} type="number" min={props.minrange} max={props.maxrange}></Input>
+        <Input onChange={reportValidAnswer} type="number" min={props.minrange} max={props.maxrange} locked={locked} value={userAnswer}></Input>
       </InputGroup>
     </FormComponentBase>
   )

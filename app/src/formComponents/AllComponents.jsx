@@ -1,4 +1,4 @@
-import { SignleSelectAnswer, SignleSelectAnswerBuilder } from '../formComponents/SingleSelect.jsx';
+import { SignleSelectAnswer, SingleSelectAnswerBuilder } from '../formComponents/SingleSelect.jsx';
 import { MultiSelectAnswer, MultiSelectAnswerBuilder } from '../formComponents/MultiSelect.jsx';
 import { ShortTextAnswer, ShortTextAnswerBuilder } from '../formComponents/ShortText.jsx';
 import { TrueFalseAnswer, TrueFalseAnswerBuilder } from '../formComponents/TrueFalse.jsx';
@@ -11,7 +11,7 @@ const formComponentsBuilders = {
   "long-text-answer": LongTextAnswerBuilder,
   "numeric-answer": NumericAnswerBuilder,
   "truefalse-answer": TrueFalseAnswerBuilder,
-  "single-select-answer": SignleSelectAnswerBuilder,
+  "single-select-answer": SingleSelectAnswerBuilder,
   "multi-select-answer": MultiSelectAnswerBuilder,
 }
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 
-export function SingleSelect({ qid, options, answerReporter }) {
+export function SingleSelect({ qid, options, answerReporter, selectedId, locked }) {
   function handleAnswerChange(c) {
     const selected = document.querySelector(`input[name='ssel-${qid}']:checked`).getAttribute("optionkey");
     if (answerReporter) answerReporter(selected);
@@ -12,7 +12,15 @@ export function SingleSelect({ qid, options, answerReporter }) {
       {
         options?.map((option) => (
           <label key={option.id} className='select-radio-label'>
-            <input type="radio" name={'ssel-' + qid} optionkey={option.id} onInput={handleAnswerChange} className='select-radio'/>
+            <input 
+              type="radio"
+              name={'ssel-' + qid}
+              optionkey={option.id}
+              onInput={handleAnswerChange}
+              className='select-radio'
+              disabled={locked}
+              defaultChecked={selectedId === option.id}
+            />
             {option.value}
           </label>
         ))
@@ -21,7 +29,7 @@ export function SingleSelect({ qid, options, answerReporter }) {
   )
 }
 
-export function MultiSelect({ qid, onOptionChange, options, answersReporter, selectedIds }) {
+export function MultiSelect({ qid, onOptionChange, options, answersReporter, selectedIds, locked }) {
   const [localAnswers, setLocalAnswers] = useState([]);
   function handleAnswerChange(c) {
     const checkbox = c.target;
@@ -49,6 +57,7 @@ export function MultiSelect({ qid, onOptionChange, options, answersReporter, sel
               className='select-radio multi-radio'
               onInput={(c) => {handleAnswerChange(c); if (onOptionChange) onOptionChange(c)}}
               defaultChecked={selectedIds?.includes(option.id)}
+              disabled={locked}
             />
             {option.value}
           </label>

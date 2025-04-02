@@ -5,9 +5,9 @@ import { MultiSelect } from '../ui/Select.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye } from 'lucide-react';
+import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { getComponentBuilder } from "../formComponents/AllComponents.jsx"
+import { getComponentBuilder, getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx"
 import butterup from 'butteruptoasts';
 import 'butteruptoasts/src/butterup.css';
 import './styles/builder.css'
@@ -19,6 +19,28 @@ function displayMessage(content) {
     location: 'bottom-center',
     dismissable: true,
   });
+}
+
+function formatTime(timestamp) {
+  const date = new Date(timestamp * 1000);
+  const dd = String(date.getDate()).padStart(2, "0");
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const yy = String(date.getFullYear()).slice(-2);
+  const hh = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+
+  return `${dd}/${mm}/${yy} - ${hh}:${min}`;
+}
+
+function getTimeDifference(startTimestmap, endTimestamp) {
+  const start = new Date(startTimestmap * 1000);
+  const end = new Date(endTimestamp * 1000);
+  let diffMs = Math.abs(end.getTime() - start.getTime());
+
+  let hours = Math.floor(diffMs / (1000 * 60 * 60));
+  let minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  return `${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m`;
 }
 
 
@@ -34,7 +56,7 @@ export default function FormBuilder() {
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [isResponsesModalOpen, setIsResponsesModalOpen] = useState(false);
+  const [isAnswersView, setIsAnswersView] = useState(false);
   const [authorGroups, setAuthorGroups] = useState([]);
 
   const fetchAuthorGroups = async () => {
@@ -115,6 +137,7 @@ export default function FormBuilder() {
   const [assignedGroups, setAssignedGroups] = useState([]);
   const [currentlyResponding, setCurrentlyResponding] = useState({});
   const [responses, setResponses] = useState({});
+  const [viewedResponse, setViewedResponse] = useState(null);
 
   function handleAssignEmail() {
     const email = document.getElementById("assign-email");
@@ -244,6 +267,18 @@ export default function FormBuilder() {
     else { displayMessage("Failed to end, " + data.err_msg); }
   }
 
+  function switchResponseDetailsTarget(email) {
+    responses[email].email = email;
+    setViewedResponse(responses[email]);
+  }
+
+  function getComponentById(componentId) {
+    for (const componentData of formComponents) {
+      if (componentData.componentId == componentId) return componentData
+    }
+  }
+
+
   if (loading) return <>Loading {formId}</>;
   
   return (
@@ -342,34 +377,9 @@ export default function FormBuilder() {
             </div>
           </div>
           <div className='builder-properties-bottom'>
-            <TertiaryButton wide onClick={() => {setIsResponsesModalOpen(true)}}>
-              <Eye/>View {Object.keys(responses).length} responses
+            <TertiaryButton wide onClick={() => {setIsAnswersView(true)}}>
+              <Eye/>View responses
             </TertiaryButton>
-            {
-              !isResponsesModalOpen && (
-                <Modal title="View form responses." close={setIsResponsesModalOpen}>
-                  <div className='responses-content'>
-                    <div className='responses-type-header'>Currently responding: <span className='header-value'>{Object.keys(currentlyResponding).length}</span></div>
-                    <div className='currently-responding-container'>
-                      {
-                        Object.entries(currentlyResponding).map(([email, data]) => (
-                          <span className='currently-responding' key={email}>{data.fullname} ({email})</span>
-                        ))
-                      }
-                    </div>
-                    <div className='hzSep'></div>
-                    <div className='responses-type-header'>Submitted responses: <span className='header-value'>{Object.keys(responses).length}</span></div>
-                    <div className='submitted-responses-container'>
-                      {
-                        Object.entries(responses).map(([email, data]) => (
-                          <span className='currently-responding' key={email}>{data.fullname} ({email})</span>
-                        ))
-                      }
-                    </div>
-                  </div>
-                </Modal>
-              )
-            }
           </div>
           <div className='builder-properties-bottom row'>
             <SecondaryButton wide onClick={() => {setIsAssignModalOpen(true)}}>
@@ -466,44 +476,134 @@ export default function FormBuilder() {
             <ClipboardList/><h2>{formName}</h2>
           </div>
           <div className='hzSepMid'></div>
-          <div className='builder-form-content'>
+          {
+            isAnswersView ? (
+              <>
+                <div className='responses-view-header'>
+                  <span className='responses-view-header-btn' onClick={() => {setIsAnswersView(false)}}>
+                    <ArrowLeft/>Back to builder
+                  </span>
+                  Manage responses
+                  <span className='responses-view-header-btn'>
+                    <RefreshCcw/>Refresh
+                  </span>
+                </div>
+                <div className='responses-view'>
+                  <div className='responses-lists'>
+                    <div className='responses-type-header'>Currently responding: <span className='header-value'>{Object.keys(currentlyResponding).length}</span></div>
+                    <div className='currently-responding-container'>
+                      {
+                        Object.entries(currentlyResponding).map(([email, data]) => (
+                          <span className='currently-responding' key={email}>{data.fullname} ({email})</span>
+                        ))
+                      }
+                    </div>
+                    <div className='hzSep'></div>
+                    <div className='responses-type-header'>Submitted responses: <span className='header-value'>{Object.keys(responses).length}</span></div>
+                    <div className='submitted-responses-container'>
+                      {
+                        Object.entries(responses).map(([email, data]) => (
+                          <div className='submitted-response' key={email} onClick={() => {switchResponseDetailsTarget(email)}}>
+                            <div className='submitted-respondent-info'>
+                              <span className='respondent-name'>{data.fullname}</span>
+                              <span className='respondent-email'>{email}</span>
+                            </div>
+                            <ChevronRight/>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  </div>
+                  {
+                    viewedResponse? (
+                      <div className='response-details'>
+                        <div className='response-details-meta'>
+                          <span className='response-meta'>
+                            Full name:
+                            <span className='response-meta-value'>{viewedResponse.fullname}</span>
+                          </span>
+                          <span className='response-meta'>
+                            Email:
+                            <span className='response-meta-value'>{viewedResponse.email}</span>
+                          </span>
+                          <span className='response-meta'>
+                            Started:
+                            <span className='response-meta-value'>{formatTime(viewedResponse.started_at)}</span>
+                          </span>
+                          <span className='response-meta'>
+                            Submitted:
+                            <span className='response-meta-value'>{formatTime(viewedResponse.finished_at)}</span>
+                          </span>
+                          <span className='response-meta'>
+                            Total time:
+                            <span className='response-meta-value'>{getTimeDifference(viewedResponse.started_at, viewedResponse.finished_at)}</span>
+                          </span>
+                        </div>
+                        <div className='hzSepMid'></div>
+                        <div className='response-asnwers-container'>
+                          {
+                            Object.entries(viewedResponse.answers).map(([componentId, answer], qIndex) => {
+                              const componentData = getComponentById(componentId);
 
-            {
-              formComponents.map((componentData, qIndex) => {
-                const DynamicComponentBuilder = getComponentBuilder(componentData.componentType)  ;
-                return (
-                  <DynamicComponentBuilder 
-                    key={componentData.componentId} 
-                    questionNo={qIndex + 1} 
-                    formComponents={formComponents}
-                    setFormComponents={setFormComponents}
-                    {...componentData}
-                  ></DynamicComponentBuilder>
-                )
-              })
-            }
-
-            <div className='builder-new-blocks'>
-              <div className='add-component-btn' onClick={() => {addFormComponent("short-text-answer")}}>
-                <TextCursorInput/>Short text answer
-              </div>
-              <div className='add-component-btn' onClick={() => {addFormComponent("long-text-answer")}}>
-                <Text/>Long text answer
-              </div>
-              <div className='add-component-btn' onClick={() => {addFormComponent("numeric-answer")}}>
-                <Binary/>Numeric answer
-              </div>
-              <div className='add-component-btn' onClick={() => {addFormComponent("truefalse-answer")}}>
-                <ToggleRight/>True / False
-              </div>
-              <div className='add-component-btn' onClick={() => {addFormComponent("single-select-answer")}}>
-                <CircleCheck/>Select single option
-              </div>
-              <div className='add-component-btn' onClick={() => {addFormComponent("multi-select-answer")}}>
-                <SquareCheck/>Select multiple options
+                              const DynamicComponentBuilder = getAnswerComponentBuilder(componentData.componentType)  ;
+                              return (
+                                <DynamicComponentBuilder 
+                                  key={componentData.componentId} 
+                                  questionNo={qIndex + 1}
+                                  userAnswer={answer}
+                                  locked
+                                  {...componentData}
+                                ></DynamicComponentBuilder>
+                              )
+                            })
+                          }
+                        </div>
+                      </div>
+                    ) : (<></>)
+                  }
+                </div>
+              </>
+            ) : (
+            <div className='builder-form-content'>
+              {
+                formComponents.map((componentData, qIndex) => {
+                  const DynamicComponentBuilder = getComponentBuilder(componentData.componentType)  ;
+                  return (
+                    <DynamicComponentBuilder 
+                      key={componentData.componentId} 
+                      questionNo={qIndex + 1} 
+                      formComponents={formComponents}
+                      setFormComponents={setFormComponents}
+                      locked
+                      {...componentData}
+                    ></DynamicComponentBuilder>
+                  )
+                })
+              }
+  
+              <div className='builder-new-blocks'>
+                <div className='add-component-btn' onClick={() => {addFormComponent("short-text-answer")}}>
+                  <TextCursorInput/>Short text answer
+                </div>
+                <div className='add-component-btn' onClick={() => {addFormComponent("long-text-answer")}}>
+                  <Text/>Long text answer
+                </div>
+                <div className='add-component-btn' onClick={() => {addFormComponent("numeric-answer")}}>
+                  <Binary/>Numeric answer
+                </div>
+                <div className='add-component-btn' onClick={() => {addFormComponent("truefalse-answer")}}>
+                  <ToggleRight/>True / False
+                </div>
+                <div className='add-component-btn' onClick={() => {addFormComponent("single-select-answer")}}>
+                  <CircleCheck/>Select single option
+                </div>
+                <div className='add-component-btn' onClick={() => {addFormComponent("multi-select-answer")}}>
+                  <SquareCheck/>Select multiple options
+                </div>
               </div>
             </div>
-          </div>
+            )
+          }
         </div>
       </div>
     </main>

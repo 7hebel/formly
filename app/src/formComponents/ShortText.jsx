@@ -33,14 +33,14 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
   )
 }
 
-export function ShortTextAnswer({formComponents, setFormComponents, ...props}) {
-  const [answer, setAnswer] = useState(null);
-  
+export function ShortTextAnswer({formComponents, setFormComponents, userAnswer, locked, ...props}) {
+  const [answer, setAnswer] = useState(userAnswer);
+
   return (
     <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} userAnswer={answer} {...props}>
       <InputGroup>
         <InputLabel>Your short answer</InputLabel>
-        <Input onChange={(c) => {setAnswer(c.target.value)}} placeholder="Maximum 80 characters..." maxlen={80}></Input>
+        <Input onChange={(c) => {setAnswer(c.target.value)}} value={userAnswer} placeholder="Maximum 80 characters..." maxlen={80} locked={locked}></Input>
       </InputGroup>
     </FormComponentBase>
   )

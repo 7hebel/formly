@@ -87,12 +87,12 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
   )
 }
 
-export function MultiSelectAnswer({formComponents, setFormComponents, ...props}) {
-  const [answers, setAnswers] = useState([]);
+export function MultiSelectAnswer({formComponents, setFormComponents, userAnswer, locked, ...props}) {
+  const [answers, setAnswers] = useState(userAnswer);
   
   return (
     <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} userAnswer={answers} {...props}>
-      <MultiSelect qid={props.componentId} answersReporter={setAnswers} options={props.options}></MultiSelect>
+      <MultiSelect qid={props.componentId} answersReporter={setAnswers} options={props.options} locked={locked} selectedIds={userAnswer}></MultiSelect>
     </FormComponentBase>
   )
 }
