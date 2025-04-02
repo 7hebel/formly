@@ -102,7 +102,7 @@ export function FormResponse({formId, responseData, formComponents, onRemoved}) 
       <div className='hzSepMid'></div>
       <div className='response-asnwers-container' key={JSON.stringify(responseData.answers)}>
         {
-          Object.entries(responseData.answers).map(([componentId, answer], qIndex) => {
+          Object.entries(responseData.answers).map(([componentId, {answer, grade}], qIndex) => {
             const componentData = getComponentById(componentId);
   
             const DynamicComponentBuilder = getAnswerComponentBuilder(componentData.componentType)  ;

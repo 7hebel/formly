@@ -324,6 +324,61 @@ def create_responder_entry(form_id: str, email: str, fullname: str, host: str) -
     logs.info("Forms", f"Created `responding` entry for: {email} - {fullname} at form: ({form_id}). ResponseID: {response_id}")
     return (True, response_id)    
     
+def auto_grade(form_id: str, answers: dict[str, str]) -> dict[str, str]:
+    form_data = _get_form_content(form_id)
+    structure = form_data["structure"]
+
+    def get_component_data(component_id: str) -> dict | None:
+        for component in structure:
+            if component["componentId"] == component_id:
+                return component
+        else:
+            return None
+    
+    for (component_id, data) in answers.items():
+        component = get_component_data(component_id)
+        correct_answer = component.get("correct")
+        points = int(component.get("points")) or 1
+        user_answer = data["answer"]
+
+        if not user_answer or correct_answer is None:
+            continue
+
+        match component["componentType"]:
+            case "numeric-answer":
+                if str(user_answer) == str(correct_answer):
+                    answers[component_id]["grade"] = points
+                else:
+                    answers[component_id]["grade"] = 0
+                        
+            case "truefalse-answer":
+                if int(user_answer) == int(correct_answer):
+                    answers[component_id]["grade"] = points
+                else:
+                    answers[component_id]["grade"] = 0
+
+            case "single-select-answer":
+                if user_answer == correct_answer:
+                    answers[component_id]["grade"] = points
+                else:
+                    answers[component_id]["grade"] = 0
+
+            case "multi-select-answer":
+                points = 0
+                for selected_option in user_answer.split(","):
+                    if selected_option in correct_answer:
+                        points += 1
+                    else:
+                        points -= 1
+
+                if points < 0:
+                    points = 0
+                answers[component_id]["grade"] = points
+         
+    return answers       
+                
+                
+    
 def handle_response(form_id: str, response_id: str, answers: dict) -> bool | str:
     form_data = _get_form_content(form_id)
     if form_data is None:
@@ -338,12 +393,15 @@ def handle_response(form_id: str, response_id: str, answers: dict) -> bool | str
         logs.error("Forms", f"Failed to handle response: {response_id} at form: ({form_id}) - response id not found.")
         return "Response not found"
 
+    for (key, value) in answers.items():
+        answers[key] = {"answer": value, "grade": None}
+
     response_data = form_data["responding"].pop(email)
     form_data["answers"][email] = {
         "fullname": response_data["fullname"],
         "started_at": response_data["started_at"],
         "finished_at": int(time.time()),
-        "answers": answers,
+        "answers": auto_grade(form_id, answers),
         "response_id": response_id
     }
     

@@ -42,6 +42,7 @@ export default function Answer() {
   const [isResponded, setIsResponded] = useState(false);
   const [responseID, setResponseID] = useState(null);
   const [minutesLeft, setMinutesLeft] = useState(null);
+  let timerInterval = null;
 
   const fetchFormData = async () => {
     if (!formId) return;
@@ -128,13 +129,13 @@ export default function Answer() {
       setFormStructure(data.data.structure);
 
       if (minutesLeft !== null) {
-        const timer = setInterval(() => {
+        timerInterval = setInterval(() => {
           const newMinutesLeft = minutesLeft - 1;
           setMinutesLeft(newMinutesLeft);
           if (newMinutesLeft <= 0) {
             finishForm(data.data.response_id, true);
             displayMessage("Time is up!");
-            clearInterval(timer);
+            clearInterval(timerInterval);
           }
 
         }, 60 * 1000)
@@ -184,6 +185,7 @@ export default function Answer() {
     const data = await response.json();
     if (data.status) {
       setIsResponded(true);
+      clearInterval(timerInterval);
     } else {
       displayMessage(data.err_msg);
     }
