@@ -18,6 +18,20 @@ export function FormComponentBase({ questionNo, formComponents, setFormComponent
   )
 }
 
+export function ResponseGradePanel({ componentId, currentGrade }) {
+  return (
+    <div className='form-component-grade-panel'>
+      <InputGroup>
+        <InputLabel>Grade answer</InputLabel>
+        <div className='input-with-action'>
+          <Input type='number' groupName="response-grade" id={componentId} value={currentGrade} min={0}></Input>
+          <p className='input-unit'>p.</p>
+        </div>
+      </InputGroup>
+    </div>
+  )
+}
+
 export function FormBuilderOptions({ componentId, formComponents, setFormComponents, onQuestionChange, question, onPointsChange, points, noPointsInput }) {
   function handleDeleteFormComponent() {
     const newComponents = formComponents.filter(c => c.componentId != componentId);

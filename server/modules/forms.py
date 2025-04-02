@@ -44,8 +44,9 @@ Saved form format:
             finished_at: timestamp
             answers: []
             response_id: ...
+            "grade": "74%"
         }
-    }
+    },
 }
 """
 
@@ -139,6 +140,7 @@ def get_responded_by_user(user_uuid: str) -> list[str]:
     
     return responded_by_user
 
+
 def is_assigned_to_user(form_id: str, user_uuid: str) -> bool:
     user = users.get_user_by_uuid(user_uuid)
     user_groups = user.groups.split("|")
@@ -206,7 +208,7 @@ def create_form(author_uuid: str) -> str:
             "emails": []
         },
         "responding": {},
-        "answers": {}
+        "answers": {},
     }
 
     with open(form_filepath, "a+") as form_file:
@@ -246,10 +248,13 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
         user_email = user.email
     
     characteristics = []
+    
+    # Author only.
     if user_uuid == form_data["author_uuid"]:
         characteristics.append({"type": "author", "content": f"You are the [author]"})
         
-        if assigned_groups or assigned_emails:
+        # Author and not answered by author.
+        if user_email not in form_data["answers"] and (assigned_groups or assigned_emails):
             if assigned_groups:
                 content = f"Assigned to [{len(assigned_groups)} groups]"
                 if assigned_emails:
@@ -262,6 +267,7 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
     else:
         author_name = users.get_user_by_uuid(form_data["author_uuid"]).fullname
         characteristics.append({"type": "author", "content": f"Made by [{author_name}]"})
+
     if form_settings["is_anonymous"]:
         characteristics.append({"type": "anonymous", "content": "Answers are [anonymous]"})
     
@@ -278,6 +284,9 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
         
         characteristics.append({"type": "submitted", "content": f"Submitted: [{submit_time}]"})
         characteristics.append({"type": "timelimit", "content": f"Answered in [{total_time}]"})
+
+        grade = form_data["answers"][user_email]["grade"]
+        characteristics.append({"type": "grade", "content": f"Grade: [{grade}]"})
         
     else:
         if form_settings["time_limit_m"] > 0:
@@ -291,6 +300,7 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
 
     form_data["characteristics"] = characteristics
     return form_data
+   
    
 def create_responder_entry(form_id: str, email: str, fullname: str, host: str) -> tuple[bool, str]:
     form_data = _get_form_content(form_id)
@@ -324,7 +334,8 @@ def create_responder_entry(form_id: str, email: str, fullname: str, host: str) -
     logs.info("Forms", f"Created `responding` entry for: {email} - {fullname} at form: ({form_id}). ResponseID: {response_id}")
     return (True, response_id)    
     
-def auto_grade(form_id: str, answers: dict[str, str]) -> dict[str, str]:
+    
+def auto_grade_answers(form_id: str, answers: dict[str, str]) -> dict:
     form_data = _get_form_content(form_id)
     structure = form_data["structure"]
 
@@ -376,8 +387,25 @@ def auto_grade(form_id: str, answers: dict[str, str]) -> dict[str, str]:
                 answers[component_id]["grade"] = points
          
     return answers       
-                
-                
+         
+
+def get_full_grade(form_id: str, answers: dict) -> str | int:
+    form_data = _get_form_content(form_id)
+    max_points = 0
+    user_points = 0
+    
+    for component_data in form_data["structure"]:
+        max_points += float(component_data.get("points", 0))
+    
+    for answer_data in answers.values():
+        if answer_data["grade"] is None:
+            return "Not graded yet."
+
+        user_points += answer_data["grade"]
+        
+    percentage_grade = round((user_points / max_points) * 100)
+    return f"{percentage_grade}%"
+    
     
 def handle_response(form_id: str, response_id: str, answers: dict) -> bool | str:
     form_data = _get_form_content(form_id)
@@ -401,13 +429,15 @@ def handle_response(form_id: str, response_id: str, answers: dict) -> bool | str
         "fullname": response_data["fullname"],
         "started_at": response_data["started_at"],
         "finished_at": int(time.time()),
-        "answers": auto_grade(form_id, answers),
-        "response_id": response_id
+        "answers": auto_grade_answers(form_id, answers),
+        "response_id": response_id,
+        "grade": get_full_grade(form_id, answers)
     }
     
     _save_form_content(form_id, form_data)
     logs.info("Forms", f"Saved response: {response_id} at form: ({form_id}) for respondent: {email} - {response_data['fullname']}")
     return True
+
 
 def remove_response(form_id: str, response_id: str) -> bool | str:
     form_data = _get_form_content(form_id)
@@ -426,6 +456,30 @@ def remove_response(form_id: str, response_id: str) -> bool | str:
     _save_form_content(form_id, form_data)
     logs.warn("Forms", f"Removed response: {response_id} from form: ({form_id}) for respondent: {email}")
     return True
+    
+    
+def set_grades(form_id: str, response_id: str, grades: dict) -> str:
+    form_data = _get_form_content(form_id)
+    if form_data is None:
+        logs.error("Forms", f"Failed to grade response: {response_id} at form: ({form_id}) - form not found")
+        return "Form not found"
+
+    for email in form_data["answers"]:
+        if form_data["answers"][email]["response_id"] == response_id:
+            break
+    else:
+        logs.error("Forms", f"Failed to grade response: {response_id} at form: ({form_id}) - response id not found.")
+        return "Response not found"
+    
+    for (component_id, grade) in grades.items():
+        form_data["answers"][email]["answers"][component_id]["grade"] = grade
+        
+    full_grade = get_full_grade(form_id, form_data["answers"][email]["answers"])
+    form_data["answers"][email]["grade"] = full_grade
+    _save_form_content(form_id, form_data)
+    logs.info("Forms", f"Graded response: {response_id} at form: ({form_id})")
+    return full_grade
+    
     
 def remove_form(form_id: str) -> bool | str:
     if _get_form_content(form_id) is None:

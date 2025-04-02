@@ -518,7 +518,10 @@ export default function FormBuilder() {
                               <span className='respondent-name'>{data.fullname}</span>
                               <span className='respondent-email'>{email}</span>
                             </div>
-                            <ChevronRight/>
+                            <div className='submitted-response-right'>
+                              <span className='response-grade' id={"resp-grade-" + data.response_id}>{data.grade}</span>
+                              <ChevronRight/>
+                            </div>
                           </div>
                         ))
                       }
@@ -526,7 +529,7 @@ export default function FormBuilder() {
                   </div>
                   {
                     viewedResponse? (
-                      <FormResponse formId={formId} responseData={viewedResponse} formComponents={formComponents} onRemoved={() => {setViewedResponse(null); refreshResponses()}}></FormResponse>
+                      <FormResponse formId={formId} responseData={viewedResponse} formComponents={formComponents} onRemoved={() => {setViewedResponse(null); refreshResponses()}} withGradePanel></FormResponse>
                     ) : (<></>)
                   }
                 </div>

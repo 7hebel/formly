@@ -384,6 +384,16 @@ async def post_remove_response(data: schemas.FormIdSchema, request: Request) -> 
 
     return api_response(True)
 
+@api.post("/api/forms/grade-response")
+@protected_endpoint
+@protect_form_endpoint(author_only=True)
+async def post_grade_response(data: schemas.GradeResponse, request: Request) -> JSONResponse:
+    status = forms.set_grades(data.form_id, data.response_id, data.grades)
+    if not status.endswith("%"):
+        return api_response(False, err_msg=status)
+
+    return api_response(True, status)
+
 @api.post("/api/forms/get-brief")
 async def post_get_brief_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
     enriched_content = forms.get_sharable_form_data(data.form_id, data.uuid)

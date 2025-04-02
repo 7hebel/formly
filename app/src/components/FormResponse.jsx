@@ -1,6 +1,7 @@
-import { DangerButton } from '../ui/Button.jsx';
-import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx"
-import { Trash2 } from 'lucide-react';
+import { DangerButton, PrimaryButton } from '../ui/Button.jsx';
+import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx";
+import { ResponseGradePanel } from "../formComponents/FormComponentBase.jsx";
+import { Medal, Trash2 } from 'lucide-react';
 import butterup from 'butteruptoasts';
 import '../pages/styles/builder.css'
 
@@ -36,7 +37,7 @@ function getTimeDifference(startTimestmap, endTimestamp) {
 }
 
 
-export function FormResponse({formId, responseData, formComponents, onRemoved}) {   
+export function FormResponse({formId, responseData, formComponents, onRemoved, withGradePanel}) {   
   function getComponentById(componentId) {
     for (let componentData of formComponents) {
       if (componentData.componentId == componentId) return componentData
@@ -63,7 +64,38 @@ export function FormResponse({formId, responseData, formComponents, onRemoved}) 
     } 
     else { displayMessage(data.data); }
   }
-  
+
+  async function gradeResponse(responseId) {
+    const gradeInputs = document.querySelectorAll(`input[group="response-grade"]`);
+    const grades = {};
+
+    for (let gradeInput of gradeInputs) {
+      const componentId = gradeInput.id;
+      const grade = Math.max(parseInt(gradeInput.value), 0) ?? 0;
+      grades[componentId] = grade;
+    }
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        form_id: formId,
+        response_id: responseId,
+        grades: grades
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/grade-response", requestOptions);
+    const data = await response.json();
+    
+    if (data.status) {
+      displayMessage(`Graded response: ${data.data}`);
+      document.getElementById("resp-grade-" + responseId).textContent = data.data;
+    } 
+    else { displayMessage(data.data); }
+  }
+
   return (
     <div className='response-details'>
       <div className='response-details-meta'>
@@ -104,19 +136,27 @@ export function FormResponse({formId, responseData, formComponents, onRemoved}) 
         {
           Object.entries(responseData.answers).map(([componentId, {answer, grade}], qIndex) => {
             const componentData = getComponentById(componentId);
-  
+
             const DynamicComponentBuilder = getAnswerComponentBuilder(componentData.componentType)  ;
             return (
-            <DynamicComponentBuilder 
-                key={componentData.componentId} 
-                questionNo={qIndex + 1}
-                userAnswer={answer}
-                locked
-                {...componentData}
-            ></DynamicComponentBuilder>
+              <div className='form-answer-with-grade' key={componentId}>
+                <DynamicComponentBuilder 
+                  key={componentData.componentId} 
+                  questionNo={qIndex + 1}
+                  userAnswer={answer}
+                  locked
+                  {...componentData}
+                ></DynamicComponentBuilder>
+                {
+                  withGradePanel? (
+                    <ResponseGradePanel componentId={componentId} currentGrade={grade}></ResponseGradePanel>
+                  ) : <></>
+                }
+              </div>
             )
           })
         }
+        <PrimaryButton onClick={() => {gradeResponse(responseData.response_id)}}><Medal/>Grade response</PrimaryButton>
       </div>
     </div>
   )

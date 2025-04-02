@@ -76,3 +76,8 @@ class DeleteFormResponse(ProtectedModel):
     form_id: str
     response_id: str
     
+class GradeResponse(ProtectedModel):
+    form_id: str
+    response_id: str
+    grades: dict
+    

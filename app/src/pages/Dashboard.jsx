@@ -5,7 +5,7 @@ import { Modal } from '../ui/Modal.jsx';
 import DashboardCategorySwitcher from '../components/dashCategorySwitcher.jsx'
 import FormBrief from '../components/FormBrief.jsx'
 import GroupView from '../components/GroupView.jsx'
-import { data, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle, Mail, Check, X, CodeSquare } from 'lucide-react';
 import { ErrorLabel } from "../ui/ErrorLabel.jsx"
 import { useEffect, useRef, useState } from 'react';
