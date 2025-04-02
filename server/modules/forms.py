@@ -2,6 +2,7 @@ from modules import users
 from modules import logs
 
 from dataclasses import dataclass, asdict
+from datetime import datetime
 import json
 import time
 import uuid
@@ -123,6 +124,21 @@ def get_assigned_to_user(user_uuid: str) -> list[str]:
     return assigned_forms
 
 
+def get_responded_by_user(user_uuid: str) -> list[str]:
+    responded_by_user = []
+    user = users.get_user_by_uuid(user_uuid)
+    if user is None:
+        logs.error("Forms", f"Failed to load list of forms responded by user: <{user_uuid}> (user not found)")
+        return []
+
+    for form_file in os.listdir(FORMS_DIR_PATH):
+        form_id = form_file.split(".")[0]
+        form = _get_form_content(form_id)
+        if form and user.email in form["answers"]:
+            responded_by_user.append(form_id)
+    
+    return responded_by_user
+
 def is_assigned_to_user(form_id: str, user_uuid: str) -> bool:
     user = users.get_user_by_uuid(user_uuid)
     user_groups = user.groups.split("|")
@@ -224,32 +240,57 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
     assigned_emails = form_data["assigned"]["emails"]
     form_settings["password"] = bool(form_settings["password"])
     
+    user_email = None
+    user = users.get_user_by_uuid(user_uuid)
+    if user is not None:
+        user_email = user.email
+    
     characteristics = []
     if user_uuid == form_data["author_uuid"]:
         characteristics.append({"type": "author", "content": f"You are the [author]"})
+        
+        if assigned_groups or assigned_emails:
+            if assigned_groups:
+                content = f"Assigned to [{len(assigned_groups)} groups]"
+                if assigned_emails:
+                    content += f" and [{len(assigned_emails)} emails]"
+                    
+                characteristics.append({"type": "assign", "content": content})
+            elif assigned_emails:
+                characteristics.append({"type": "assign", "content": f"Assigned to [{len(assigned_emails)}] emails"})
+        
     else:
         author_name = users.get_user_by_uuid(form_data["author_uuid"]).fullname
         characteristics.append({"type": "author", "content": f"Made by [{author_name}]"})
     if form_settings["is_anonymous"]:
         characteristics.append({"type": "anonymous", "content": "Answers are [anonymous]"})
-    if form_settings["time_limit_m"] > 0:
-        characteristics.append({"type": "timelimit", "content": f"Time limit: [{form_settings['time_limit_m']} minutes]"})
-    if form_settings["password"]:
-        characteristics.append({"type": "password", "content": f"Form is secured with [password]"})
-    if form_settings["hide_answers"]:
-        characteristics.append({"type": "hidden_answers", "content": f"You response will be [hidden]"})
-    characteristics.append({"type": "questions_count", "content": f"{len(form_data["structure"])} questions"})
-    if assigned_groups or assigned_emails:
-        if assigned_groups:
-            content = f"Assigned to [{len(assigned_groups)} groups]"
-            if assigned_emails:
-                content += f" and [{len(assigned_emails)} emails]"
-                
-            characteristics.append({"type": "assign", "content": content})
-        elif assigned_emails:
-            characteristics.append({"type": "assign", "content": f"Assigned to [{len(assigned_emails)}] emails"})
+    
+    if user_email in form_data["answers"]:
+        submitted_at_timestamp = form_data["answers"][user_email]["finished_at"]
+        started_at_timestamp = form_data["answers"][user_email]["started_at"]
         
-    form_data.pop("structure")
+        submit_time = datetime.fromtimestamp(submitted_at_timestamp).strftime("%H:%M %d/%m/%Y")
+
+        total_seconds = submitted_at_timestamp - started_at_timestamp
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        total_time = f"{hours:02}h {minutes:02}m"
+        
+        characteristics.append({"type": "submitted", "content": f"Submitted: [{submit_time}]"})
+        characteristics.append({"type": "timelimit", "content": f"Answered in [{total_time}]"})
+        
+    else:
+        
+        if form_settings["time_limit_m"] > 0:
+            characteristics.append({"type": "timelimit", "content": f"Time limit: [{form_settings['time_limit_m']} minutes]"})
+        if form_settings["password"]:
+            characteristics.append({"type": "password", "content": f"Form is secured with [password]"})
+        if form_settings["hide_answers"]:
+            characteristics.append({"type": "hidden_answers", "content": f"You response will be [hidden]"})
+
+        characteristics.append({"type": "questions_count", "content": f"{len(form_data["structure"])} questions"})
+        form_data.pop("structure")
+
     form_data["characteristics"] = characteristics
     return form_data
    

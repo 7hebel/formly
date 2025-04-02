@@ -318,7 +318,7 @@ async def post_load_forms(data: schemas.ProtectedModel, request: Request) -> JSO
     user_forms = {
         "assigned": forms.get_assigned_to_user(data.uuid),
         "my_forms": forms.get_user_forms(data.uuid),
-        "answered": []    
+        "answered": forms.get_responded_by_user(data.uuid)    
     }
     return api_response(True, user_forms)
     

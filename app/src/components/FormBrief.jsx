@@ -3,7 +3,8 @@ import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx
 import '../pages/styles/dashboard.css'
 import { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { FormResponse } from './FormResponse.jsx';
+import { Modal } from '../ui/Modal.jsx';
 
 const characteristicsIcons = {
   author: User,
@@ -22,11 +23,13 @@ const characteristicsIcons = {
 export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered=false, formId }) {
   const navigate = useNavigate();
   
-  let isResultHidden = false;
-
   const [formName, setFormName] = useState("");
   const [characteristics, setCharacteristics] = useState([]);
   const [myFormState, setMyFormState] = useState(0);
+  const [isResultHidden, setIsResultHidden] = useState(true);
+  const [isResponseOpen, setIsResponseOpen] = useState(false)
+  const [formData, setFormData] = useState(null);
+
 
   const fetchFormData = async () => {
     if (!formId) return;
@@ -44,10 +47,14 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
     const data = await response.json();
 
     if (data.status) {
+      setFormData(data.data);
+
       const settings = data.data.settings;
       setCharacteristics(data.data.characteristics);
       setFormName(settings.title);
+      setIsResultHidden(settings.hide_answers);
       if (settings.is_active) { setMyFormState(2); } // 1 for pending, not supported yet.
+
     }
   };
   useEffect(() => {fetchFormData()}, []);
@@ -87,10 +94,19 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
               </SecondaryButton>
             ) : (
               (isAnswered) ? (
-                (isResultHidden) ? (
-                  <TertiaryButton>
-                    <Eye/>My response
-                  </TertiaryButton>
+                (!isResultHidden) ? (
+                  <>
+                    <TertiaryButton onClick={() => {setIsResponseOpen(true)}}>
+                      <Eye/>My response
+                    </TertiaryButton>
+                    {
+                      isResponseOpen? (
+                        <Modal title="My response" close={setIsResponseOpen}>
+                          <FormResponse formId={formId} responseData={formData.answers[localStorage.getItem('email')]} formComponents={formData.structure}></FormResponse>
+                        </Modal>
+                      ) : (<></>)
+                    }
+                  </>
                 ) : (
                   <TertiaryButton>
                     <EyeOff/>Response hidden

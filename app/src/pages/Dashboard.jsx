@@ -376,10 +376,11 @@ export default function Dashboard() {
             <div className='dash-forms-category-container'>
               <h1>Answered by me:</h1>
               <div className="dash-forms-container">
-
-                <FormBrief isAnswered></FormBrief>
-                <FormBrief isAnswered></FormBrief>
-
+                {
+                  forms && forms.answered.map((formId) => (
+                    <FormBrief isAnswered formId={formId} key={formId}></FormBrief>
+                  ))  
+                }
               </div>
             </div>
           </div>
