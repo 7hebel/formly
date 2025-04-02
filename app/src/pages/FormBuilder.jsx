@@ -185,7 +185,7 @@ export default function FormBuilder() {
   }
 
   function addFormComponent(componentType) {
-    setFormComponents([...formComponents, {"componentType": componentType, "componentId": crypto.randomUUID()}]);
+    setFormComponents([...formComponents, {"componentType": componentType, "componentId": crypto.randomUUID(), "points": 1}]);
   }
 
   function onGroupAssignChange(event) {
@@ -278,7 +278,7 @@ export default function FormBuilder() {
       }),
     };
   
-    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/remove-form", requestOptions);
+    await fetch(import.meta.env.VITE_API_URL + "/forms/remove-form", requestOptions);
     navigate("/dash");
     displayMessage(`Deleted ${formName}`);
 

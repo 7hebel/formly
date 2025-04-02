@@ -10,8 +10,8 @@ import { TertiaryButton } from '../ui/Button.jsx';
 export function SingleSelectAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
   const [options, setOptions] = useState(props.options || [{id: crypto.randomUUID(), value: "Option 1"}]);
-  const [points, setPoints] = useState(props.points || "");
   const [correct, setCorrect] = useState(props.correct || null);
+  props.points = 1;
 
   function changeQuestion(value) {
     setQuestion(value);
@@ -75,8 +75,9 @@ export function SingleSelectAnswerBuilder({formComponents, setFormComponents, ..
           setFormComponents={setFormComponents}
           question={question}
           onQuestionChange={changeQuestion}
-          points={points}
+          points={1}
           onPointsChange={changePoints}
+          noPointsInput={true}
         ></FormBuilderOptions>
         <div className='hzSep'></div>
         <div className='form-builder-options-container'>

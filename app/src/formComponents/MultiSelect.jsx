@@ -10,8 +10,8 @@ import { TertiaryButton } from '../ui/Button.jsx';
 export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
   const [options, setOptions] = useState(props.options || [{id: crypto.randomUUID(), value: "Option 1"}]);
-  const [points, setPoints] = useState(props.points || "");
   const [correct, setCorrect] = useState(props.correct || []);
+  props.points = correct.length;
 
   function changeQuestion(value) {
     setQuestion(value);
@@ -22,33 +22,26 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
     );
   }
 
-  function changePoints(value) {
-    setPoints(value);
-    setFormComponents(prevComponents =>
-      prevComponents.map(c =>
-        c.componentId === props.componentId ? { ...c, points: value } : c
-      )
-    );
-  }
-
   function changeCorrect(value) {
     if (correct.includes(value)) {
       document.getElementById(value).setAttribute("checked", "");
       const newCorrect = correct.filter(v => v !== value);
+      props.points = newCorrect.length
       setCorrect(newCorrect);
       setFormComponents(prevComponents =>
         prevComponents.map(c =>
-          c.componentId === props.componentId ? { ...c, correct: newCorrect } : c
+          c.componentId === props.componentId ? { ...c, correct: newCorrect, points: props.points } : c
         )
       )
       return;
     }
     
     const newCorrect = [...correct, value];
+    props.points = newCorrect.length
     setCorrect(newCorrect);
     setFormComponents(prevComponents =>
       prevComponents.map(c =>
-        c.componentId === props.componentId ? { ...c, correct: newCorrect } : c
+        c.componentId === props.componentId ? { ...c, correct: newCorrect, points: props.points } : c
       )
     );
     document.getElementById(value).setAttribute("checked", "1");
@@ -57,10 +50,11 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
   function onAddOption() {
     const addedOption = {id: crypto.randomUUID(), value: `Option ${options.length + 1}`};
     const newOptions = [...options, addedOption];
+    props.points = correct.length;
     setOptions(newOptions);
     setFormComponents(prevComponents =>
       prevComponents.map(c =>
-        c.componentId === props.componentId ? { ...c, options: newOptions } : c
+        c.componentId === props.componentId ? { ...c, options: newOptions, points: correct.length } : c
       )
     );
   }
@@ -75,8 +69,8 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
           setFormComponents={setFormComponents}
           question={question}
           onQuestionChange={changeQuestion}
-          points={points}
-          onPointsChange={changePoints}
+          points={props.points}
+          noPointsInput={true}
         ></FormBuilderOptions>
         <div className='hzSep'></div>
         <div className='form-builder-options-container'>
@@ -94,7 +88,7 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
                       setOptions(newOptions);
                       setFormComponents(prevComponents =>
                         prevComponents.map(c =>
-                          c.componentId === props.componentId ? { ...c, options: newOptions } : c
+                          c.componentId === props.componentId ? { ...c, options: newOptions, points: correct.length } : c
                         )
                       );
                     }}

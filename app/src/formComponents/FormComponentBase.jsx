@@ -18,7 +18,7 @@ export function FormComponentBase({ questionNo, formComponents, setFormComponent
   )
 }
 
-export function FormBuilderOptions({ componentId, formComponents, setFormComponents, onQuestionChange, question, onPointsChange, points }) {
+export function FormBuilderOptions({ componentId, formComponents, setFormComponents, onQuestionChange, question, onPointsChange, points, noPointsInput }) {
   function handleDeleteFormComponent() {
     const newComponents = formComponents.filter(c => c.componentId != componentId);
     setFormComponents(newComponents);
@@ -64,11 +64,16 @@ export function FormBuilderOptions({ componentId, formComponents, setFormCompone
         <InputLabel>Question</InputLabel>
         <LongInput onChange={updateQuestion} defaultValue={question}></LongInput>
       </InputGroup>
-      <div className='hzSep'></div>
-      <InputGroup>
-        <InputLabel>Points</InputLabel>
-        <Input type='number' min={0} value={points} onChange={updatePoints}></Input>
-      </InputGroup>
+      {
+        !noPointsInput? (<>
+          <div className='hzSep'></div>
+          <InputGroup>
+            <InputLabel>Points</InputLabel>
+            <Input type='number' min={0} value={points} onChange={updatePoints}></Input>
+          </InputGroup>
+        </>
+        ) : <></>
+      }
     </>
   )
 }
