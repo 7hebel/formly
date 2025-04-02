@@ -42,6 +42,7 @@ Saved form format:
             started_at: ...
             finished_at: timestamp
             answers: []
+            response_id: ...
         }
     }
 }
@@ -303,10 +304,30 @@ def handle_response(form_id: str, response_id: str, answers: dict) -> bool | str
         "fullname": response_data["fullname"],
         "started_at": response_data["started_at"],
         "finished_at": int(time.time()),
-        "answers": answers
+        "answers": answers,
+        "response_id": response_id
     }
     
     _save_form_content(form_id, form_data)
     logs.info("Forms", f"Saved response: {response_id} at form: ({form_id}) for respondent: {email} - {response_data['fullname']}")
     return True
+
+def remove_response(form_id: str, response_id: str) -> bool | str:
+    form_data = _get_form_content(form_id)
+    if form_data is None:
+        logs.error("Forms", f"Failed to remove response: {response_id} at form: ({form_id}) - form not found")
+        return "Form not found"
+
+    for email in form_data["answers"]:
+        if form_data["answers"][email]["response_id"] == response_id:
+            break
+    else:
+        logs.error("Forms", f"Failed to remove response: {response_id} at form: ({form_id}) - response id not found.")
+        return "Response not found"
+
+    form_data["answers"].pop(email)
+    _save_form_content(form_id, form_data)
+    logs.warn("Forms", f"Removed response: {response_id} from form: ({form_id}) for respondent: {email}")
+    return True
+    
     

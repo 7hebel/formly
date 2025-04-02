@@ -364,6 +364,16 @@ async def post_form_end(data: schemas.FormIdSchema, request: Request) -> JSONRes
     
     return api_response(True)
 
+@api.post("/api/forms/delete-response")
+@protected_endpoint
+@protect_form_endpoint(author_only=True)
+async def post_remove_response(data: schemas.DeleteFormResponse, request: Request) -> JSONResponse:
+    status = forms.remove_response(data.form_id, data.response_id)
+    if isinstance(status, str):
+        return api_response(False, err_msg=status)
+
+    return api_response(True)
+
 @api.post("/api/forms/get-brief")
 async def post_get_brief_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
     enriched_content = forms.get_sharable_form_data(data.form_id, data.uuid)
@@ -415,7 +425,6 @@ async def post_form_answer(data: schemas.FormResponse, request: Request) -> JSON
         return api_response(False, err_msg=status)
 
     return api_response(True)
-
 
 
 uvicorn.run(api, host="0.0.0.0", port=50500)

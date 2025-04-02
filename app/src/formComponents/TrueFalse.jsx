@@ -36,10 +36,10 @@ export function TrueFalseAnswerBuilder({formComponents, setFormComponents, ...pr
 
 export function TrueFalseAnswer({formComponents, setFormComponents, userAnswer, locked, ...props}) {
   const [answer, setAnswer] = useState(userAnswer);
-  
+
   return (
     <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} userAnswer={answer} {...props}>
-      <TrueFalse setter={(v) => {setAnswer(Number(v))}} qid={props.componentId} locked={locked} defValueState={Boolean(userAnswer)}></TrueFalse>
+      <TrueFalse setter={(v) => {setAnswer(Number(v))}} qid={props.componentId} locked={locked} defValueState={userAnswer == 1}></TrueFalse>
     </FormComponentBase>
   )
 }

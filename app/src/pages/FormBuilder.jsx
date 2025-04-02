@@ -5,7 +5,7 @@ import { MultiSelect } from '../ui/Select.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight } from 'lucide-react';
+import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { getComponentBuilder, getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx"
 import butterup from 'butteruptoasts';
@@ -101,7 +101,6 @@ export default function FormBuilder() {
       const data = await response.json();
       
       if (data.status) setFormData(data.data);
-      console.log(data.data)
       setFormName(data.data.settings.title);
       setIsAnon(data.data.settings.is_anonymous);
       setHideAnswers(data.data.settings.hide_answers);
@@ -268,6 +267,7 @@ export default function FormBuilder() {
   }
 
   function switchResponseDetailsTarget(email) {
+    console.log(responses)
     responses[email].email = email;
     setViewedResponse(responses[email]);
   }
@@ -276,6 +276,47 @@ export default function FormBuilder() {
     for (const componentData of formComponents) {
       if (componentData.componentId == componentId) return componentData
     }
+  }
+
+  async function refreshResponses() {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        form_id: formId
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/fetch-form", requestOptions);
+    const data = await response.json();
+    
+    if (data.status) setFormData(data.data);
+    setCurrentlyResponding(data.data.responding);
+    setResponses(data.data.answers);
+    displayMessage("Refreshed");
+  }
+
+  async function removeResponse(responseId) {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        form_id: formId,
+        response_id: responseId
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/delete-response", requestOptions);
+    const data = await response.json();
+    
+    if (data.status) {
+      displayMessage("Removed response.");
+      refreshResponses();
+      setViewedResponse(null);
+    } 
+    else { displayMessage(data.data); }
   }
 
 
@@ -484,7 +525,7 @@ export default function FormBuilder() {
                     <ArrowLeft/>Back to builder
                   </span>
                   Manage responses
-                  <span className='responses-view-header-btn'>
+                  <span className='responses-view-header-btn' onClick={refreshResponses}>
                     <RefreshCcw/>Refresh
                   </span>
                 </div>
@@ -518,29 +559,36 @@ export default function FormBuilder() {
                     viewedResponse? (
                       <div className='response-details'>
                         <div className='response-details-meta'>
-                          <span className='response-meta'>
-                            Full name:
-                            <span className='response-meta-value'>{viewedResponse.fullname}</span>
-                          </span>
-                          <span className='response-meta'>
-                            Email:
-                            <span className='response-meta-value'>{viewedResponse.email}</span>
-                          </span>
-                          <span className='response-meta'>
-                            Started:
-                            <span className='response-meta-value'>{formatTime(viewedResponse.started_at)}</span>
-                          </span>
-                          <span className='response-meta'>
-                            Submitted:
-                            <span className='response-meta-value'>{formatTime(viewedResponse.finished_at)}</span>
-                          </span>
-                          <span className='response-meta'>
-                            Total time:
-                            <span className='response-meta-value'>{getTimeDifference(viewedResponse.started_at, viewedResponse.finished_at)}</span>
-                          </span>
+                          <div className='response-meta-left'>
+                            <span className='response-meta'>
+                              Full name:
+                              <span className='response-meta-value'>{viewedResponse.fullname}</span>
+                            </span>
+                            <span className='response-meta'>
+                              Email:
+                              <span className='response-meta-value'>{viewedResponse.email}</span>
+                            </span>
+                            <span className='response-meta'>
+                              Started:
+                              <span className='response-meta-value'>{formatTime(viewedResponse.started_at)}</span>
+                            </span>
+                            <span className='response-meta'>
+                              Submitted:
+                              <span className='response-meta-value'>{formatTime(viewedResponse.finished_at)}</span>
+                            </span>
+                            <span className='response-meta'>
+                              Total time:
+                              <span className='response-meta-value'>{getTimeDifference(viewedResponse.started_at, viewedResponse.finished_at)}</span>
+                            </span>
+                          </div>
+                          <div className='response-details-actions'>
+                            <DangerButton onClick={() => {removeResponse(viewedResponse.response_id)}}>
+                              <Trash2/>Delete
+                            </DangerButton>
+                          </div>
                         </div>
                         <div className='hzSepMid'></div>
-                        <div className='response-asnwers-container'>
+                        <div className='response-asnwers-container' key={JSON.stringify(viewedResponse.answers)}>
                           {
                             Object.entries(viewedResponse.answers).map(([componentId, answer], qIndex) => {
                               const componentData = getComponentById(componentId);

@@ -72,3 +72,7 @@ class FormResponse(BaseModel):
     response_id: str
     answers: dict
     
+class DeleteFormResponse(ProtectedModel):
+    form_id: str
+    response_id: str
+    

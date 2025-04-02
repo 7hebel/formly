@@ -392,7 +392,8 @@
 .response-details-meta {
     font-family: var(--ui-font);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .response-meta {
@@ -413,4 +414,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.submitted-responses-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.response-meta-left {
+    display: flex;
+    flex-direction: column;
 }
