@@ -2,7 +2,7 @@
 .form-component {
     width: 50%;
     min-width: 480px;
-    margin-block: 40px;
+    margin-block: 8px;
     padding: 8px;
     background-color: var(--color-bg-main);
     border: 1px solid var(--color-border);
@@ -36,7 +36,8 @@
     z-index: 0;
     background-color: var(--color-panel);
     width: 50%;
-    margin-top: -46px;
+    margin-top: -12px;
+    margin-bottom: 36px;
     border: 1px solid var(--color-border);
     border-radius: 0px 0px 6px 6px;
     padding: 8px;

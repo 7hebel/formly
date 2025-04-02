@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "butteruptoasts": "^2.0.1",
+    "framer-motion": "^12.6.2",
     "lucide-react": "^0.484.0",
     "ogl": "^1.0.11",
     "react": "^19.0.0",

@@ -336,10 +336,39 @@ async def post_update_form(data: schemas.UpdateFormSchema, request: Request) -> 
     forms.update_form(data.form_id, data.settings, data.structure, data.assigned)
     return api_response(True)
 
+@api.post("/api/forms/start")
+@protected_endpoint
+@protect_form_endpoint(author_only=True)
+async def post_form_start(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
+    form_data = forms._get_form_content(data.form_id)
+    if form_data is None:
+        return api_response(False, err_msg="Form not found.")
+    
+    form_data["settings"]["is_active"] = True
+    forms._save_form_content(data.form_id, form_data)
+    logs.info("Forms", f"Manually activated form: ({data.form_id}) by <{data.uuid}>")
+    
+    return api_response(True)
+
+@api.post("/api/forms/end")
+@protected_endpoint
+@protect_form_endpoint(author_only=True)
+async def post_form_end(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
+    form_data = forms._get_form_content(data.form_id)
+    if form_data is None:
+        return api_response(False, err_msg="Form not found.")
+    
+    form_data["settings"]["is_active"] = False
+    forms._save_form_content(data.form_id, form_data)
+    logs.info("Forms", f"Manually deactivated form: ({data.form_id}) by <{data.uuid}>")
+    
+    return api_response(True)
 
 @api.post("/api/forms/get-brief")
 async def post_get_brief_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
     enriched_content = forms.get_sharable_form_data(data.form_id, data.uuid)
+    if enriched_content is None:
+        return api_response(False, err_msg="Form not found.")
     return api_response(True, enriched_content)
 
 @api.post("/api/forms/validate-respondent")
@@ -347,6 +376,15 @@ async def post_validate_respondent(data: schemas.FormRespondentSchema, request: 
     form_data = forms._get_form_content(data.form_id)
     if form_data is None:
         return api_response(False, err_msg="Form not found.")
+
+    if not form_data["settings"]["is_active"]:
+        return api_response(False, err_msg="This form is not active yet.")
+
+    user = None
+    if data.is_account:
+        user = users.get_user_by_uuid(data.uuid)
+        if user is None:
+            return api_response(False, err_msg="User not found.")
     
     if form_data["settings"]["assigned_only"]:
         if data.is_account and not forms.is_assigned_to_user(data.form_id, data.uuid):
@@ -358,6 +396,26 @@ async def post_validate_respondent(data: schemas.FormRespondentSchema, request: 
         if data.password != form_data["settings"]["password"]:
             return api_response(False, err_msg="Incorrect password.")
     
-    return api_response(True, form_data["structure"])
+    email = data.email
+    fullname = data.fullname
+    if data.is_account:
+        email = user.email
+        fullname = user.fullname
+    
+    status, id_or_err = forms.create_responder_entry(data.form_id, email, fullname, request.client.host)
+    if not status:
+        return api_response(False, err_msg=id_or_err)
+
+    return api_response(True, {"response_id": id_or_err, "structure": form_data["structure"]})
+
+@api.post("/api/forms/respond")
+async def post_form_answer(data: schemas.FormResponse, request: Request) -> JSONResponse:
+    status = forms.handle_response(data.form_id, data.response_id, data.answers)
+    if isinstance(status, str):
+        return api_response(False, err_msg=status)
+
+    return api_response(True)
+
+
 
 uvicorn.run(api, host="0.0.0.0", port=50500)

@@ -34,11 +34,13 @@ export function LongTextAnswerBuilder({formComponents, setFormComponents, ...pro
 }
 
 export function LongTextAnswer({formComponents, setFormComponents, ...props}) {
+  const [answer, setAnswer] = useState(null);
+  
   return (
-    <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} {...props}>
+    <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} userAnswer={answer} {...props}>
       <InputGroup>
         <InputLabel>Your long answer</InputLabel>
-        <LongInput maxlen={5000}></LongInput>
+        <LongInput onChange={(c) => {setAnswer(c.target.value)}} maxlen={5000}></LongInput>
       </InputGroup>
     </FormComponentBase>
   )

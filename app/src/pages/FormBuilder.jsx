@@ -5,7 +5,7 @@ import { MultiSelect } from '../ui/Select.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff } from 'lucide-react';
+import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { getComponentBuilder } from "../formComponents/AllComponents.jsx"
 import butterup from 'butteruptoasts';
@@ -21,10 +21,6 @@ function displayMessage(content) {
   });
 }
 
-function generateComponentId() {
-  return Date.now() + "" + Math.random();
-}
-
 
 export default function FormBuilder() {
   const navigate = useNavigate();
@@ -37,7 +33,9 @@ export default function FormBuilder() {
   const [loading, setLoading] = useState(true);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [authorGroups, setAuthorGroups] = useState([[], []]);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isResponsesModalOpen, setIsResponsesModalOpen] = useState(false);
+  const [authorGroups, setAuthorGroups] = useState([]);
 
   const fetchAuthorGroups = async () => {
     const requestOptions = {
@@ -52,15 +50,16 @@ export default function FormBuilder() {
     const data = await response.json();
 
     if (data.status) {
-      let names = [];
-      let keys = [];
+      let authorGroupsOptions = [];
 
       for (let [groupKey, groupName] of data.data) {
-        names.push(groupName);
-        keys.push(groupKey);
+        authorGroupsOptions.push({
+          id: groupKey,
+          value: groupName
+        })
       }
 
-      setAuthorGroups([names, keys]);
+      setAuthorGroups(authorGroupsOptions);
     }
 
   };
@@ -80,15 +79,18 @@ export default function FormBuilder() {
       const data = await response.json();
       
       if (data.status) setFormData(data.data);
-      
+      console.log(data.data)
       setFormName(data.data.settings.title);
       setIsAnon(data.data.settings.is_anonymous);
       setHideAnswers(data.data.settings.hide_answers);
       setIsAssignedOnly(data.data.settings.assigned_only);
       setFormPassword(data.data.settings.password);
       setFormComponents(data.data.structure);
+      setIsActive(data.data.settings.is_active);
       setAssignedEmails(data.data.assigned.emails);
       setAssignedGroups(data.data.assigned.groups);
+      setCurrentlyResponding(data.data.responding);
+      setResponses(data.data.answers);
 
     } catch (error) {
       displayMessage("Failed to load form.");
@@ -106,10 +108,13 @@ export default function FormBuilder() {
   const [isAnon, setIsAnon] = useState(false);
   const [hideAnswers, setHideAnswers] = useState(false);
   const [isAssignedOnly, setIsAssignedOnly] = useState(true);
+  const [isActive, setIsActive] = useState(false);
   const [formPassword, setFormPassword] = useState(null);
   const [formComponents, setFormComponents] = useState([]);
   const [assignedEmails, setAssignedEmails] = useState([]);
   const [assignedGroups, setAssignedGroups] = useState([]);
+  const [currentlyResponding, setCurrentlyResponding] = useState({});
+  const [responses, setResponses] = useState({});
 
   function handleAssignEmail() {
     const email = document.getElementById("assign-email");
@@ -180,7 +185,7 @@ export default function FormBuilder() {
   }
 
   function addFormComponent(componentType) {
-    setFormComponents([...formComponents, {"componentType": componentType, "componentId": generateComponentId()}]);
+    setFormComponents([...formComponents, {"componentType": componentType, "componentId": crypto.randomUUID()}]);
   }
 
   function onGroupAssignChange(event) {
@@ -201,12 +206,42 @@ export default function FormBuilder() {
     }
   }
 
-  function getGroupSelectStates() {
-    const states = [];
-    for (const groupId of authorGroups[1]) {
-      states.push(assignedGroups.includes(groupId))
+  async function startForm() {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        form_id: formId,
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/start", requestOptions);
+    const data = await response.json();
+    if (data.status) { 
+      setIsActive(true);
+      displayMessage("Form is now active.");
     }
-    return states;
+    else { displayMessage("Failed to start, " + data.err_msg); }
+  }
+
+  async function endForm() {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        form_id: formId,
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/end", requestOptions);
+    const data = await response.json();
+    if (data.status) { 
+      setIsActive(false);
+      displayMessage("Form is now: not active.");
+    }
+    else { displayMessage("Failed to end, " + data.err_msg); }
   }
 
   if (loading) return <>Loading {formId}</>;
@@ -285,7 +320,7 @@ export default function FormBuilder() {
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
-                  <EyeOff/>Hide asnwers
+                  <EyeOff/>Hide answers after response
                 </InputLabel>
                 <TrueFalse qid="hide-answers" defValueState={hideAnswers} setter={setHideAnswers}></TrueFalse>
               </InputGroup>
@@ -306,10 +341,40 @@ export default function FormBuilder() {
               <div className='hzSep'></div>
             </div>
           </div>
-          <div className='builder-properties-bottom row'>
-            <TertiaryButton wide onClick={() => {setIsAssignModalOpen(true)}}>
-              <UserPlus/>Assign
+          <div className='builder-properties-bottom'>
+            <TertiaryButton wide onClick={() => {setIsResponsesModalOpen(true)}}>
+              <Eye/>View {Object.keys(responses).length} responses
             </TertiaryButton>
+            {
+              !isResponsesModalOpen && (
+                <Modal title="View form responses." close={setIsResponsesModalOpen}>
+                  <div className='responses-content'>
+                    <div className='responses-type-header'>Currently responding: <span className='header-value'>{Object.keys(currentlyResponding).length}</span></div>
+                    <div className='currently-responding-container'>
+                      {
+                        Object.entries(currentlyResponding).map(([email, data]) => (
+                          <span className='currently-responding' key={email}>{data.fullname} ({email})</span>
+                        ))
+                      }
+                    </div>
+                    <div className='hzSep'></div>
+                    <div className='responses-type-header'>Submitted responses: <span className='header-value'>{Object.keys(responses).length}</span></div>
+                    <div className='submitted-responses-container'>
+                      {
+                        Object.entries(responses).map(([email, data]) => (
+                          <span className='currently-responding' key={email}>{data.fullname} ({email})</span>
+                        ))
+                      }
+                    </div>
+                  </div>
+                </Modal>
+              )
+            }
+          </div>
+          <div className='builder-properties-bottom row'>
+            <SecondaryButton wide onClick={() => {setIsAssignModalOpen(true)}}>
+              <UserPlus/>Assign
+            </SecondaryButton>
             {
               isAssignModalOpen && (
                 <Modal title="Assign form." close={setIsAssignModalOpen}>
@@ -322,9 +387,8 @@ export default function FormBuilder() {
                       <div className='assignees-container'>
                         <MultiSelect
                           qid="assign-groups"
-                          options={authorGroups[0]}
-                          keys={authorGroups[1]}
-                          states={getGroupSelectStates()}
+                          options={authorGroups}
+                          selectedIds={assignedGroups}
                           onOptionChange={onGroupAssignChange}
                         ></MultiSelect>
                       </div>
@@ -359,9 +423,41 @@ export default function FormBuilder() {
               )
             }
 
-            <PrimaryButton wide>
-              <Send/>Deploy
+            <PrimaryButton wide onClick={() => {setIsShareModalOpen(true)}}>
+              <Send/>Share
             </PrimaryButton>
+            {
+              isShareModalOpen && (
+                <Modal title="Share form." close={setIsShareModalOpen}>
+                  <div className='share-form-content'>
+                    <span className='is-active-info'>Form is {(isActive) ? 'active' : 'not active'}</span>
+                    <div className='hzSep'></div>
+                    <div className='link-container'>
+                      <span className='link-header row'>
+                        <Link/>URL
+                      </span>
+                      <span className='link-content'>{window.location.host}/form/{formId}</span>
+                      <span className='link-copy row' onClick={() => {navigator.clipboard.writeText(window.location.host + "/form/" + formId); displayMessage("Copied!")}}>
+                        <Copy/>Copy
+                      </span>
+                    </div>
+                    <InputLabel>Assigned Formly users can access this form from their dashboards.</InputLabel>
+                    <div className='hzSep'></div>
+                    {
+                      !isActive? (
+                        <PrimaryButton wide onClick={startForm}>
+                          <Send/>Start now
+                        </PrimaryButton>
+                      ) : (
+                        <DangerButton wide onClick={endForm}>
+                          <Ban/>End now
+                        </DangerButton>
+                      )
+                    }
+                  </div>
+                </Modal>
+              )
+            }
           </div>
         </div>
 

@@ -2,12 +2,12 @@ import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
 import { InputGroup, InputLabel, Input } from '../ui/Input.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList } from 'lucide-react';
+import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList,CheckCircle, LayoutDashboard } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import './styles/answer.css'
 import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx"
 import butterup from 'butteruptoasts';
 import 'butteruptoasts/src/butterup.css';
+import './styles/answer.css'
 
 function displayMessage(content) {
     butterup.toast({
@@ -16,7 +16,6 @@ function displayMessage(content) {
       dismissable: true,
     });
 }
-
 
 const characteristicsIcons = {
   author: User,
@@ -38,8 +37,10 @@ export default function Answer() {
   
   const [formSettings, setFormSettings] = useState("");
   const [characteristics, setCharacteristics] = useState([]);
-  const [formStructure, setFormStructure] = useState([])
+  const [formStructure, setFormStructure] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isResponded, setIsResponded] = useState(false);
+  const [responseID, setResponseID] = useState(null);
 
   const fetchFormData = async () => {
     if (!formId) return;
@@ -90,7 +91,7 @@ export default function Answer() {
       });
   }, []);
 
-  const validateRespondent = async () => {
+  async function validateRespondent() {
     const fullname = document.getElementById("resp-fullname");
     const email = document.getElementById("resp-email");
     const password = document.getElementById("form-password")?.value;
@@ -119,10 +120,55 @@ export default function Answer() {
     if (!data.status) {
       displayMessage(data.err_msg);
     } else {
-      //TODO: continue...
-      setFormStructure(data.data);
+      setResponseID(data.data.response_id);
+      setFormStructure(data.data.structure);
+      console.log(`Responding with ID: ${data.data.response_id}`)
     }
   };
+
+  function grabRespondentAnswers() {
+    const respondentAnswers = {};
+    let questionNum = 1;
+    
+    for (const component of document.getElementsByClassName("form-component")) {
+      const id = component.getAttribute("_componentid");
+      const answer = component.getAttribute("_answer");
+      
+      if (answer === null || !answer) {
+        displayMessage(`Answer question ${questionNum}.`);
+        return null;
+      }
+
+      respondentAnswers[id] = answer;
+      questionNum++;
+    }
+
+    return respondentAnswers;
+  }
+
+  async function finishForm() {
+    const answers = grabRespondentAnswers();
+    if (answers == null) return;
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        form_id: formId,
+        response_id: responseID,
+        answers: answers
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/forms/respond", requestOptions);
+    const data = await response.json();
+    if (data.status) {
+      setIsResponded(true);
+    } else {
+      displayMessage(data.err_msg);
+    }
+
+  }
 
   return (
     <main className='answer'>
@@ -155,43 +201,76 @@ export default function Answer() {
           }
         </div>
       </div>
-      <div className='respondent-info'>
-        {
-          (isLoggedIn) ? (
-            <div className='respondent-account'>
-              <User/>Responding as: <span id='respondent-name'>{localStorage.getItem("fullname")}</span>
-              <span id='change-logged-respondent' onClick={() => {setIsLoggedIn(false)}}>(change)</span>
-            </div>
-          ) : (
-            <div className='respondent-no-account'>
-              <InputGroup>
-                <InputLabel>Full name</InputLabel>
-                <Input type="text" id="resp-fullname" minlen={3}></Input>
-              </InputGroup>
-              <InputGroup>
-                <InputLabel>Your email</InputLabel>
-                <Input type="email" id="resp-email" minlen={3}></Input>
-              </InputGroup>
-              <span id='already-user' onClick={() => {navigate('/login')}}>Login instead.</span>
-            </div>
-          )
-        }
-        <div className='hzSep'></div>
-        {
-          (formSettings.password) ? (
-            <>
-              <InputGroup>
-                <InputLabel>Form password</InputLabel>
-                <Input type='password' id="form-password"></Input>
-              </InputGroup>
-              <div className='hzSep'></div>
-            </>
-          ) : (<></>)
-        }
+      {
+        (formStructure === null) ? (
+          <div className='respondent-info'>
+            {
+              (isLoggedIn) ? (
+                <div className='respondent-account'>
+                  <User/>Responding as: <span id='respondent-name'>{localStorage.getItem("fullname")}</span>
+                  <span id='change-logged-respondent' onClick={() => {setIsLoggedIn(false)}}>(change)</span>
+                </div>
+              ) : (
+                <div className='respondent-no-account'>
+                  <InputGroup>
+                    <InputLabel>Full name</InputLabel>
+                    <Input type="text" id="resp-fullname" minlen={3}></Input>
+                  </InputGroup>
+                  <InputGroup>
+                    <InputLabel>Your email</InputLabel>
+                    <Input type="email" id="resp-email" minlen={3}></Input>
+                  </InputGroup>
+                  <span id='already-user' onClick={() => {navigate('/login')}}>Login instead.</span>
+                </div>
+              )
+            }
+            <div className='hzSep'></div>
+            {
+              (formSettings.password) ? (
+                <>
+                  <InputGroup>
+                    <InputLabel>Form password</InputLabel>
+                    <Input type='password' id="form-password"></Input>
+                  </InputGroup>
+                  <div className='hzSep'></div>
+                </>
+              ) : (<></>)
+            }
+    
+            <PrimaryButton wide onClick={validateRespondent}>Start</PrimaryButton>
+          </div>
+        ) : !isResponded? (
+          <>
+            {
+              formStructure.map((componentData, qIndex) => {
+                const DynamicComponentBuilder = getAnswerComponentBuilder(componentData.componentType)  ;
+                return (
+                  <DynamicComponentBuilder 
+                    key={componentData.componentId} 
+                    questionNo={qIndex + 1} 
+                    formComponents={formStructure}
+                    setFormComponents={setFormStructure}
+                    {...componentData}
+                  ></DynamicComponentBuilder>
+                )
+              })
+            }
 
-        <PrimaryButton wide onClick={validateRespondent}>Start</PrimaryButton>
-      </div>
-
+            <PrimaryButton onClick={finishForm}>
+              <CheckCircle></CheckCircle>Finish
+            </PrimaryButton>       
+          </>
+        ) : (
+          <>
+            <div className='responded-panel'>
+              <CheckCircle/>Response sent.
+            </div>
+            <PrimaryButton onClick={() => {navigate('/dash')}}>
+              <LayoutDashboard/>Back to dashboard
+            </PrimaryButton>
+          </>
+        )
+      }
     </main>
   )
 }

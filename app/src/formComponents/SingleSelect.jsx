@@ -9,7 +9,7 @@ import { TertiaryButton } from '../ui/Button.jsx';
 
 export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
-  const [options, setOptions] = useState(props.options || ["Answer 1"]);
+  const [options, setOptions] = useState(props.options || [{id: crypto.randomUUID(), value: "Option 1"}]);
   const questionChangerRef = useRef(null);
 
   function onQuestionChange() {
@@ -22,19 +22,9 @@ export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ..
     );
   }
 
-  function onOptionContentChange(index, value) {
-    const newOptions = [...options]; 
-    newOptions[index] = value; 
-    setOptions(newOptions);
-    setFormComponents(prevComponents =>
-      prevComponents.map(c =>
-        c.componentId === props.componentId ? { ...c, options: newOptions } : c
-      )
-    );
-  }
-
   function onAddOption() {
-    const newOptions = [...options, `Answer ${options.length + 1}`]
+    const addedOption = {id: crypto.randomUUID(), value: `Option ${options.length + 1}`};
+    const newOptions = [...options, addedOption];
     setOptions(newOptions);
     setFormComponents(prevComponents =>
       prevComponents.map(c =>
@@ -42,18 +32,7 @@ export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ..
       )
     );
   }
-
-  function onOptionDelete(index) {
-    const newOptions = [...options];
-    newOptions.splice(index, 1);
-    setOptions(newOptions);
-    setFormComponents(prevComponents =>
-      prevComponents.map(c =>
-        c.componentId === props.componentId ? { ...c, options: newOptions } : c
-      )
-    );
-  }
-
+  
   return (
     <div className='form-component-builder-group'>
       <SignleSelectAnswer question={question} options={options} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></SignleSelectAnswer>
@@ -68,15 +47,35 @@ export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ..
         <div className='form-builder-options-container'>
           {
             options.map((option, index) => (
-              <InputGroup key={index}>
+              <InputGroup key={option.id}>
                 <InputLabel>Option {index + 1}</InputLabel>
                 <div className='input-with-action'>
-                  <Input value={option} onChange={(ev) => {onOptionContentChange(index, ev.target.value)}}></Input>
-                  <MinusCircle className='form-builder-option-delete' onClick={() => {onOptionDelete(index)}}/>
+                  <Input 
+                    value={option.value} 
+                    onChange={(ev) => {
+                      const newOptions = options.map(opt =>
+                        opt.id === option.id ? { ...opt, value: ev.target.value } : opt
+                      );
+                      setOptions(newOptions);
+                      setFormComponents(prevComponents =>
+                      prevComponents.map(c =>
+                        c.componentId === props.componentId ? { ...c, options: newOptions } : c
+                      )) 
+                    }}
+                  />
+                  <MinusCircle className='form-builder-option-delete' onClick={() => {
+                    const newOptions = options.filter(opt => opt.id !== option.id);
+                    setOptions(newOptions);
+                    setFormComponents(prevComponents =>
+                      prevComponents.map(c =>
+                        c.componentId === props.componentId ? { ...c, options: newOptions } : c
+                    )) 
+                  }}/>
                 </div>
               </InputGroup>
             ))
           }
+
         </div>
         <div className='hzSep'></div>
         <TertiaryButton onClick={onAddOption}>
@@ -88,9 +87,11 @@ export function SignleSelectAnswerBuilder({formComponents, setFormComponents, ..
 }
 
 export function SignleSelectAnswer({formComponents, setFormComponents, ...props}) {
+  const [answer, setAnswer] = useState(null);
+  
   return (
-    <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} {...props}>
-      <SingleSelect qid={props.componentId} options={props.options}></SingleSelect>
+    <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} userAnswer={answer} {...props}>
+      <SingleSelect qid={props.componentId} options={props.options} answerReporter={setAnswer}></SingleSelect>
     </FormComponentBase>
   )
 }

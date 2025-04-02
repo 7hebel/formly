@@ -65,7 +65,7 @@ def delete_group(group_id: str, deleter_uuid: str) -> str | bool:
 
 def add_member_to_group(group_id: str, user_uuid: str) -> None:
     content = _get_group_content(group_id)
-    if user_uuid not in content["members"]:
+    if user_uuid not in content["members"] and user_uuid not in content["managers"]:
         content["members"].append(user_uuid)
         _save_group_content(group_id, content)
         logs.info("Groups", f"Added member <{user_uuid}> to group [{group_id}]")
@@ -183,8 +183,12 @@ def rename_group(group_id: str, new_name: str) -> None:
 # Invitations
 
 def add_group_invitation(user_uuid: str, group_id: str) -> bool | str:
-    if users.get_user_by_uuid(user_uuid) is None:
+    user = users.get_user_by_uuid(user_uuid) 
+    if user is None:
         return "User not found."
+        
+    if group_id in user.groups.split("|"):
+        return "User is already a member of this group."
 
     users.DB.execute("INSERT INTO invitations (user_uuid, group_id) VALUES (?, ?)", (user_uuid, group_id))
     users.db_conn.commit()

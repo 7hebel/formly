@@ -1,14 +1,19 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 
 
-export function SingleSelect({ qid, options }) {
+export function SingleSelect({ qid, options, answerReporter }) {
+  function handleAnswerChange(c) {
+    const selected = document.querySelector(`input[name='ssel-${qid}']:checked`).getAttribute("optionkey");
+    if (answerReporter) answerReporter(selected);
+  }
+
   return (
     <div className="select-container">
       {
-        options?.map((option, index) => (
-          <label key={index} className='select-radio-label'>
-            <input type="radio" name={'ssel-' + qid} className='select-radio'/>
-            {option}
+        options?.map((option) => (
+          <label key={option.id} className='select-radio-label'>
+            <input type="radio" name={'ssel-' + qid} optionkey={option.id} onInput={handleAnswerChange} className='select-radio'/>
+            {option.value}
           </label>
         ))
       }
@@ -16,28 +21,36 @@ export function SingleSelect({ qid, options }) {
   )
 }
 
-export function MultiSelect({ qid, onOptionChange, options, keys, states }) {
-  if (keys !== undefined && options.length !== keys.length) {
-    throw new Error("Created MultiSelect with keys array not matching options.");
+export function MultiSelect({ qid, onOptionChange, options, answersReporter, selectedIds }) {
+  const [localAnswers, setLocalAnswers] = useState([]);
+  function handleAnswerChange(c) {
+    const checkbox = c.target;
+    let newAnswers = localAnswers;
+
+    if (checkbox.checked) {
+      newAnswers = [...localAnswers, checkbox.getAttribute("optionkey")];
+    } else {
+      newAnswers = localAnswers.filter(a => a != checkbox.getAttribute("optionkey"));
+    }
+    
+    setLocalAnswers(newAnswers);
+    if (answersReporter) answersReporter(newAnswers);
   }
-  if (states !== undefined && options.length !== states.length) {
-    throw new Error("Created MultiSelect with states array not matching options.");
-  }
-  
+
   return (
     <div className="select-container">
       {
-        options?.map((option, index) => (
-          <label key={option + "" + index + (keys? keys[index] : "")} className='select-radio-label'>
+        options?.map((option) => (
+          <label key={option.id} className='select-radio-label'>
             <input 
               type="checkbox"
               name={'msel-' + qid}
-              optionkey={keys? keys[index] : null}
+              optionkey={option.id}
               className='select-radio multi-radio'
-              onInput={onOptionChange}
-              defaultChecked={states? states[index] : false}
+              onInput={(c) => {handleAnswerChange(c); if (onOptionChange) onOptionChange(c)}}
+              defaultChecked={selectedIds?.includes(option.id)}
             />
-            {option}
+            {option.value}
           </label>
         ))
       }
