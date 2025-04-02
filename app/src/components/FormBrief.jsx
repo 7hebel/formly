@@ -113,7 +113,7 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
                   </TertiaryButton>
                 )
               ) : (
-                <PrimaryButton>
+                <PrimaryButton onClick={() => {navigate("/form/" + formId)}}>
                   <CornerDownRight/>Answer
                 </PrimaryButton>
               )

@@ -403,6 +403,8 @@ def get_full_grade(form_id: str, answers: dict) -> str | int:
 
         user_points += answer_data["grade"]
         
+    if max_points == 0:
+        return "Not graded."
     percentage_grade = round((user_points / max_points) * 100)
     return f"{percentage_grade}%"
     
