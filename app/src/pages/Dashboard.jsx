@@ -352,9 +352,13 @@ export default function Dashboard() {
               <h1>Assigned to me:</h1>
               <div className="dash-forms-container">
                 {
-                  forms && forms.assigned.map((formId) => (
-                    <FormBrief isAssigned formId={formId} key={formId}></FormBrief>
-                  ))  
+                  (forms && forms.assigned.length > 0) ? (
+                    forms.assigned.map((formId) => (
+                      <FormBrief isAssigned formId={formId} key={formId}></FormBrief>
+                    ))  
+                  ) : (
+                    <p className='info-text'>There are no forms assigned to any of Your groups or Your email.</p>
+                  )
                 }
               </div>
             </div>
@@ -367,9 +371,13 @@ export default function Dashboard() {
               </h1>
               <div className="dash-forms-container">
                 {
-                  forms && forms.my_forms.map((formId) => (
-                    <FormBrief isMyForm formId={formId} key={formId}></FormBrief>
-                  ))  
+                  (forms && forms.my_forms.length > 0) ? (
+                    forms.my_forms.map((formId) => (
+                      <FormBrief isMyForm formId={formId} key={formId}></FormBrief>
+                    ))  
+                  ) : (
+                    <p className='info-text'>You don't have any forms yet.</p>
+                  )
                 }
               </div>
             </div>
@@ -377,9 +385,13 @@ export default function Dashboard() {
               <h1>Answered by me:</h1>
               <div className="dash-forms-container">
                 {
-                  forms && forms.answered.map((formId) => (
-                    <FormBrief isAnswered formId={formId} key={formId}></FormBrief>
-                  ))  
+                  (forms && forms.answered.length > 0) ? (
+                    forms.answered.map((formId) => (
+                      <FormBrief isAnswered formId={formId} key={formId}></FormBrief>
+                    ))  
+                  ) : (
+                    <p className='info-text'>You have not answered any form yet.</p>
+                  )
                 }
               </div>
             </div>

@@ -45,7 +45,7 @@ function GroupMember({ name, memberUUID, isMemberManager, isUserManager, onKick,
 }
 
 export default function GroupView({ refreshPanel, groupNameSetter, groupId=null }) {
-  if (!groupId) return <></>
+  if (!groupId) return <p className='info-text text-center'>Select a group to view details.</p>
 
   const [groupData, setGroupData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -205,6 +205,11 @@ export default function GroupView({ refreshPanel, groupNameSetter, groupId=null 
           groupData.draft_forms.map(formId => (
             groupData.is_manager && (<FormBrief isMyForm formId={formId} key={formId}></FormBrief>)
           ))
+        }
+        {
+          (groupData.assigned_forms.length == 0 && groupData.draft_forms.length == 0) ? (
+            <p className='info-text'>There are no forms assigned to this group.</p>
+          ) : <></>
         }
       </div>
       

@@ -285,3 +285,17 @@
     text-decoration: underline 2px;
     text-decoration-color: var(--color-primary);
 }
+
+
+/* Text */
+
+.info-text {
+    font-family: var(--ui-font);
+    color: var(--color-text);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.text-center {
+    text-align: center;
+}

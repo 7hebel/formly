@@ -156,7 +156,11 @@ export function FormResponse({formId, responseData, formComponents, onRemoved, w
             )
           })
         }
-        <PrimaryButton onClick={() => {gradeResponse(responseData.response_id)}}><Medal/>Grade response</PrimaryButton>
+        {
+          withGradePanel? (
+            <PrimaryButton onClick={() => {gradeResponse(responseData.response_id)}}><Medal/>Grade response</PrimaryButton>
+          ) : <></>
+        }
       </div>
     </div>
   )
