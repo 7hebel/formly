@@ -231,6 +231,10 @@
     outline: 1px solid var(--color-text);
 }
 
+.truefalse-inputs .dimmed-truefalse input:checked + .truefalse-name {
+    background-color: var(--color-bg-item) !important;
+}
+
 .truefalse-name > svg {
     height: 15px;
     vertical-align: middle;
@@ -299,3 +303,29 @@
 .text-center {
     text-align: center;
 }
+
+.danger-text-btn {
+    font-family: var(--ui-font);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+    transition: color .2s;
+    cursor: pointer;
+    width: max-content;
+    gap: 6px;
+}
+
+.danger-text-btn:hover {
+    color: red;
+    text-decoration: underline 1px rgba(255, 0, 0, 0.548);
+}
+
+.danger-text-btn > svg {
+    width: 14px;
+    height: 14px;
+    opacity: .7;
+}
+

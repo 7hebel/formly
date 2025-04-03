@@ -32,6 +32,7 @@ export default function FormBuilder() {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isAnswersView, setIsAnswersView] = useState(false);
@@ -304,13 +305,13 @@ export default function FormBuilder() {
         Form <span id='welcome-msg-name'>builder</span>
       </h1>
       <div className='row'>
-        <PrimaryButton onClick={sendSave}>
+        <TertiaryButton onClick={sendSave}>
           <CheckCheck/>Save
-        </PrimaryButton>
-
-        <TertiaryButton onClick={() => {setIsLeaveModalOpen(true)}}>
-          <LogOut/>Leave
         </TertiaryButton>
+
+        <DangerButton onClick={() => {setIsLeaveModalOpen(true)}}>
+          <LogOut/>Leave
+        </DangerButton>
         {
           isLeaveModalOpen && (
             <Modal title="Leave form builder?" close={setIsLeaveModalOpen}>
@@ -343,9 +344,9 @@ export default function FormBuilder() {
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
-                  <VenetianMask/>Anonymous answers
+                  <LockKeyhole/>Password
                 </InputLabel>
-                <TrueFalse qid="anon-answers" defValueState={isAnon} setter={setIsAnon}></TrueFalse>
+                <Input type='password' id='form-password' value={formPassword}></Input>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
@@ -360,31 +361,42 @@ export default function FormBuilder() {
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
-                  <EyeOff/>Hide answers after response
+                  <VenetianMask/>Anonymous answers
                 </InputLabel>
-                <TrueFalse qid="hide-answers" defValueState={hideAnswers} setter={setHideAnswers}></TrueFalse>
+                <TrueFalse qid="anon-answers" defValueState={isAnon} setter={setIsAnon} isDimmed></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
-                  <LockKeyhole/>Password
+                  <EyeOff/>Hide answers after response
                 </InputLabel>
-                <Input type='password' id='form-password' value={formPassword}></Input>
+                <TrueFalse qid="hide-answers" defValueState={hideAnswers} setter={setHideAnswers} isDimmed></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
                   <UserCheck/>Assigned respondents only
                 </InputLabel>
-                <TrueFalse qid="assigned-only" defValueState={isAssignedOnly} setter={setIsAssignedOnly}></TrueFalse>
+                <TrueFalse qid="assigned-only" defValueState={isAssignedOnly} setter={setIsAssignedOnly} isDimmed></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
+              <p className='danger-text-btn' onClick={() => {setIsDeleteModalOpen(true)}}>
+                <Trash2/>Delete form
+              </p>
+              {
+                isDeleteModalOpen && (
+                  <Modal title="Delete form?" close={setIsDeleteModalOpen}>
+                    <InputLabel>Form's properties and structure will be irreversibly deleted!</InputLabel>
+                    <div className='row wide'>
+                      <PrimaryButton wide onClick={() => {setIsDeleteModalOpen(false)}}>Back</PrimaryButton>
+                      <DangerButton wide onClick={removeForm}>Delete</DangerButton>
+                    </div>
+                  </Modal>
+                )
+              }
+              <div className='hzSep'></div>
+
             </div>
-          </div>
-          <div className='builder-properties-bottom'>
-            <DangerButton onClick={removeForm} wide>
-              <Trash2/>Delete form
-            </DangerButton>
           </div>
           <div className='builder-properties-bottom'>
             <TertiaryButton wide onClick={() => {setIsAnswersView(true)}}>

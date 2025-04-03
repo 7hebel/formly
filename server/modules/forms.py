@@ -113,6 +113,9 @@ def get_assigned_to_user(user_uuid: str) -> list[str]:
             if form["author_uuid"] == user_uuid:
                 continue
             
+            if user.email in form["answers"]:
+                continue
+            
             if user.email in form["assigned"]["emails"]:
                 assigned_forms.append(form_id)
                 continue

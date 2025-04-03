@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 
-export function TrueFalse({ qid, defValueState, setter, locked }) {
+export function TrueFalse({ qid, defValueState, setter, locked, isDimmed }) {
   const trueRef = useRef(null);
   const falseRef = useRef(null);
   
@@ -21,14 +21,14 @@ export function TrueFalse({ qid, defValueState, setter, locked }) {
   return (
     <div className="truefalse-container">
       <div className="truefalse-inputs">
-        <label className="truefalse-radio">
+        <label className={"truefalse-radio " + (isDimmed ? 'dimmed-truefalse' : '')}>
           <input type="radio" name={'tf-' + qid} id={'tf-' + qid + "-1"} ref={trueRef} onClick={onTrue} defaultChecked={defValueState===true} disabled={locked}/>
           <span className="truefalse-name">
             <CheckCircle2/>
             True
           </span>
         </label>
-        <label className="truefalse-radio">
+        <label className={"truefalse-radio " + (isDimmed ? 'dimmed-truefalse' : '')}>
           <input type="radio" name={'tf-' + qid} id={'tf-' + qid + "-0"} ref={falseRef} onClick={onFalse} defaultChecked={defValueState===false} disabled={locked}/>
           <span className="truefalse-name">
             <XCircle/>
