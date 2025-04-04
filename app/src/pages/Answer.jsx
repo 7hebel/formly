@@ -235,11 +235,11 @@ export default function Answer() {
               ) : (
                 <div className='respondent-no-account'>
                   <InputGroup>
-                    <InputLabel>Full name</InputLabel>
+                    <InputLabel>Full name {formSettings.is_anonymous? <b>(hidden)</b> : ''}</InputLabel>
                     <Input type="text" id="resp-fullname" minlen={3}></Input>
                   </InputGroup>
                   <InputGroup>
-                    <InputLabel>Your email</InputLabel>
+                    <InputLabel>Your email {formSettings.is_anonymous? <b>(hidden)</b> : ''}</InputLabel>
                     <Input type="email" id="resp-email" minlen={3}></Input>
                   </InputGroup>
                   <span id='already-user' onClick={() => {navigate('/login')}}>Login instead.</span>

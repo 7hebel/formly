@@ -323,13 +323,18 @@ def create_responder_entry(form_id: str, email: str, fullname: str, host: str) -
         logs.error("Forms", f"Failed to create responder entry for: {email} - {fullname} at form: ({form_id}) - email already responded...")
         return (False, "Person with this email has already answered this form.")
 
+    if form_data["settings"]["is_anonymous"]:
+        anon_no = len(form_responding) + len(form_data["answers"]) + 1
+        fullname = f"Anonymous respondent {anon_no}"
+
     timestamp = int(time.time())
     response_id = uuid.uuid4().hex
     entry = {
         "fullname": fullname,
         "started_at": timestamp,
         "response_id": response_id,
-        "host": users.hash_ip(host)
+        "host": users.hash_ip(host),
+        "anonymous": form_data["settings"]["is_anonymous"]
     }
 
     form_data["responding"][email] = entry
@@ -494,4 +499,17 @@ def remove_form(form_id: str) -> bool | str:
     logs.warn("Forms", f"Removed form: ({form_id})")
     return True
     
+
+def hide_anonymous_data(form_content: dict) -> dict:
+    responding_emails = list(form_content["responding"].keys())
+    answered_emails = list(form_content["answers"].keys())
     
+    for (index, email) in enumerate(responding_emails, len(answered_emails) + 1):
+        form_content["responding"][f"Anon {index + 1}"] = form_content["responding"][email]
+        form_content["responding"].pop(email)
+    
+    for (index, email) in enumerate(answered_emails):
+        form_content["answers"][f"Anon {index + 1}"] = form_content["answers"][email]
+        form_content["answers"].pop(email)
+        
+    return form_content

@@ -327,6 +327,9 @@ async def post_load_forms(data: schemas.ProtectedModel, request: Request) -> JSO
 @protect_form_endpoint(author_only=True)
 async def post_fetch_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
     content = forms._get_form_content(data.form_id)
+    if content["settings"]["is_anonymous"]:
+        content = forms.hide_anonymous_data(content)
+    
     return api_response(True, content)
 
 @api.post("/api/forms/update-form")
