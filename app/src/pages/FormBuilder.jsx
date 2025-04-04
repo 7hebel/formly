@@ -143,16 +143,8 @@ export default function FormBuilder() {
     setFormName(event.target.value);
   }
 
-  function grabComponentsData() {
-    const data = [];
-    document.querySelectorAll(".form-component").forEach((componentEl) => {
-      data.push(JSON.parse(componentEl.getAttribute("_componentdata")));
-    })
-    return data;
-  }
-
   async function sendSave() {
-    const structure = grabComponentsData();
+    const structure = formComponents;
     const settings = {
       "title": formName,
       "is_anonymous": isAnon,
