@@ -8,32 +8,60 @@ export function Modal({ title, close, children }) {
   const modalRoot = document.getElementById('modal-root');
   const containerRef = useRef(null);
   const closeRef = useRef(null);
+  const modalRef = useRef(null);
+
+  function onClose() {
+    if (modalRef && modalRef.current) {
+      modalRef.current.classList.add('modal-transition');
+      // const timer = setTimeout(() => {
+      //   modalRef.current.classList.remove('modal-transition');
+      // }, 1);
+      
+      setTimeout(close, 250);
+      return () => clearTimeout(timer);
+    }
+  }
 
   useEffect(() => {
     if (containerRef && containerRef.current) {
-      containerRef.current.addEventListener("click", (event) => { if (event.target.id == 'modal-container') close(); })
+      containerRef.current.addEventListener("click", (event) => { 
+        if (event.target.id === 'modal-container') onClose(); 
+      });
     }
-    if (closeRef && closeRef.current) {
-      closeRef.current.addEventListener("click", (event) => { close(); })
-    }
-  }, [])
 
-  return ReactDOM.createPortal(
-    (
-      <div id='modal-container' ref={containerRef}>
-        <div className="modal">
-          <div className='modal-header'>
-            <h1>{title}</h1>
-            <X ref={closeRef}/>
-          </div>
-          <div className='hzSepMid'></div>
-          <div className='modal-content'>
-            {children}
-          </div>
+    if (closeRef && closeRef.current) {
+      closeRef.current.addEventListener("click", (event) => { 
+        onClose(); 
+      });
+    }
+
+    if (modalRef && modalRef.current) {
+      modalRef.current.classList.add('modal-transition');
+      document.getElementById("modal-container").classList.add('modal-transition')
+      const timer = setTimeout(() => {
+        document.getElementById("modal-container").classList.remove('modal-transition')
+        modalRef.current.classList.remove('modal-transition');
+      }, 1);
+      
+      return () => clearTimeout(timer);
+    }
+
+  }, []);
+
+  return ReactDOM.createPortal((
+    <div id='modal-container' ref={containerRef}>
+      <div className="modal" ref={modalRef}>
+        <div className='modal-header'>
+          <h1>{title}</h1>
+          <X ref={closeRef}/>
+        </div>
+        <div className='hzSepMid'></div>
+        <div className='modal-content'>
+          {children}
         </div>
       </div>
-    ),
-    modalRoot
-  );
+    </div>
+  ), modalRoot);
 }
+
 

@@ -5,7 +5,7 @@ import { MultiSelect } from '../ui/Select.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2 } from 'lucide-react';
+import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2, LayoutDashboard } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { getComponentBuilder } from "../formComponents/AllComponents.jsx"
 import { FormResponse } from "../components/FormResponse.jsx";
@@ -31,7 +31,6 @@ export default function FormBuilder() {
 
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
-  const [isLeaveModalOpen, setIsLeaveModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -316,25 +315,14 @@ export default function FormBuilder() {
       </div>
       
       <header className='dash-header'>
-      <img src='../logo.svg' height={42} onClick={() => {navigate('/')}}></img>
+      <img src='../logo.svg' height={42} onClick={async () => {await sendSave(); navigate('/')}}></img>
       <h1 className='welcome-msg'>
         Form <span id='welcome-msg-name'>builder</span>
       </h1>
       <div className='row'>
-        <DangerButton onClick={() => {setIsLeaveModalOpen(true)}}>
-          <LogOut/>Leave
-        </DangerButton>
-        {
-          isLeaveModalOpen && (
-            <Modal title="Leave form builder?" close={setIsLeaveModalOpen}>
-              <InputLabel>You might have unsaved changes.</InputLabel>
-              <div className='row wide'>
-                <PrimaryButton wide onClick={() => {setIsLeaveModalOpen(false)}}>Stay</PrimaryButton>
-                <DangerButton wide onClick={() => {navigate('/dash')}}>Leave</DangerButton>
-              </div>
-            </Modal>
-          )
-        }
+        <TertiaryButton onClick={() => {navigate('/dash')}}>
+          <LayoutDashboard/>Dashboard
+        </TertiaryButton>
       </div>
       </header>
 
