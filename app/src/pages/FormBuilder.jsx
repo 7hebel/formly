@@ -59,10 +59,8 @@ export default function FormBuilder() {
           value: groupName
         })
       }
-
       setAuthorGroups(authorGroupsOptions);
     }
-
   };
   
   const fetchFormData = async () => {
@@ -92,6 +90,16 @@ export default function FormBuilder() {
       setCurrentlyResponding(data.data.responding);
       setResponses(data.data.answers);
 
+      // setPreviousSentdata(JSON.stringify(data.data))
+      previousSentDataRef.current = JSON.stringify({
+        structure: data.data.structure,
+        assigned: {
+          "groups": data.data.assigned.groups,
+          "emails": data.data.assigned.emails
+        }
+      })
+
+
     } catch (error) {
       displayMessage("Failed to load form.");
       navigate("/dash");
@@ -116,6 +124,7 @@ export default function FormBuilder() {
   const [currentlyResponding, setCurrentlyResponding] = useState({});
   const [responses, setResponses] = useState({});
   const [viewedResponse, setViewedResponse] = useState(null);
+  const previousSentDataRef = useRef(null);
 
   function handleAssignEmail() {
     const email = document.getElementById("assign-email");
@@ -144,6 +153,8 @@ export default function FormBuilder() {
   }
 
   async function sendSave() {
+    if (previousSentDataRef.current === null) return;
+    
     const structure = formComponents;
     const settings = {
       "title": formName,
@@ -158,6 +169,13 @@ export default function FormBuilder() {
       "emails": assignedEmails
     }
 
+    const changedData = JSON.stringify({
+      structure: structure,
+      assigned: assigned
+    })
+    if (changedData == previousSentDataRef.current) return;
+    previousSentDataRef.current = changedData;
+    
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -172,10 +190,16 @@ export default function FormBuilder() {
 
     const response = await fetch(import.meta.env.VITE_API_URL + "/forms/update-form", requestOptions);
     const data = await response.json();
-    if (data.status) { displayMessage("Saved!"); }
-    else { displayMessage("Failed to save, " + data.err_msg); }
-
+    if (!data.status) { displayMessage("Failed to save, " + data.err_msg); }
   }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      sendSave();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [formComponents, assignedGroups, assignedEmails]);
+  
 
   function addFormComponent(componentType) {
     setFormComponents([...formComponents, {"componentType": componentType, "componentId": crypto.randomUUID(), "points": 1}]);
@@ -297,10 +321,6 @@ export default function FormBuilder() {
         Form <span id='welcome-msg-name'>builder</span>
       </h1>
       <div className='row'>
-        <TertiaryButton onClick={sendSave}>
-          <CheckCheck/>Save
-        </TertiaryButton>
-
         <DangerButton onClick={() => {setIsLeaveModalOpen(true)}}>
           <LogOut/>Leave
         </DangerButton>
@@ -331,14 +351,14 @@ export default function FormBuilder() {
                 <InputLabel>
                   <Type/>Form name
                 </InputLabel>
-                <Input onChange={updateName} placeholder={formData.settings.title} minlen={1} maxlen={32}></Input>
+                <Input onChange={updateName} onBlur={sendSave} placeholder={formData.settings.title} minlen={1} maxlen={32}></Input>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
                   <LockKeyhole/>Password
                 </InputLabel>
-                <Input type='password' id='form-password' value={formPassword}></Input>
+                <Input type='password' id='form-password' value={formPassword} onBlur={sendSave}></Input>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
@@ -346,7 +366,7 @@ export default function FormBuilder() {
                   <Hourglass/>Answer time limit
                 </InputLabel>
                 <div className='input-with-action'>
-                  <Input type='number' id='form-ans-time-limit' value={formData.settings.time_limit_m} min={0}></Input>
+                  <Input type='number' id='form-ans-time-limit' value={formData.settings.time_limit_m} min={0} onBlur={sendSave}></Input>
                   <p className='input-unit'>Minutes.</p>
                 </div>
               </InputGroup>
@@ -355,21 +375,21 @@ export default function FormBuilder() {
                 <InputLabel>
                   <VenetianMask/>Anonymous answers
                 </InputLabel>
-                <TrueFalse qid="anon-answers" defValueState={isAnon} setter={setIsAnon} isDimmed></TrueFalse>
+                <TrueFalse qid="anon-answers" defValueState={isAnon} setter={setIsAnon} onChange={sendSave} isDimmed></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
                   <EyeOff/>Hide answers after response
                 </InputLabel>
-                <TrueFalse qid="hide-answers" defValueState={hideAnswers} setter={setHideAnswers} isDimmed></TrueFalse>
+                <TrueFalse qid="hide-answers" defValueState={hideAnswers} setter={setHideAnswers} onChange={sendSave} isDimmed></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
                   <UserCheck/>Assigned respondents only
                 </InputLabel>
-                <TrueFalse qid="assigned-only" defValueState={isAssignedOnly} setter={setIsAssignedOnly} isDimmed></TrueFalse>
+                <TrueFalse qid="assigned-only" defValueState={isAssignedOnly} setter={setIsAssignedOnly} onChange={sendSave} isDimmed></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
               <p className='danger-text-btn' onClick={() => {setIsDeleteModalOpen(true)}}>

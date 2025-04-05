@@ -11,9 +11,9 @@ export function InputLabel({ children }) {
   )
 }
 
-export function Input({ id, type="text", placeholder, value, pattern, minlen, maxlen, onChange, ref, min, max, locked, groupName }) {
+export function Input({ id, type="text", placeholder, value, pattern, minlen, maxlen, onChange, onBlur, ref, min, max, locked, groupName }) {
   if (pattern==null && type=="number") pattern = "^\d*\.?\d*$"
-  
+
   return (
     <input 
       id={id} 
@@ -24,6 +24,7 @@ export function Input({ id, type="text", placeholder, value, pattern, minlen, ma
       minLength={minlen}
       maxLength={maxlen}
       onChange={onChange}
+      onBlur={onBlur}
       defaultValue={value}
       ref={ref}
       step="any"

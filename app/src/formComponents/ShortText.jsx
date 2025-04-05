@@ -55,7 +55,7 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
             <InputLabel>Correct answer</InputLabel>
             <Input onChange={changeCorrect} placeholder="Used for auto grading. Hidden from respondent." value={correct}></Input>
           </InputGroup>
-          <InfoAI>Response compared <b>using AI</b>. Text shoud be short and concise.</InfoAI>
+          <InfoAI>Response will be compared <b>using AI</b>. Text shoud be short and concise.</InfoAI>
       </div>
     </div>
   )
