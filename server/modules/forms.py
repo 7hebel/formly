@@ -1,3 +1,4 @@
+from modules import text_grading
 from modules import users
 from modules import logs
 
@@ -364,6 +365,10 @@ def auto_grade_answers(form_id: str, answers: dict[str, str]) -> dict:
             continue
 
         match component["componentType"]:
+            case "short-text-answer" | "long-text-answer":
+                grade = text_grading.TextGrader.grade_answer(correct_answer, user_answer, points) or 0
+                answers[component_id]["grade"] = grade
+                    
             case "numeric-answer":
                 if str(user_answer) == str(correct_answer):
                     answers[component_id]["grade"] = points

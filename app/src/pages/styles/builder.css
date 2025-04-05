@@ -35,7 +35,10 @@
     border: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
-    background-color: #fffae2;
+    background-color: #fffbe6;
+    background-image: radial-gradient(circle at 1px 1px, #00000023 1px, transparent 0);
+    background-size: 40px 40px;
+    background-position: 20px 20px;
 }
 
 .builder-panel-header {

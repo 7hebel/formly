@@ -124,3 +124,35 @@
     font-weight: 500;
     gap: 8px;
 }
+
+
+/* AI info block */
+
+.info-ai-block {
+    width: 100%;
+    margin-top: 6px;
+    border: 1px solid #00000017;
+    border-radius: 4px;
+    padding: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    background-color: #fff9dcd1;
+    box-shadow: inset 0px -1px 4px -2px var(--color-primary);
+}
+
+.info-ai-block > svg {
+    color: var(--color-primary-muted);
+    width: 16px;
+    height: 16px;
+}
+
+.info-ai-text {
+    font-family: var(--ui-font);
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--color-text);
+    opacity: .85;
+}
+

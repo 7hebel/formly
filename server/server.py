@@ -5,6 +5,7 @@ if not os.path.exists("./data/forms"): os.mkdir("./data/forms/")
 if not os.path.exists("./data/groups"): os.mkdir("./data/groups/")
 if not os.path.exists("./data/logs"): os.mkdir("./data/logs/")
 
+from modules import text_grading
 from modules import schemas
 from modules import groups
 from modules import forms

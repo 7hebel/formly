@@ -1,5 +1,6 @@
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import { FormComponentBase, FormBuilderOptions } from './FormComponentBase.jsx';
+import InfoAI from '../components/InfoAI.jsx';
 import { useRef, useState } from 'react';
 import './formComponents.css';
 
@@ -7,6 +8,7 @@ import './formComponents.css';
 export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
   const [points, setPoints] = useState(props.points ?? 1);
+  const [correct, setCorrect] = useState(props.correct ?? '');
 
   function changeQuestion(value) {
     setQuestion(value);
@@ -25,6 +27,15 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
       )
     );
   }
+
+  function changeCorrect(change) {
+    setCorrect(change.target.value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, correct: change.target.value } : c
+      )
+    );
+  }
   
   return (
     <div className='form-component-builder-group'>
@@ -39,6 +50,12 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
           points={points}
           onPointsChange={changePoints}
         ></FormBuilderOptions>
+        <div className='hzSep'></div>
+          <InputGroup>
+            <InputLabel>Correct answer</InputLabel>
+            <Input onChange={changeCorrect} placeholder="Used for auto grading. Hidden from respondent." value={correct}></Input>
+          </InputGroup>
+          <InfoAI>Response compared <b>using AI</b>. Text shoud be short and concise.</InfoAI>
       </div>
     </div>
   )
