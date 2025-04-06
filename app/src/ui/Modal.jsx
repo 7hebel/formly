@@ -13,10 +13,6 @@ export function Modal({ title, close, children }) {
   function onClose() {
     if (modalRef && modalRef.current) {
       modalRef.current.classList.add('modal-transition');
-      // const timer = setTimeout(() => {
-      //   modalRef.current.classList.remove('modal-transition');
-      // }, 1);
-      
       setTimeout(close, 250);
       return () => clearTimeout(timer);
     }
@@ -25,7 +21,8 @@ export function Modal({ title, close, children }) {
   useEffect(() => {
     if (containerRef && containerRef.current) {
       containerRef.current.addEventListener("click", (event) => { 
-        if (event.target.id === 'modal-container') onClose(); 
+        if (event.target.id === 'modal-container') onClose()
+        // else event.stopPropagation(); 
       });
     }
 

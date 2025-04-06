@@ -1,11 +1,12 @@
 import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { PrimaryButton, SecondaryButton, TertiaryButton, DangerButton } from '../ui/Button.jsx';
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
+import { DropdownGroup, DropdownItem } from '../ui/dropdown.jsx';
 import { MultiSelect } from '../ui/Select.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LogOut, CheckCheck, Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2, LayoutDashboard } from 'lucide-react';
+import { Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2, LayoutDashboard, Trophy } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { getComponentBuilder } from "../formComponents/AllComponents.jsx"
 import { FormResponse } from "../components/FormResponse.jsx";
@@ -89,7 +90,6 @@ export default function FormBuilder() {
       setCurrentlyResponding(data.data.responding);
       setResponses(data.data.answers);
 
-      // setPreviousSentdata(JSON.stringify(data.data))
       previousSentDataRef.current = JSON.stringify({
         structure: data.data.structure,
         assigned: {
@@ -380,6 +380,16 @@ export default function FormBuilder() {
                 <TrueFalse qid="assigned-only" defValueState={isAssignedOnly} setter={setIsAssignedOnly} onChange={sendSave} isDimmed></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
+              <InputLabel>
+                <Trophy/>Grading schema
+              </InputLabel>
+              <DropdownGroup>
+
+                <DropdownItem>Abc schema name 1</DropdownItem>
+                <DropdownItem>Another schema name</DropdownItem>
+
+              </DropdownGroup>
+              <div className='hzSep'></div>
               <p className='danger-text-btn' onClick={() => {setIsDeleteModalOpen(true)}}>
                 <Trash2/>Delete form
               </p>
@@ -395,7 +405,6 @@ export default function FormBuilder() {
                 )
               }
               <div className='hzSep'></div>
-
             </div>
           </div>
           <div className='builder-properties-bottom'>
