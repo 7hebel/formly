@@ -180,6 +180,18 @@ async def post_account_update_password(data: schemas.PasswordUpdateSchema, reque
 
 
 
+# Grading schemas.
+
+@api.post("/api/grading-schemas/craete")
+@protected_endpoint
+async def post_create_grading_schema(data: schemas.CreateGradingSchema, request: Request) -> JSONResponse:
+    status = users.update_password(data.uuid, data.new_password, data.current_password)
+    if isinstance(status, str):
+        return api_response(False, err_msg=status)
+    return api_response(True)
+
+
+
 # Groups.
 
 @api.post("/api/groups/create")

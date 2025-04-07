@@ -10,7 +10,7 @@ input[group="grading-schema-grade-input"] {
     padding-inline: 4px !important;
 }
 
-.custom-slider {
+.custom-slider, .blank-slider {
     height: 2px;
     background: #61616141;
     margin-block: 50px;
@@ -98,10 +98,72 @@ input[group="grading-schema-grade-input"] {
     width: 140px;
     justify-content: space-between;
     gap: 8px;
+    background-color: var(--color-bg-item);
+    padding: 6px;
+    position: relative;
+    border-radius: 4px;
+}
+
+.grade-edit > svg {
+    position: absolute;
+    right: -24px;
+    color: var(--color-border);
+    width: 15px;
+    height: 15px;
+    min-width: 15px;
+    min-height: 15px;
+    cursor: pointer;
+
 }
 
 .grade-line {
     width: 100%;
     height: 1px;
-    background-color: #61616141;    
+    background-color: #6161611f;    
+}
+
+.grade-edit-insert-between-place-container {
+    position: relative;
+}
+
+.grade-edit-insert-between {
+    position: absolute;
+    left: -40px;
+    top: -6px;
+    font-size: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.grade-edit-insert-between > svg {
+    min-width: 15px;
+    min-height: 15px;
+    width: 15px;
+    height: 15px;
+    padding: 2px;
+    border-radius: 4px;
+    box-sizing: content-box;
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    cursor: pointer;
+}
+
+.insert-between-line {
+    height: 1px;
+    width: 30px;
+    background-color: var(--color-primary);
+    opacity: .5;
+}
+
+.schemas-editor-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.schemas-editor-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 6px;
 }

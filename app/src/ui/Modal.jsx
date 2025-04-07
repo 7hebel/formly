@@ -22,7 +22,6 @@ export function Modal({ title, close, children }) {
     if (containerRef && containerRef.current) {
       containerRef.current.addEventListener("click", (event) => { 
         if (event.target.id === 'modal-container') onClose()
-        // else event.stopPropagation(); 
       });
     }
 

@@ -1,8 +1,7 @@
 /* --- BUTTONS --- */
 
 .button {
-    padding-block: 8px;
-    padding-inline: 12px;
+    padding: 8px 12px;
     font-family: var(--ui-font);
     font-size: 16px;
     font-weight: 600;
@@ -21,13 +20,30 @@
     transform: translateY(2px);
 }
 
+
 .button .lucide {
     width: 16px;
     height: 16px;
+    min-width: 16px;
+    min-height: 16px;
     stroke-width: 2.5px;
     vertical-align: middle;
     padding-bottom: 2px;
-    margin-right: 8px;
+    margin-right: 6px;
+}
+
+.small {
+    font-size: 12px !important;
+    padding: 4px 8px;
+    font-weight: 500;
+}
+
+.small .lucide {
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    min-height: 14px;
+    stroke-width: 2px;
 }
 
 /* Hierarchy */
@@ -330,7 +346,38 @@
 }
 
 
-/* --- Drop Down --- */
+
+
+/* --- Text drop down --- */
+.text-select-dropdown {
+    border: none;
+    background-color: var(--color-panel) !important;
+    font-family: var(--ui-font);
+    font-size: 20px;
+    color: var(--color-text);
+    font-weight: 600;
+    cursor: pointer;
+    width: max-content;
+}
+
+.text-select-dropdown > option {
+    font-family: var(--ui-font) !important;
+    font-size: 16px;
+    color: var(--color-text);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.text-select-dropdown > option:hover,
+.text-select-dropdown > option:focus,
+.text-select-dropdown > option:active,
+.text-select-dropdown > option:checked {
+    background-color: var(--color-primary);
+    border-radius: 6px;
+}
+
+
+/* --- Custom Drop Down --- */
 
 .dropdown-group {
     width: 100%;
@@ -393,3 +440,13 @@
     text-decoration: underline;
 }
 
+
+/* align right */
+
+.right-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    width: 100%;
+    margin-top: 8px;
+}

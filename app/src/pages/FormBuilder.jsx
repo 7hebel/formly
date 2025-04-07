@@ -1,7 +1,7 @@
 import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { PrimaryButton, SecondaryButton, TertiaryButton, DangerButton } from '../ui/Button.jsx';
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
-import { DropdownGroup, DropdownItem } from '../ui/dropdown.jsx';
+import { DropdownGroup, DropdownItem } from '../ui/Dropdown.jsx';
 import { MultiSelect } from '../ui/Select.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';

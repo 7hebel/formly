@@ -135,6 +135,7 @@ def add_group_to_user_list(user_uuid: str, group_id: str) -> None:
 
     logs.info("Users", f"Added group: [{group_id}] to user's groups-list <{user_uuid}>")
 
+
 def remove_group_from_user_list(user_uuid: str, group_id: str) -> None:
     user = get_user_by_uuid(user_uuid)
     user_groups = user.groups.split("|")

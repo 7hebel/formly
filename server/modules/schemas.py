@@ -47,6 +47,13 @@ class GroupRenameSchema(ProtectedModel):
     group_id: str
     new_name: str
     
+    
+# Grading schemas.
+    
+class CreateGradingSchema(ProtectedModel):
+    title: str
+    steps: list[int]
+    grades: list    
 
 # Forms.
 

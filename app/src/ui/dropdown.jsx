@@ -43,7 +43,7 @@ export function DropdownGroup({ id, items=[], selectedItemID }) {
       }
     </div>
     {
-      !isEditSchemasOpen? (
+      isEditSchemasOpen? (
         <Modal title="Manage grading schemas" close={setIsEditSchemasOpen}>
           <GradingSchemasManager></GradingSchemasManager>
         </Modal>

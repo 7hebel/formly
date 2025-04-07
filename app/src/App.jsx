@@ -13,8 +13,6 @@ sessionStorage.setItem("session-accepted", 0);
 
 
 function App() {
-  const [sessionAccepted, setSessionAccepted] = useState(0);
-
   useEffect(() => {
     const savedUuid = localStorage.getItem('uuid');
     if (!savedUuid) return;
@@ -30,19 +28,16 @@ function App() {
         if (response.status === false) {
           localStorage.setItem('uuid', "");
           console.warn(`Autologin to: '${savedUuid}' rejected by API with reason: '${response.err_msg}'`);
-          setSessionAccepted(0);
         } else {
           sessionStorage.setItem('session-accepted', 1);
           localStorage.setItem("fullname", response.data.fullname);
           localStorage.setItem("email", response.data.email);
           console.log(`Autologin successful to: '${savedUuid}'`);
-          setSessionAccepted(1);
         }
       })
       .catch(err => {
         localStorage.setItem('uuid', "");
         console.warn("Failed to request autologin");
-        setSessionAccepted(0);
       });
   }, []);
 
