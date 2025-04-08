@@ -252,7 +252,7 @@
 
 /* --- GROUPS --- */
 
-.groups-category-container {
+.lists-category-container {
     width: 100%;
     height: 100%;
     display: flex;
@@ -262,7 +262,7 @@
     gap: 40px
 }
 
-.my-groups-container {
+.my-lists-container {
     width: 350px;
     min-width: max-content;
     height: 100%;
@@ -270,7 +270,7 @@
     flex-direction: column;
 }
 
-.my-groups-header {
+.my-lists-header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -282,13 +282,13 @@
     gap: 12px;
 }
 
-.my-groups {
+.my-lists {
     display: flex;
     flex-direction: column;
     padding-inline: 8px;
 }
 
-.my-group {
+.my-list {
     font-family: var(--ui-font);
     display: flex;
     flex-direction: row;
@@ -298,13 +298,13 @@
     cursor: pointer;
 }
 
-.my-group[selected="1"] > h3 {
+.my-list[selected="1"] > h3 {
     font-weight: 700;
     text-decoration: underline 2px var(--color-primary);
     text-underline-offset: 3px;
 }
 
-.my-group > svg {
+.my-list > svg {
     min-height: 16px;
     min-width: 16px;
     height: 16px;
@@ -314,12 +314,12 @@
     transition: opacity .2s;
 }
 
-.my-group[selected="1"] > svg,
-.my-group:hover > svg {
+.my-list[selected="1"] > svg,
+.my-list:hover > svg {
     opacity: 1;
 }
 
-.my-group > h3 {
+.my-list > h3 {
     font-weight: 400;
     font-size: 16px;
     color: var(--color-text);
@@ -365,11 +365,11 @@
 
 /* group details */
 
-.group-details {
+.list-details {
     width: 100%;
 }
 
-.group-details > h1 {
+.list-details > h1 {
     font-family: var(--ui-font);
     color: var(--color-text);
     font-size: 28px;
@@ -379,11 +379,11 @@
     white-space: nowrap;    
 }
 
-.group-view-container {
+.list-view-container {
     padding-inline: 8px;
 }
 
-.group-view-container > h2 {
+.list-view-container > h2 {
     font-family: var(--ui-font);
     color: var(--color-text);
     font-size: 24px;
@@ -391,16 +391,16 @@
     font-weight: 600;
     flex-direction: row;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
-.group-view-container > h2 > svg {
+.list-view-container > h2 > svg {
     width: 20px;
     height: 20px;
     opacity: .5;
 }
 
-.group-view-forms-container {
+.list-view-forms-container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -410,7 +410,7 @@
     gap: 20px;
 }
 
-.group-view-management-container {
+.list-view-management-container {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -422,57 +422,40 @@
 
 /* group member */
 
-.group-member {
+.list-view-members {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin-left: 16px;
+    margin-top: 16px;
+    margin-bottom: 50px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-item);
+    box-shadow: var(--subtle-shadow);
+    padding: 6px;
+    border-radius: 6px;
+}
+
+.list-member:nth-child(odd) {
+    background-color: #00000008;
+    border-radius: 4px;
+}
+
+.list-member {
     display: flex;
     flex-direction: row;
-    font-family: var(--ui-font);
+    font-family: var(--mono-font);
     font-size: 14px;
     color: var(--color-text);
     align-items: center;
     gap: 4px;
-    position: relative;
-}
-
-.group-member[manager="1"] {
-    font-weight: 600;
-}
-
-.group-member > svg {
-    width: 14px;
-    height: 14px;
-    color: var(--color-primary-muted);
-}
-
-.group-member-manage-icons {
-    display: flex;
-    flex-direction: row;
-    gap: 4px;
-    cursor: pointer;
-    position: absolute;
-    left: 25%;
-    background-color: var(--color-panel);
     padding: 6px;
-    border-radius: 5px;
-    border: 1px solid var(--color-text);
-    display: none;
+    font-weight: 400;
+    justify-content: space-between;
 }
 
-.group-member:hover > .group-member-manage-icons {
-    display: flex;
+.total-emails {
+    text-align: center;
+    border-bottom: 1px solid var(--color-bg-item);
+    padding-bottom: 6px;
 }
-
-.group-member-manage-icons > svg {
-    width: 16px;
-    height: 16px;
-    opacity: .6;
-    transition: opacity .2s;
-}
-
-.group-member-manage-icons > svg:hover {
-    opacity: 1;
-}
-
-.group-member > p[isself="1"] {
-    color: var(--color-primary-muted);
-}
-

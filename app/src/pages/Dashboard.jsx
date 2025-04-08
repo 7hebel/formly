@@ -4,7 +4,7 @@ import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import DashboardCategorySwitcher from '../components/dashCategorySwitcher.jsx'
 import FormBrief from '../components/FormBrief.jsx'
-import GroupView from '../components/GroupView.jsx'
+import ListView from '../components/ListView.jsx'
 import { useNavigate } from 'react-router-dom';
 import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle, Mail, Check, X, CodeSquare } from 'lucide-react';
 import { ErrorLabel } from "../ui/ErrorLabel.jsx"
@@ -23,69 +23,27 @@ function displayMessage(content) {
 }
 
 
-function MyGroupsPanel({ refreshPanel, groups, onSwitchGroup }) {
-  if (!groups) return <p>Loading...</p>;
+function MyListsPanel({ lists, onSwitchList }) {
+  if (!lists) return <p>Loading...</p>;
   
-  async function onInviteAccept(groupId) {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        uuid: String(localStorage.getItem("uuid")),
-        group_id: groupId,
-      }),
-    };
-
-    await fetch(import.meta.env.VITE_API_URL + "/groups/accept-invite", requestOptions);
-    refreshPanel();
-  }
-  
-  async function onInviteReject(groupId) {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        uuid: String(localStorage.getItem("uuid")),
-        group_id: groupId,
-      }),
-    };
-
-    await fetch(import.meta.env.VITE_API_URL + "/groups/reject-invite", requestOptions);
-    refreshPanel();
-  }
-
   return (
     <>
       {
-        groups.invites.map(([group_id, group_name], index) => {
+        lists.map((listData, index) => {
           return (
-            <div className='group-invitation' key={group_id}>
-              <small><Mail/>Invite</small>
-              <h4>{group_name}</h4>
-              <div className='row'>
-                <PrimaryButton wide onClick={() => {onInviteAccept(group_id)}}><Check/>Join</PrimaryButton>
-                <DangerButton wide onClick={() => {onInviteReject(group_id)}}><X/>Reject</DangerButton>
-              </div>
-            </div>
-          )
-        })
-      }
-      {
-        groups.groups.map(([group_id, group_name], index) => {
-          return (
-            <div key={group_id}>
+            <div key={listData.list_id}>
               <div 
-                onClick={() => onSwitchGroup(group_name, group_id)} 
-                className='my-group' 
-                id={'group-' + group_id} 
+                onClick={() => onSwitchList(listData.name, listData)} 
+                className='my-list' 
+                id={'list-' + listData.list_id} 
                 selected="0"
               >
-                <h3>{group_name}</h3>
+                <h3>{listData.name}</h3>
                 <ChevronRightCircle/>
               </div>
   
               {
-                (index != groups.length - 1) && <div className='hzSepMid'></div>
+                (index != lists.length - 1) && <div className='hzSepMid'></div>
               }
             </div>
           )
@@ -214,15 +172,15 @@ export default function Dashboard() {
     });
   }
 
-  function switchGroup(name, groupId) {
-    setSelectedGroupName(name);
-    setSelectedGroup(groupId);
-    document.querySelectorAll(".my-group").forEach(group => {group.setAttribute("selected", "0")})
-    document.getElementById("group-" + groupId).setAttribute("selected", "1");
+  function switchList(name, listData) {
+    setSelectedListName(name);
+    setSelectedList(listData);
+    document.querySelectorAll(".my-list").forEach(list => {list.setAttribute("selected", "0")})
+    document.getElementById("list-" + listData.list_id).setAttribute("selected", "1");
   }
 
-  function onGroupCreate() {
-    const name = document.getElementById("create-group-name");
+  function onListCreate() {
+    const name = document.getElementById("create-list-name");
     if (!name.value || !name.validity.valid) return;
 
     const requestOptions = {
@@ -234,13 +192,13 @@ export default function Dashboard() {
       })
     };
     
-    fetch(import.meta.env.VITE_API_URL + "/groups/create", requestOptions)
+    fetch(import.meta.env.VITE_API_URL + "/lists/create", requestOptions)
     .then(response => response.json())
     .then(response => {
       if (response.status) {
-        displayMessage(`Created group ${name.value}`);
-        setAddGroupOpen(false);
-        fetchGroups();
+        displayMessage(`Created list ${name.value}`);
+        setIsAddListOpen(false);
+        fetchLists();
       }
     })
   }
@@ -267,16 +225,16 @@ export default function Dashboard() {
   }
 
   const formsViewRef = useRef(0);
-  const groupsViewRef = useRef(0);
+  const listsViewRef = useRef(0);
   const accountViewRef = useRef(0);
-  const [selectedGroup, setSelectedGroup] = useState(null);
-  const [selectedGroupName, setSelectedGroupName] = useState("-");
-  const [groups, setMyGroups] = useState(null);
+  const [selectedList, setSelectedList] = useState(null);
+  const [selectedListName, setSelectedListName] = useState("-");
+  const [lists, setLists] = useState(null);
   const [forms, setForms] = useState(null);
 
-  const [isAddGroupOpen, setAddGroupOpen] = useState(false);
+  const [isAddListOpen, setIsAddListOpen] = useState(false);
 
-  const fetchGroups = async () => {
+  const fetchLists = async () => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -285,12 +243,12 @@ export default function Dashboard() {
       }),
     };
 
-    const response = await fetch(import.meta.env.VITE_API_URL + "/groups/my-groups", requestOptions);
+    const response = await fetch(import.meta.env.VITE_API_URL + "/lists/fetch", requestOptions);
     const data = await response.json();
 
-    if (data.status) setMyGroups(data.data);
+    if (data.status) setLists(data.data);
   };
-  useEffect(() => {fetchGroups()}, []);
+  useEffect(() => {fetchLists()}, []);
 
   const fetchForms = async () => {
     const requestOptions = {
@@ -326,7 +284,7 @@ export default function Dashboard() {
         <h1 className='welcome-msg'>
             Welcome, <span id='welcome-msg-name'>{fullname}</span>
         </h1>
-        <TertiaryButton onClick={onLogout}>
+        <TertiaryButton small onClick={onLogout}>
           <LogOut/>Logout
         </TertiaryButton>
       </header>
@@ -336,8 +294,8 @@ export default function Dashboard() {
           <DashboardCategorySwitcher viewRef={formsViewRef} isActive>
             <ClipboardList/>Forms
           </DashboardCategorySwitcher>
-          <DashboardCategorySwitcher viewRef={groupsViewRef}>
-            <Users/>Groups
+          <DashboardCategorySwitcher viewRef={listsViewRef}>
+            <Users/>Lists
           </DashboardCategorySwitcher>
           <DashboardCategorySwitcher viewRef={accountViewRef}>
             <Settings2/>Account
@@ -357,7 +315,7 @@ export default function Dashboard() {
                       <FormBrief isAssigned formId={formId} key={formId}></FormBrief>
                     ))  
                   ) : (
-                    <p className='info-text'>There are no forms assigned to any of Your groups or Your email.</p>
+                    <p className='info-text'>There are no forms assigned to Your email.</p>
                   )
                 }
               </div>
@@ -397,35 +355,35 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className='dash-category-content' ref={groupsViewRef} active="0">
-            <div className='groups-category-container'>
-              <div className='my-groups-container'>
-                <div className='my-groups-header'>
-                  <h1>My groups</h1>
-                  <PrimaryButton onClick={() => {setAddGroupOpen(true)}}>
+          <div className='dash-category-content' ref={listsViewRef} active="0">
+            <div className='lists-category-container'>
+              <div className='my-lists-container'>
+                <div className='my-lists-header'>
+                  <h1>My lists</h1>
+                  <TertiaryButton small onClick={() => {setIsAddListOpen(true)}}>
                     <PlusCircle/>New
-                  </PrimaryButton>
+                  </TertiaryButton>
                   {
-                    isAddGroupOpen && (
-                      <Modal title="Create group" close={setAddGroupOpen}>
+                    isAddListOpen && (
+                      <Modal title="Create list" close={setIsAddListOpen}>
                         <InputGroup>
-                          <InputLabel>Group name</InputLabel>
-                          <Input id="create-group-name" minlen={3}></Input>
+                          <InputLabel>List name</InputLabel>
+                          <Input id="create-list-name" minlen={3}></Input>
                         </InputGroup>
-                        <PrimaryButton wide onClick={onGroupCreate}><PlusCircle/>Create</PrimaryButton>
+                        <PrimaryButton wide onClick={onListCreate}><PlusCircle/>Create</PrimaryButton>
                       </Modal>
                     )
                   }
                 </div>
                 <div className='hzSepStrong'></div>
-                <div className='my-groups'>
-                  <MyGroupsPanel refreshPanel={fetchGroups} groups={groups} onSwitchGroup={switchGroup}/>
+                <div className='my-lists'>
+                  <MyListsPanel lists={lists} onSwitchList={switchList}/>
                 </div>
               </div>
-              <div className='group-details'>
-                <h1>{selectedGroupName}</h1>
+              <div className='list-details'>
+                <h1>{selectedListName}</h1>
                 <div className='hzSepStrong'></div>
-                <GroupView refreshPanel={fetchGroups} groupNameSetter={(name) => {setSelectedGroupName(name); fetchGroups()}} groupId={selectedGroup}/>
+                <ListView refreshPanel={() => {setSelectedList(null); setSelectedListName('-'); fetchLists()}} listNameSetter={(name) => {setSelectedListName(name); fetchLists()}} listData={selectedList}/>
               </div>
             </div>
           </div>

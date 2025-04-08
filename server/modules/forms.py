@@ -1,4 +1,5 @@
 from modules import text_grading
+from modules import lists
 from modules import users
 from modules import logs
 
@@ -28,7 +29,7 @@ Saved form format:
         "hide_answers": False 
     },
     "assigned": {
-        "groups": [],
+        "lists": [],
         "emails": []
     },
     "responding" {
@@ -90,7 +91,7 @@ def _save_form_content(form_id: str, content: dict) -> None:
     
 
 def get_user_forms(user_uuid: str) -> list[str]:
-    """ Get list form ids created by user.   """
+    """ Get list form ids created by user.  """
     user_forms = []
     
     for form_file in os.listdir(FORMS_DIR_PATH):
@@ -104,7 +105,6 @@ def get_user_forms(user_uuid: str) -> list[str]:
 
 def get_assigned_to_user(user_uuid: str) -> list[str]:
     user = users.get_user_by_uuid(user_uuid)
-    user_groups = user.groups.split("|")
     assigned_forms = []
     
     for form_file in os.listdir(FORMS_DIR_PATH):
@@ -114,18 +114,19 @@ def get_assigned_to_user(user_uuid: str) -> list[str]:
             if form["author_uuid"] == user_uuid:
                 continue
             
-            if user.email in form["answers"]:
+            if user["email"] in form["answers"]:
                 continue
             
-            if user.email in form["assigned"]["emails"]:
+            if user["email"] in form["assigned"]["emails"]:
                 assigned_forms.append(form_id)
                 continue
             
-            for assigned_group in form["assigned"]["groups"]:
-                if assigned_group in user_groups:
+            for assigned_list in form["assigned"]["lists"]:
+                list_content = lists._get_list_content(assigned_list)
+                if list_content and user["email"] in list_content["emails"]:
                     assigned_forms.append(form_id)
                     break
-
+                    
     return assigned_forms
 
 
@@ -139,7 +140,7 @@ def get_responded_by_user(user_uuid: str) -> list[str]:
     for form_file in os.listdir(FORMS_DIR_PATH):
         form_id = form_file.split(".")[0]
         form = _get_form_content(form_id)
-        if form and user.email in form["answers"]:
+        if form and user["email"] in form["answers"]:
             responded_by_user.append(form_id)
     
     return responded_by_user
@@ -147,7 +148,6 @@ def get_responded_by_user(user_uuid: str) -> list[str]:
 
 def is_assigned_to_user(form_id: str, user_uuid: str) -> bool:
     user = users.get_user_by_uuid(user_uuid)
-    user_groups = user.groups.split("|")
     
     form = _get_form_content(form_id)
     if form is None:
@@ -157,35 +157,15 @@ def is_assigned_to_user(form_id: str, user_uuid: str) -> bool:
     if form["author_uuid"] == user_uuid:
         return True
     
-    if user.email in form["assigned"]["emails"]:
+    if user["email"] in form["assigned"]["emails"]:
         return True
     
-    for assigned_group in form["assigned"]["groups"]:
-        if assigned_group in user_groups:
+    for assigned_list in form["assigned"]["lists"]:
+        list_content = lists._get_list_content(assigned_list)
+        if list_content and user["email"] in list_content["emails"]:
             return True
         
     return False
-
-
-def get_forms_in_group(group_id: str, author_uuid: str) -> tuple[list[str], list[str]]:
-    assigned_forms = []
-    draft_forms = []
-    
-    for form_file in os.listdir(FORMS_DIR_PATH):
-        form_id = form_file.split(".")[0]
-        form = _get_form_content(form_id)
-        if form is not None:
-            for assigned_group in form["assigned"]["groups"]:
-                if assigned_group == group_id:
-                    if form["author_uuid"] == author_uuid:
-                        draft_forms.append(form_id)
-                        break
-                    
-                    else:
-                        assigned_forms.append(form_id)
-                        break
-
-    return (assigned_forms, draft_forms)
 
 
 def generate_form_title(user_uuid: str) -> str:
@@ -208,7 +188,7 @@ def create_form(author_uuid: str) -> str:
         "structure": [],
         "settings": asdict(form_settings),
         "assigned": {
-            "groups": [],
+            "lists": [],
             "emails": []
         },
         "responding": {},
@@ -242,14 +222,14 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
         return
     
     form_settings = form_data["settings"]
-    assigned_groups = form_data["assigned"]["groups"]
+    assigned_lists = form_data["assigned"]["lists"]
     assigned_emails = form_data["assigned"]["emails"]
     form_settings["password"] = bool(form_settings["password"])
     
     user_email = None
     user = users.get_user_by_uuid(user_uuid)
     if user is not None:
-        user_email = user.email
+        user_email = user["email"]
     
     characteristics = []
     
@@ -258,9 +238,9 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
         characteristics.append({"type": "author", "content": f"You are the [author]"})
         
         # Author and not answered by author.
-        if user_email not in form_data["answers"] and (assigned_groups or assigned_emails):
-            if assigned_groups:
-                content = f"Assigned to [{len(assigned_groups)} groups]"
+        if user_email not in form_data["answers"] and (assigned_lists or assigned_emails):
+            if assigned_lists:
+                content = f"Assigned to [{len(assigned_lists)} lists]"
                 if assigned_emails:
                     content += f" and [{len(assigned_emails)} emails]"
                     
@@ -269,7 +249,7 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
                 characteristics.append({"type": "assign", "content": f"Assigned to [{len(assigned_emails)}] emails"})
         
     else:
-        author_name = users.get_user_by_uuid(form_data["author_uuid"]).fullname
+        author_name = users.get_user_by_uuid(form_data["author_uuid"])["fullname"]
         characteristics.append({"type": "author", "content": f"Made by [{author_name}]"})
 
     if form_settings["is_anonymous"]:

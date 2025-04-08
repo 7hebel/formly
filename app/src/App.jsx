@@ -13,34 +13,6 @@ sessionStorage.setItem("session-accepted", 0);
 
 
 function App() {
-  useEffect(() => {
-    const savedUuid = localStorage.getItem('uuid');
-    if (!savedUuid) return;
-
-    const requestOptions = {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    };
-
-    fetch(import.meta.env.VITE_API_URL + "/autologinCheck/" + savedUuid, requestOptions)
-      .then(response => response.json())
-      .then(response => {
-        if (response.status === false) {
-          localStorage.setItem('uuid', "");
-          console.warn(`Autologin to: '${savedUuid}' rejected by API with reason: '${response.err_msg}'`);
-        } else {
-          sessionStorage.setItem('session-accepted', 1);
-          localStorage.setItem("fullname", response.data.fullname);
-          localStorage.setItem("email", response.data.email);
-          console.log(`Autologin successful to: '${savedUuid}'`);
-        }
-      })
-      .catch(err => {
-        localStorage.setItem('uuid', "");
-        console.warn("Failed to request autologin");
-      });
-  }, []);
-
   return (
     <StrictMode>
       <BrowserRouter>

@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Space+Grotesk:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
 
 * {
     padding: 0;
@@ -9,6 +10,7 @@
 :root {
     --ui-font: 'Space Grotesk';
     --form-font: 'Nunito Sans';
+    --mono-font: 'DM Mono';
 
     --color-bg-main: #FFFDF5;
     --color-bg-item: #0000000a;
@@ -17,6 +19,8 @@
     --color-text: #353535;
     --color-panel: #FFFCEE;
     --color-border: #35353552;
+
+    --subtle-shadow: 0px 6px 8px 0px #00000008;
 }
 
 body {
@@ -106,3 +110,5 @@ body {
     cursor: pointer;
     border-radius: 100px;
 }
+
+

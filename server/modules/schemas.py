@@ -27,25 +27,21 @@ class PasswordUpdateSchema(ProtectedModel):
     current_password: str
 
 
-#  Groups.
+#  Lists.
 
-class GroupIdSchema(ProtectedModel):
-    group_id: str
-    
-class GroupMemberSchema(ProtectedModel):
-    group_id: str
-    member_uuid: str
-    
-class GroupCreateSchema(ProtectedModel):
+class CreateList(ProtectedModel):
     name: str
 
-class GroupInviteSchema(ProtectedModel):
-    invite_email: str
-    group_id: str
-
-class GroupRenameSchema(ProtectedModel):
-    group_id: str
+class RemoveList(ProtectedModel):
+    list_id: str
+    
+class RenameList(ProtectedModel):
+    list_id: str
     new_name: str
+    
+class ListUpdate(ProtectedModel):
+    list_id: str
+    email: str
     
     
 # Grading schemas.
@@ -54,6 +50,7 @@ class CreateGradingSchema(ProtectedModel):
     title: str
     steps: list[int]
     grades: list    
+
 
 # Forms.
 

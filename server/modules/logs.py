@@ -7,7 +7,7 @@ import time
 colorama.init()
 
 
-type LogSubjectT = Literal["API", "Groups", "Forms", "Users"]
+type LogSubjectT = Literal["API", "Forms", "Users", "Lists"]
 
 
 @dataclass

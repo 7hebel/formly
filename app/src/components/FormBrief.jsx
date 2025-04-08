@@ -89,14 +89,14 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
         <div className='form-brief-btn-container'>
           {
             (isMyForm) ? (
-              <SecondaryButton onClick={() => {navigate('/builder/' + formId)}}>
+              <SecondaryButton small onClick={() => {navigate('/builder/' + formId)}}>
                 <Edit3/>Manage
               </SecondaryButton>
             ) : (
               (isAnswered) ? (
                 (!isResultHidden) ? (
                   <>
-                    <TertiaryButton onClick={() => {setIsResponseOpen(true)}}>
+                    <TertiaryButton small onClick={() => {setIsResponseOpen(true)}}>
                       <Eye/>My response
                     </TertiaryButton>
                     {
@@ -108,12 +108,12 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
                     }
                   </>
                 ) : (
-                  <TertiaryButton>
+                  <TertiaryButton small>
                     <EyeOff/>Response hidden
                   </TertiaryButton>
                 )
               ) : (
-                <PrimaryButton onClick={() => {navigate("/form/" + formId)}}>
+                <PrimaryButton small onClick={() => {navigate("/form/" + formId)}}>
                   <CornerDownRight/>Answer
                 </PrimaryButton>
               )

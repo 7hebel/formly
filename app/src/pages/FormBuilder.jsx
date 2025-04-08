@@ -13,6 +13,7 @@ import { FormResponse } from "../components/FormResponse.jsx";
 import butterup from 'butteruptoasts';
 import 'butteruptoasts/src/butterup.css';
 import './styles/builder.css'
+import { isEqual } from 'lodash';
 
 
 function displayMessage(content) {
@@ -36,9 +37,9 @@ export default function FormBuilder() {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isAnswersView, setIsAnswersView] = useState(false);
-  const [authorGroups, setAuthorGroups] = useState([]);
+  const [authorLists, setAuthorLists] = useState([]);
 
-  const fetchAuthorGroups = async () => {
+  const fetchAuthorLists = async () => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -47,19 +48,19 @@ export default function FormBuilder() {
       }),
     };
 
-    const response = await fetch(import.meta.env.VITE_API_URL + "/groups/get-assignable", requestOptions);
+    const response = await fetch(import.meta.env.VITE_API_URL + "/lists/fetch", requestOptions);
     const data = await response.json();
 
     if (data.status) {
-      let authorGroupsOptions = [];
+      let authorLists = [];
 
-      for (let [groupKey, groupName] of data.data) {
-        authorGroupsOptions.push({
-          id: groupKey,
-          value: groupName
+      for (let listData of data.data) {
+        authorLists.push({
+          id: listData.list_id,
+          value: listData.name
         })
       }
-      setAuthorGroups(authorGroupsOptions);
+      setAuthorLists(authorLists);
     }
   };
   
@@ -86,14 +87,14 @@ export default function FormBuilder() {
       setFormComponents(data.data.structure);
       setIsActive(data.data.settings.is_active);
       setAssignedEmails(data.data.assigned.emails);
-      setAssignedGroups(data.data.assigned.groups);
+      setAssignedLists(data.data.assigned.lists);
       setCurrentlyResponding(data.data.responding);
       setResponses(data.data.answers);
 
       previousSentDataRef.current = JSON.stringify({
         structure: data.data.structure,
         assigned: {
-          "groups": data.data.assigned.groups,
+          "lists": data.data.assigned.lists,
           "emails": data.data.assigned.emails
         }
       })
@@ -108,7 +109,7 @@ export default function FormBuilder() {
     }
   };
   
-  useEffect(() => {fetchAuthorGroups()}, []);
+  useEffect(() => {fetchAuthorLists()}, []);
   useEffect(() => {fetchFormData()}, [formId]);
   
   const [formName, setFormName] = useState("Form");
@@ -119,7 +120,7 @@ export default function FormBuilder() {
   const [formPassword, setFormPassword] = useState(null);
   const [formComponents, setFormComponents] = useState([]);
   const [assignedEmails, setAssignedEmails] = useState([]);
-  const [assignedGroups, setAssignedGroups] = useState([]);
+  const [assignedLists, setAssignedLists] = useState([]);
   const [currentlyResponding, setCurrentlyResponding] = useState({});
   const [responses, setResponses] = useState({});
   const [viewedResponse, setViewedResponse] = useState(null);
@@ -151,8 +152,8 @@ export default function FormBuilder() {
     setFormName(event.target.value);
   }
 
-  async function sendSave() {
-    if (previousSentDataRef.current === null) return;
+  async function sendSave(_, diffCheck=false) {
+    if (diffCheck && !previousSentDataRef.current) return;
     
     const structure = formComponents;
     const settings = {
@@ -164,15 +165,15 @@ export default function FormBuilder() {
       "hide_answers": hideAnswers
     };
     const assigned = {
-      "groups": assignedGroups,
+      "lists": assignedLists,
       "emails": assignedEmails
     }
 
-    const changedData = JSON.stringify({
+    const changedData = {
       structure: structure,
-      assigned: assigned
-    })
-    if (changedData == previousSentDataRef.current) return;
+      assigned: assigned,
+    }
+    if (diffCheck && isEqual(changedData, previousSentDataRef.current)) return;
     previousSentDataRef.current = changedData;
     
     const requestOptions = {
@@ -194,31 +195,31 @@ export default function FormBuilder() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      sendSave();
-    }, 3000);
+      sendSave(true, true);
+    }, 1000);
     return () => clearInterval(interval);
-  }, [formComponents, assignedGroups, assignedEmails]);
+  }, [formComponents, assignedLists, assignedEmails]);
   
 
   function addFormComponent(componentType) {
     setFormComponents([...formComponents, {"componentType": componentType, "componentId": crypto.randomUUID(), "points": 1}]);
   }
 
-  function onGroupAssignChange(event) {
-    const groupId = event.target.getAttribute("optionkey");
+  function onListAssignChange(event) {
+    const listId = event.target.getAttribute("optionkey");
     const state = event.target.checked;
 
-    if (state && !assignedGroups.includes(groupId)) {
-      const newAssignedGroups = [...assignedGroups, groupId];
-      setAssignedGroups(newAssignedGroups); 
+    if (state && !assignedLists.includes(listId)) {
+      const newAssignedLists = [...assignedLists, listId];
+      setAssignedLists(newAssignedLists); 
     }
 
-    if (!state && assignedGroups.includes(groupId)) {
-      const newAssignedGroups = [];
-      for (const assignedGroup of assignedGroups) {
-        if (assignedGroup !== groupId) newAssignedGroups.push(assignedGroup);
+    if (!state && assignedLists.includes(listId)) {
+      const newAssignedLists = [];
+      for (const assignedList of assignedLists) {
+        if (assignedList !== listId) newAssignedLists.push(assignedList);
       }
-      setAssignedGroups(newAssignedGroups);
+      setAssignedLists(newAssignedLists);
     }
   }
 
@@ -300,7 +301,7 @@ export default function FormBuilder() {
 
   }
 
-  if (loading) return <>Loading {formId}</>;
+  if (loading) return <p className='info-text'>Loading {formId}</p>;
   
   return (
     <main className='builder'>
@@ -339,7 +340,7 @@ export default function FormBuilder() {
                 <InputLabel>
                   <Type/>Form name
                 </InputLabel>
-                <Input onChange={updateName} onBlur={sendSave} placeholder={formData.settings.title} minlen={1} maxlen={32}></Input>
+                <Input onChange={updateName} onBlur={sendSave} value={formData.settings.title} minlen={1} maxlen={32}></Input>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
@@ -422,15 +423,15 @@ export default function FormBuilder() {
                   <div className='assign-categories-container'>
                     <div className='assign-category'>
                       <h3>
-                        <Users/>Groups
+                        <Users/>Lists
                       </h3>
                       <div className='hzSep'></div>
                       <div className='assignees-container'>
                         <MultiSelect
-                          qid="assign-groups"
-                          options={authorGroups}
-                          selectedIds={assignedGroups}
-                          onOptionChange={onGroupAssignChange}
+                          qid="assign-lists"
+                          options={authorLists}
+                          selectedIds={assignedLists}
+                          onOptionChange={onListAssignChange}
                         ></MultiSelect>
                       </div>
                     </div>
