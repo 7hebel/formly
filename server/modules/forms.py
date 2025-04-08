@@ -1,5 +1,5 @@
+from modules.database import ListsDB, FormsDB, UsersDB
 from modules import text_grading
-from modules import lists
 from modules import users
 from modules import logs
 
@@ -52,8 +52,6 @@ Saved form format:
 }
 """
 
-FORMS_DIR_PATH = "./data/forms/"
-
 
 @dataclass
 class FormSettings:
@@ -69,87 +67,44 @@ class FormSettings:
     def from_dict(settings: dict) -> "FormSettings":
         return FormSettings(**settings)
         
-    
-def _get_form_content(form_id: str) -> dict | None:
-    filepath = FORMS_DIR_PATH + form_id + ".json"
-    if not os.path.exists(filepath):
-        logs.error("Forms", f"Failed to get content of form: ({form_id}) as file was not found: {filepath}")
-        return None
-    
-    with open(filepath, "r") as file:
-        return json.load(file)
-    
-    
-def _save_form_content(form_id: str, content: dict) -> None:
-    filepath = FORMS_DIR_PATH + form_id + ".json"
-    if not os.path.exists(filepath):
-        logs.error("Forms", f"Failed to save content of form: ({form_id}) as file was not found")
-        return None
-    
-    with open(filepath, "w") as file:
-        return json.dump(content, file, indent=2)
-    
-
 def get_user_forms(user_uuid: str) -> list[str]:
-    """ Get list form ids created by user.  """
-    user_forms = []
-    
-    for form_file in os.listdir(FORMS_DIR_PATH):
-        form_id = form_file.split(".")[0]
-        form = _get_form_content(form_id)
-        if form and form["author_uuid"] == user_uuid:
-            user_forms.append(form_id)
-
-    return user_forms
-
+    forms = FormsDB.fetch_all_where(lambda form: form["author_uuid"] == user_uuid)
+    return [form["form_id"] for form in forms]
 
 def get_assigned_to_user(user_uuid: str) -> list[str]:
-    user = users.get_user_by_uuid(user_uuid)
+    user = UsersDB.fetch(user_uuid)
     assigned_forms = []
     
-    for form_file in os.listdir(FORMS_DIR_PATH):
-        form_id = form_file.split(".")[0]
-        form = _get_form_content(form_id)
-        if form is not None:
-            if form["author_uuid"] == user_uuid:
-                continue
-            
-            if user["email"] in form["answers"]:
-                continue
-            
-            if user["email"] in form["assigned"]["emails"]:
-                assigned_forms.append(form_id)
-                continue
-            
-            for assigned_list in form["assigned"]["lists"]:
-                list_content = lists._get_list_content(assigned_list)
-                if list_content and user["email"] in list_content["emails"]:
-                    assigned_forms.append(form_id)
-                    break
+    for form in FormsDB.fetch_all():
+        if form["author_uuid"] == user_uuid:
+            continue
+        
+        if user["email"] in form["answers"]:
+            continue
+        
+        if user["email"] in form["assigned"]["emails"]:
+            assigned_forms.append(form["form_id"])
+            continue
+        
+        for assigned_list in form["assigned"]["lists"]:
+            list_content = ListsDB.fetch(assigned_list)
+            if list_content and user["email"] in list_content["emails"]:
+                assigned_forms.append(form["form_id"])
+                break
                     
     return assigned_forms
 
 
 def get_responded_by_user(user_uuid: str) -> list[str]:
-    responded_by_user = []
-    user = users.get_user_by_uuid(user_uuid)
-    if user is None:
-        logs.error("Forms", f"Failed to load list of forms responded by user: <{user_uuid}> (user not found)")
-        return []
-
-    for form_file in os.listdir(FORMS_DIR_PATH):
-        form_id = form_file.split(".")[0]
-        form = _get_form_content(form_id)
-        if form and user["email"] in form["answers"]:
-            responded_by_user.append(form_id)
-    
-    return responded_by_user
+    user = UsersDB.fetch(user_uuid)
+    forms = FormsDB.fetch_all_where(lambda form: user["email"] in form["answers"])
+    return [form["form_id"] for form in forms]
 
 
 def is_assigned_to_user(form_id: str, user_uuid: str) -> bool:
-    user = users.get_user_by_uuid(user_uuid)
+    user = UsersDB.fetch(user_uuid)
     
-    form = _get_form_content(form_id)
+    form = FormsDB.fetch(form_id)
     if form is None:
         logs.error(f"Failed to check if form: ({form_id}) is assigned to user: <{user_uuid}> (form not found)")
         return False
@@ -161,7 +116,7 @@ def is_assigned_to_user(form_id: str, user_uuid: str) -> bool:
         return True
     
     for assigned_list in form["assigned"]["lists"]:
-        list_content = lists._get_list_content(assigned_list)
+        list_content = ListsDB.fetch(assigned_list)
         if list_content and user["email"] in list_content["emails"]:
             return True
         
@@ -176,13 +131,7 @@ def generate_form_title(user_uuid: str) -> str:
 
 
 def create_form(author_uuid: str) -> str:
-    form_id = uuid.uuid4().hex
-    form_filepath = f"./data/forms/{form_id}.json"
-
-    form_settings = FormSettings(
-        title=generate_form_title(author_uuid)
-    )
-
+    form_settings = FormSettings(title=generate_form_title(author_uuid))
     data = {
         "author_uuid": author_uuid,
         "structure": [],
@@ -195,28 +144,21 @@ def create_form(author_uuid: str) -> str:
         "answers": {},
     }
 
-    with open(form_filepath, "a+") as form_file:
-        json.dump(data, form_file, indent=2)
-
-    return form_id
+    form = FormsDB.create(data)
+    return form["form_id"]
 
 
 def update_form(form_id: str, new_settings: dict, structure: list, assigned: dict[str, list[str]]) -> None:
-    form_data = _get_form_content(form_id)
-    form_settings = FormSettings.from_dict(form_data["settings"])
-    
-    for (key, value) in new_settings.items():
-        setattr(form_settings, key, value)
-        
-    form_data["settings"] = asdict(form_settings)
+    form_data = FormsDB.fetch(form_id)
+    form_data["settings"] = new_settings
     form_data["structure"] = structure
     form_data["assigned"] = assigned
-    _save_form_content(form_id, form_data)
+    FormsDB.save(form_id, form_data)
     logs.info("Forms", f"Updated form settings and structure ({form_id})")
 
 
 def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
-    form_data = _get_form_content(form_id)
+    form_data = FormsDB.fetch(form_id)
     if form_data is None:
         logs.error("Forms", f"Failed to create form brief as form was not found ({form_id})")
         return
@@ -227,7 +169,7 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
     form_settings["password"] = bool(form_settings["password"])
     
     user_email = None
-    user = users.get_user_by_uuid(user_uuid)
+    user = UsersDB.fetch(user_uuid)
     if user is not None:
         user_email = user["email"]
     
@@ -249,7 +191,7 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
                 characteristics.append({"type": "assign", "content": f"Assigned to [{len(assigned_emails)}] emails"})
         
     else:
-        author_name = users.get_user_by_uuid(form_data["author_uuid"])["fullname"]
+        author_name = UsersDB.fetch(form_data["author_uuid"])["fullname"]
         characteristics.append({"type": "author", "content": f"Made by [{author_name}]"})
 
     if form_settings["is_anonymous"]:
@@ -287,7 +229,7 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
    
    
 def create_responder_entry(form_id: str, email: str, fullname: str, host: str) -> tuple[bool, str]:
-    form_data = _get_form_content(form_id)
+    form_data = FormsDB.fetch(form_id)
     if form_data is None:
         logs.error("Forms", f"Failed to create responder entry for: {email} - {fullname} at form: ({form_id}) - form not found")
         return (False, "Form not found")
@@ -319,13 +261,14 @@ def create_responder_entry(form_id: str, email: str, fullname: str, host: str) -
     }
 
     form_data["responding"][email] = entry
-    _save_form_content(form_id, form_data)
+    FormsDB.save(form_id, form_data)
+    
     logs.info("Forms", f"Created `responding` entry for: {email} - {fullname} at form: ({form_id}). ResponseID: {response_id}")
     return (True, response_id)    
     
     
 def auto_grade_answers(form_id: str, answers: dict[str, str]) -> dict:
-    form_data = _get_form_content(form_id)
+    form_data = FormsDB.fetch(form_id)
     structure = form_data["structure"]
 
     def get_component_data(component_id: str) -> dict | None:
@@ -383,7 +326,7 @@ def auto_grade_answers(form_id: str, answers: dict[str, str]) -> dict:
          
 
 def get_full_grade(form_id: str, answers: dict) -> str | int:
-    form_data = _get_form_content(form_id)
+    form_data = FormsDB.fetch(form_id)
     max_points = 0
     user_points = 0
     
@@ -403,7 +346,7 @@ def get_full_grade(form_id: str, answers: dict) -> str | int:
     
     
 def handle_response(form_id: str, response_id: str, answers: dict) -> bool | str:
-    form_data = _get_form_content(form_id)
+    form_data = FormsDB.fetch(form_id)
     if form_data is None:
         logs.error("Forms", f"Failed to handle response: {response_id} at form: ({form_id}) - form not found")
         return "Form not found"
@@ -429,16 +372,13 @@ def handle_response(form_id: str, response_id: str, answers: dict) -> bool | str
         "grade": get_full_grade(form_id, answers)
     }
     
-    _save_form_content(form_id, form_data)
+    FormsDB.save(form_id, form_data)
     logs.info("Forms", f"Saved response: {response_id} at form: ({form_id}) for respondent: {email} - {response_data['fullname']}")
     return True
 
 
 def remove_response(form_id: str, response_id: str) -> bool | str:
-    form_data = _get_form_content(form_id)
-    if form_data is None:
-        logs.error("Forms", f"Failed to remove response: {response_id} at form: ({form_id}) - form not found")
-        return "Form not found"
+    form_data = FormsDB.fetch(form_id)
 
     for email in form_data["answers"]:
         if form_data["answers"][email]["response_id"] == response_id:
@@ -447,14 +387,13 @@ def remove_response(form_id: str, response_id: str) -> bool | str:
         logs.error("Forms", f"Failed to remove response: {response_id} at form: ({form_id}) - response id not found.")
         return "Response not found"
 
-    form_data["answers"].pop(email)
-    _save_form_content(form_id, form_data)
+    FormsDB.update_field(form_id, "answers", email, i_pop=True)
     logs.warn("Forms", f"Removed response: {response_id} from form: ({form_id}) for respondent: {email}")
     return True
     
     
 def set_grades(form_id: str, response_id: str, grades: dict) -> str:
-    form_data = _get_form_content(form_id)
+    form_data = FormsDB.fetch(form_id)
     if form_data is None:
         logs.error("Forms", f"Failed to grade response: {response_id} at form: ({form_id}) - form not found")
         return "Form not found"
@@ -471,16 +410,13 @@ def set_grades(form_id: str, response_id: str, grades: dict) -> str:
         
     full_grade = get_full_grade(form_id, form_data["answers"][email]["answers"])
     form_data["answers"][email]["grade"] = full_grade
-    _save_form_content(form_id, form_data)
+    FormsDB.save(form_id, form_data)
     logs.info("Forms", f"Graded response: {response_id} at form: ({form_id})")
     return full_grade
     
     
 def remove_form(form_id: str) -> bool | str:
-    if _get_form_content(form_id) is None:
-        return "Form not found."
-    
-    os.remove(FORMS_DIR_PATH + form_id + ".json")
+    FormsDB.remove(form_id)
     logs.warn("Forms", f"Removed form: ({form_id})")
     return True
     

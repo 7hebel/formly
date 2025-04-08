@@ -1,11 +1,9 @@
 import os
 
 if not os.path.exists("./data/"): os.mkdir("./data/")
-if not os.path.exists("./data/forms"): os.mkdir("./data/forms/")
-if not os.path.exists("./data/users"): os.mkdir("./data/users/")
-if not os.path.exists("./data/lists"): os.mkdir("./data/lists/")
 if not os.path.exists("./data/logs"): os.mkdir("./data/logs/")
 
+from modules.database import ListsDB, UsersDB, FormsDB
 from modules import text_grading  # Starts background AI models initialization.
 from modules import schemas
 from modules import lists
@@ -52,7 +50,7 @@ def protected_endpoint(endpoint_fn):
         request = kwargs["request"]
         caller_ip = request.client.host
         
-        user = users.get_user_by_uuid(uuid)
+        user = UsersDB.fetch(uuid)
         if user is None:
             return api_response(False, err_msg=f"Validation failed: provided invalid uuid: `{uuid}` to protected endpoint.")
         
@@ -70,11 +68,11 @@ def protected_list_endpoint(endpoint_fn):
         uuid = data.uuid if data else kwargs.get("uuid")
         list_id = data.list_id if data else kwargs.get("list_id")
 
-        user = users.get_user_by_uuid(uuid)
+        user = UsersDB.fetch(uuid)
         if user is None:
             return api_response(False, err_msg=f"Validation failed: provided invalid uuid: `{uuid}` to protected list endpoint.")
 
-        list_content = lists._get_list_content(list_id)
+        list_content = ListsDB.fetch(list_id)
         if list_content is None:
             return api_response(False, err_msg=f"Validation failed: provided invalid list_id: `{list_id}` to protected list endpoint.")
 
@@ -93,11 +91,11 @@ def protected_form_endpoint(author_only: bool = False):
             uuid = data.uuid if data else kwargs.get("uuid")
             form_id = data.form_id if data else kwargs.get("form_id")
 
-            user = users.get_user_by_uuid(uuid)
+            user = UsersDB.fetch(uuid)
             if user is None:
                 return api_response(False, err_msg=f"Validation failed: provided invalid uuid: `{uuid}` to protected form endpoint.")
         
-            form = forms._get_form_content(form_id)
+            form = FormsDB.fetch(form_id)
             if form is None:
                 return api_response(False, err_msg=f"Validation failed: provided invalid form-id: `{form_id}` to protected form endpoint.")
         
@@ -135,7 +133,7 @@ async def post_login(data: schemas.LoginSchema, request: Request) -> JSONRespons
     
 @api.get("/api/autologinCheck/{uuid}")
 async def get_autologin_check(uuid: str, request: Request) -> JSONResponse:
-    user = users.get_user_by_uuid(uuid)
+    user = UsersDB.fetch(uuid)
     if user is None:
         return api_response(False, err_msg="User with this uuid not found.")
     
@@ -146,7 +144,7 @@ async def get_autologin_check(uuid: str, request: Request) -> JSONResponse:
     
 @api.get("/api/logout/{uuid}")
 async def get_logout(uuid: str, request: Request) -> JSONResponse:
-    user = users.get_user_by_uuid(uuid)
+    user = UsersDB.fetch(uuid)
     if user is None:
         return api_response(False, err_msg="User with this uuid not found.")
 
@@ -163,7 +161,8 @@ async def get_logout(uuid: str, request: Request) -> JSONResponse:
 @api.post("/api/account-update/fullname")
 @protected_endpoint
 async def post_account_update_fullname(data: schemas.FullnameUpdateSchema, request: Request) -> JSONResponse:
-    users.update_fullname(data.uuid, data.fullname)
+    UsersDB.update_field(data.uuid, "fullname", data.fullname)
+    logs.info("Users", f"Changed user's fullname to: `{data.fullname}` <{data.uuid}>")
     return api_response(True)
 
 @api.post("/api/account-update/password")
@@ -193,7 +192,10 @@ async def post_account_update_password(data: schemas.PasswordUpdateSchema, reque
 @api.post("/api/lists/fetch")
 @protected_endpoint
 async def post_fetch_lists(data: schemas.ProtectedModel, request: Request) -> JSONResponse:
-    user_lists = lists.get_user_lists(data.uuid)
+    user_lists = ListsDB.fetch_all_where(lambda l: l['owner_uuid'] == data.uuid)
+    for user_list in user_lists:
+        user_list["forms"] = FormsDB.fetch_all_where(lambda form: user_list["list_id"] in form["assigned"]["lists"])
+    
     return api_response(True, user_lists)
 
 @api.post("/api/lists/create")
@@ -266,7 +268,7 @@ async def post_load_forms(data: schemas.ProtectedModel, request: Request) -> JSO
 @protected_endpoint
 @protected_form_endpoint(author_only=True)
 async def post_fetch_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
-    content = forms._get_form_content(data.form_id)
+    content = FormsDB.fetch(data.form_id)
     if content["settings"]["is_anonymous"]:
         content = forms.hide_anonymous_data(content)
     
@@ -283,28 +285,16 @@ async def post_update_form(data: schemas.UpdateFormSchema, request: Request) -> 
 @protected_endpoint
 @protected_form_endpoint(author_only=True)
 async def post_form_start(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
-    form_data = forms._get_form_content(data.form_id)
-    if form_data is None:
-        return api_response(False, err_msg="Form not found.")
-    
-    form_data["settings"]["is_active"] = True
-    forms._save_form_content(data.form_id, form_data)
+    FormsDB.update_field(data.form_id, "settings", deep_field="is_active", value=True)
     logs.info("Forms", f"Manually activated form: ({data.form_id}) by <{data.uuid}>")
-    
     return api_response(True)
 
 @api.post("/api/forms/end")
 @protected_endpoint
 @protected_form_endpoint(author_only=True)
 async def post_form_end(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
-    form_data = forms._get_form_content(data.form_id)
-    if form_data is None:
-        return api_response(False, err_msg="Form not found.")
-    
-    form_data["settings"]["is_active"] = False
-    forms._save_form_content(data.form_id, form_data)
+    FormsDB.update_field(data.form_id, "settings", deep_field="is_active", value=False)
     logs.info("Forms", f"Manually deactivated form: ({data.form_id}) by <{data.uuid}>")
-    
     return api_response(True)
 
 @api.post("/api/forms/delete-response")
@@ -346,7 +336,7 @@ async def post_get_brief_form(data: schemas.FormIdSchema, request: Request) -> J
 
 @api.post("/api/forms/validate-respondent")
 async def post_validate_respondent(data: schemas.FormRespondentSchema, request: Request) -> JSONResponse:
-    form_data = forms._get_form_content(data.form_id)
+    form_data = FormsDB.fetch(data.form_id)
     if form_data is None:
         return api_response(False, err_msg="Form not found.")
 
@@ -355,7 +345,7 @@ async def post_validate_respondent(data: schemas.FormRespondentSchema, request: 
 
     user = None
     if data.is_account:
-        user = users.get_user_by_uuid(data.uuid)
+        user = UsersDB.fetch(data.uuid)
         if user is None:
             return api_response(False, err_msg="User not found.")
     
