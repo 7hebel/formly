@@ -132,10 +132,7 @@
     flex-direction: column;
     display: flex;
     transition: box-shadow .6s;
-}
-
-.form-brief-view:hover {
-    box-shadow: 0px 8px 40px -4px #00000026;
+    box-shadow: var(--subtle-shadow);
 }
 
 .form-brief-view[isfinished="1"] {

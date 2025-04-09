@@ -26,6 +26,7 @@
     border-radius: 8px;
     display: flex;
     flex-direction: column;
+    box-shadow: var(--inner-depth);
 }
 
 .builder-form-panel {
@@ -39,6 +40,7 @@
     background-image: radial-gradient(circle at 1px 1px, #00000023 1px, transparent 0);
     background-size: 40px 40px;
     background-position: 20px 20px;
+    box-shadow: var(--inner-depth);
 }
 
 .builder-panel-header {
@@ -85,10 +87,6 @@
 }
 
 .builder-new-blocks {
-    background-color: var(--color-bg-item);
-    border: 1px solid var(--color-bg-item);
-    border-radius: 6px;
-    padding: 12px;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -112,12 +110,13 @@
     width: max-content;
     height: max-content;
     border-radius: 4px;
-    background-color: var(--color-bg-item);
-    border: 1px solid var(--color-bg-item);
-    opacity: .7;
+    background-color: #6e6e6e21;
+    border: 1px solid var(--color-border);
+    opacity: .8;
     transition: opacity .2s;
     cursor: pointer;
     user-select: none;
+    box-shadow: var(--inner-depth), var(--subtle-shadow);
 }   
 
 .add-component-btn > svg {

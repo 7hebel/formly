@@ -3,6 +3,7 @@ import { PrimaryButton, SecondaryButton, TertiaryButton, DangerButton } from '..
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import { DropdownGroup, DropdownItem } from '../ui/Dropdown.jsx';
 import { MultiSelect } from '../ui/Select.jsx';
+import { Switch } from '../ui/Swtich.jsx';
 import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -348,24 +349,36 @@ export default function FormBuilder() {
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
-                <InputLabel>
-                  <VenetianMask/>Anonymous answers
-                </InputLabel>
-                <TrueFalse qid="anon-answers" defValueState={formSettings.is_anonymous} setter={(isAnon) => {setFormSettings({...formSettings, is_anonymous: isAnon})}} isDimmed></TrueFalse>
+                <div className='row wide'>
+                  <InputLabel>
+                    <VenetianMask/>Anonymous answers
+                  </InputLabel>
+                  <div className='right-content'>
+                    <Switch checked={formSettings.is_anonymous} onChange={(isAnon) => {setFormSettings({...formSettings, is_anonymous: isAnon})}}></Switch>
+                  </div>
+                </div>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
-                <InputLabel>
-                  <EyeOff/>Hide answers after response
-                </InputLabel>
-                <TrueFalse qid="hide-answers" defValueState={formSettings.hide_answers} setter={(hideAnswers) => {setFormSettings({...formSettings, hide_answers: hideAnswers})}} isDimmed></TrueFalse>
+                <div className='row wide'>
+                  <InputLabel>
+                    <EyeOff/>Hide answers after response
+                  </InputLabel>
+                  <div className='right-content'>
+                    <Switch checked={formSettings.hide_answers} onChange={(hide) => {setFormSettings({...formSettings, hide_answers: hide})}}></Switch>
+                  </div>
+                </div>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
-                <InputLabel>
-                  <UserCheck/>Assigned respondents only
-                </InputLabel>
-                <TrueFalse qid="assigned-only" defValueState={formSettings.assigned_only} setter={(assignedOnly) => {setFormSettings({...formSettings, assigned_only: assignedOnly})}} isDimmed></TrueFalse>
+                <div className='row wide'>
+                  <InputLabel>
+                    <UserCheck/>Assigned respondents only
+                  </InputLabel>
+                  <div className='right-content'>
+                    <Switch checked={formSettings.assigned_only} onChange={(assignedOnly) => {setFormSettings({...formSettings, assigned_only: assignedOnly})}}></Switch>
+                  </div>
+                </div>
               </InputGroup>
               <div className='hzSep'></div>
               <InputLabel>

@@ -9,6 +9,7 @@
     border-radius: 6px;
     cursor: pointer;
     transition: filter .2s, box-shadow .4s;
+    box-shadow: rgba(255, 255, 255, 0.81) 0px 10px 14px -6px inset, #0006 0px -1px 10px -6px inset, var(--subtle-shadow);
 }
 
 .button:hover {
@@ -22,14 +23,15 @@
 
 
 .button .lucide {
-    width: 14px;
-    height: 14px;
-    min-width: 14px;
-    min-height: 14px;
+    width: 13px;
+    height: 13px;
+    min-width: 13px;
+    min-height: 13px;
     stroke-width: 2.5px;
     vertical-align: middle;
-    padding-bottom: 2px;
+    padding-bottom: 3px;
     margin-right: 6px;
+    box-sizing: content-box;
 }
 
 .small {
@@ -39,11 +41,12 @@
 }
 
 .small .lucide {
-    width: 15px;
-    height: 15px;
-    min-width: 15px;
-    min-height: 15px;
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    min-height: 14px;
     stroke-width: 2px;
+    margin-right: 8px;
 }
 
 /* Hierarchy */
@@ -55,12 +58,12 @@
 
 .primary-button:hover {
     filter: brightness(1.05);
-    box-shadow: 0px 10px 90px -10px var(--color-primary);
 }
 
 .secondary-button {
     background-color: var(--color-text);
     color: var(--color-bg-main);
+    box-shadow: rgba(255, 255, 255, 0.4) 0px 10px 14px -8px inset, #0006 0px -1px 10px -6px inset, var(--subtle-shadow);
 }
 
 .tertiary-button {
@@ -71,7 +74,7 @@
 }
 
 .tertiary-button:hover {
-    background-color: #0000002f;
+    background-color: #0000000a;
 }
 
 .danger-button {
@@ -83,9 +86,9 @@
 
 .danger-button:hover {
     background-color: rgba(255, 0, 0, 0.15);
+    filter: none !important;
 }
 
-/* --- INPUTS --- */
 
 .input-group {
     display: flex;
@@ -101,17 +104,16 @@
     opacity: 0.8;
     padding-left: 2px;
     position: relative;
+    white-space: nowrap;
 }
 
 .input-label > svg {
-    opacity: .8;
+    opacity: .7;
     width: 14px;
     height: 14px;
     vertical-align: middle;
     margin-bottom: 3px;
-    margin-right: 6px;
-    position: absolute;
-    right: 0;
+    margin-right: 8px;
 }
 
 .input-element {
@@ -470,4 +472,38 @@
 .icon-btn:hover {
     opacity: 8;
 }
+
+/* Switch */
+
+.switch {
+    width: 40px;
+    height: 20px;
+    border-radius: 8px;
+    background-color: var(--color-bg-item);
+    outline: 1px solid var(--color-border);
+    position: relative;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    box-shadow: rgba(255, 255, 255, 0.81) 0px 2px 4px -2px inset, 0px 0px 1px 0px var(--color-border) inset;
+}
+
+.switch-handle {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    width: 14px;
+    height: 14px;
+    background-color: var(--color-border);
+    opacity: .7;
+    border-radius: 5px;
+    transition: transform 0.2s ease;
+    box-shadow: rgba(255, 255, 255, 0.81) 0px 2px 4px -2px inset, 0px 0px 1px 0px var(--color-border);
+}
+
+.switch.on .switch-handle {
+    transform: translateX(18px);
+    background-color: var(--color-text);
+    border: 1px solid var(--color-bg-item);
+}
+
 
