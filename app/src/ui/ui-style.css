@@ -9,7 +9,7 @@
     border-radius: 6px;
     cursor: pointer;
     transition: filter .2s, box-shadow .4s;
-    box-shadow: rgba(255, 255, 255, 0.81) 0px 10px 14px -6px inset, #0006 0px -1px 10px -6px inset, var(--subtle-shadow);
+    box-shadow: rgba(255, 255, 255, 0.75) 0px 10px 14px -6px inset, #0006 0px -1px 10px -6px inset, var(--subtle-shadow);
 }
 
 .button:hover {

@@ -124,7 +124,7 @@
 
 .form-brief-view {
     width: 350px;
-    min-height: 250px;
+    min-height: 200px;
     background-color: var(--color-panel);
     border-radius: 8px;
     border: 1px solid var(--color-border);
@@ -141,14 +141,14 @@
 
 .form-brief-view[isfeatured="1"] {
     border-color: var(--color-primary);
-    border-width: 2px;
-    box-shadow: 0px 30px 170px -78px var(--color-primary-muted);
+    border-width: 1px;
+    box-shadow: 0px 10px 50px 0px #A584021A;
 }
 
 .form-brief-view > h5 {
     all: unset;
     font-family: var(--ui-font);
-    font-size: 18px;
+    font-size: 16px;
     color: var(--color-text);
     font-weight: 500;
     overflow-x: clip;
@@ -167,15 +167,15 @@
 .form-characteristic {
     font-family: var(--ui-font);
     color: var(--color-text);
-    font-size: 14px
+    font-size: 13px
 }
 
 .form-characteristic > svg {
-    height: 14px;
-    width: 14px;
+    height: 13px;
+    width: 13px;
     vertical-align: middle;
     margin-bottom: 4px;
-    margin-right: 6px;
+    margin-right: 8px;
     background-color: var(--color-primary);
     padding: 3px;
     box-sizing: content-box;
