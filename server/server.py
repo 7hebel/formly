@@ -194,7 +194,7 @@ async def post_account_update_password(data: schemas.PasswordUpdateSchema, reque
 async def post_fetch_lists(data: schemas.ProtectedModel, request: Request) -> JSONResponse:
     user_lists = ListsDB.fetch_all_where(lambda l: l['owner_uuid'] == data.uuid)
     for user_list in user_lists:
-        user_list["forms"] = FormsDB.fetch_all_where(lambda form: user_list["list_id"] in form["assigned"]["lists"])
+        user_list["forms"] = [form["form_id"] for form in FormsDB.fetch_all_where(lambda form: user_list["list_id"] in form["assigned"]["lists"])]
     
     return api_response(True, user_lists)
 

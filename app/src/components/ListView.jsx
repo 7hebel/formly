@@ -26,6 +26,9 @@ export default function ListView({ refreshPanel, listNameSetter, listData=null }
   const [addOpen, setAddOpen] = useState(false);
   const [removeOpen, setRemoveOpen] = useState(false);
   const [listEmails, setListEmails] = useState(listData.emails);
+  useEffect(() => {
+    setListEmails(listData.emails);
+  }, [listData]);
 
   async function onListRename() {
     const newName = document.getElementById("new-list-name");
@@ -118,7 +121,7 @@ export default function ListView({ refreshPanel, listNameSetter, listData=null }
 
   
   return (
-    <div className="list-view-container">
+    <div className="list-view-container" key={listData.list_id}>
       <div className='row right-content'>
         <TertiaryButton small onClick={() => {setRenameOpen(true)}}>
           <Edit3/>Rename
@@ -184,7 +187,7 @@ export default function ListView({ refreshPanel, listNameSetter, listData=null }
         }  
       </h2>
       
-      <div className='list-view-members'>
+      <div className='list-view-members' key={listEmails}>
         {
           listEmails.length > 0 ? <p className='info-text total-emails'>{listEmails.length} Emails</p> : null
         }

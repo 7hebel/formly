@@ -34,8 +34,6 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
   const fetchFormData = async () => {
     if (!formId) return;
     
-    console.log(formId)
-
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },

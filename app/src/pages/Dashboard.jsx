@@ -23,7 +23,7 @@ function displayMessage(content) {
 }
 
 
-function MyListsPanel({ lists, onSwitchList }) {
+function MyListsPanel({ lists, selectedList, onSwitchList }) {
   if (!lists) return <p>Loading...</p>;
   
   return (
@@ -33,10 +33,10 @@ function MyListsPanel({ lists, onSwitchList }) {
           return (
             <div key={listData.list_id}>
               <div 
-                onClick={() => onSwitchList(listData.name, listData)} 
+                onClick={() => onSwitchList(listData)} 
                 className='my-list' 
                 id={'list-' + listData.list_id} 
-                selected="0"
+                selected={Number(selectedList?.list_id == listData.list_id)}
               >
                 <h3>{listData.name}</h3>
                 <ChevronRightCircle/>
@@ -172,8 +172,7 @@ export default function Dashboard() {
     });
   }
 
-  function switchList(name, listData) {
-    setSelectedListName(name);
+  function switchList(listData) {
     setSelectedList(listData);
     document.querySelectorAll(".my-list").forEach(list => {list.setAttribute("selected", "0")})
     document.getElementById("list-" + listData.list_id).setAttribute("selected", "1");
@@ -228,7 +227,6 @@ export default function Dashboard() {
   const listsViewRef = useRef(0);
   const accountViewRef = useRef(0);
   const [selectedList, setSelectedList] = useState(null);
-  const [selectedListName, setSelectedListName] = useState("-");
   const [lists, setLists] = useState(null);
   const [forms, setForms] = useState(null);
 
@@ -246,7 +244,15 @@ export default function Dashboard() {
     const response = await fetch(import.meta.env.VITE_API_URL + "/lists/fetch", requestOptions);
     const data = await response.json();
 
-    if (data.status) setLists(data.data);
+    if (data.status) {
+      const myLists = data.data;
+      setLists(myLists);
+
+      if (myLists.length > 0) {
+        setSelectedList(myLists[0]);
+      }
+      
+    } 
   };
   useEffect(() => {fetchLists()}, []);
 
@@ -377,13 +383,13 @@ export default function Dashboard() {
                 </div>
                 <div className='hzSepStrong'></div>
                 <div className='my-lists'>
-                  <MyListsPanel lists={lists} onSwitchList={switchList}/>
+                  <MyListsPanel lists={lists} selectedList={selectedList} onSwitchList={switchList}/>
                 </div>
               </div>
               <div className='list-details'>
-                <h1>{selectedListName}</h1>
+                <h1>{selectedList?.name ?? '-'}</h1>
                 <div className='hzSepStrong'></div>
-                <ListView refreshPanel={() => {setSelectedList(null); setSelectedListName('-'); fetchLists()}} listNameSetter={(name) => {setSelectedListName(name); fetchLists()}} listData={selectedList}/>
+                <ListView refreshPanel={() => {setSelectedList(null); fetchLists()}} listNameSetter={(name) => {setSelectedList({...selectedList, name: name}); fetchLists()}} listData={selectedList}/>
               </div>
             </div>
           </div>
