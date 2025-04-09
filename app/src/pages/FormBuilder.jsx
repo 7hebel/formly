@@ -31,7 +31,6 @@ export default function FormBuilder() {
 
   if (!formId) return navigate("/dash")
 
-  const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
@@ -78,27 +77,13 @@ export default function FormBuilder() {
       const response = await fetch(import.meta.env.VITE_API_URL + "/forms/fetch-form", requestOptions);
       const data = await response.json();
       
-      if (data.status) setFormData(data.data);
-      setFormName(data.data.settings.title);
-      setIsAnon(data.data.settings.is_anonymous);
-      setHideAnswers(data.data.settings.hide_answers);
-      setIsAssignedOnly(data.data.settings.assigned_only);
-      setFormPassword(data.data.settings.password);
-      setFormComponents(data.data.structure);
-      setIsActive(data.data.settings.is_active);
-      setAssignedEmails(data.data.assigned.emails);
-      setAssignedLists(data.data.assigned.lists);
-      setCurrentlyResponding(data.data.responding);
-      setResponses(data.data.answers);
-
-      previousSentDataRef.current = JSON.stringify({
-        structure: data.data.structure,
-        assigned: {
-          "lists": data.data.assigned.lists,
-          "emails": data.data.assigned.emails
-        }
-      })
-
+      if (data.status) {
+        setFormComponents(data.data.structure);
+        setFormSettings(data.data.settings);
+        setAssigned(data.data.assigned);
+        setCurrentlyResponding(data.data.responding);
+        setResponses(data.data.answers);
+      }
 
     } catch (error) {
       displayMessage("Failed to load form.");
@@ -112,15 +97,21 @@ export default function FormBuilder() {
   useEffect(() => {fetchAuthorLists()}, []);
   useEffect(() => {fetchFormData()}, [formId]);
   
-  const [formName, setFormName] = useState("Form");
-  const [isAnon, setIsAnon] = useState(false);
-  const [hideAnswers, setHideAnswers] = useState(false);
-  const [isAssignedOnly, setIsAssignedOnly] = useState(true);
-  const [isActive, setIsActive] = useState(false);
-  const [formPassword, setFormPassword] = useState(null);
+  const [formSettings, setFormSettings] = useState({
+    is_anonymous: false,
+    hide_answers: false,
+    assigned_only: true,
+    is_active: false,
+    password: null,
+    title: '-'
+  });
+  
+  const [assigned, setAssigned] = useState({
+    emails: [],
+    lists: []
+  });
+
   const [formComponents, setFormComponents] = useState([]);
-  const [assignedEmails, setAssignedEmails] = useState([]);
-  const [assignedLists, setAssignedLists] = useState([]);
   const [currentlyResponding, setCurrentlyResponding] = useState({});
   const [responses, setResponses] = useState({});
   const [viewedResponse, setViewedResponse] = useState(null);
@@ -130,62 +121,56 @@ export default function FormBuilder() {
     const email = document.getElementById("assign-email");
     if (!email.value || !email.validity.valid) return;
 
-    if (assignedEmails.includes(email.value)) {
+    if (assigned.emails.includes(email.value)) {
       email.value = "";
       return;
     }
 
-    setAssignedEmails([...assignedEmails, email.value]);
+    setAssigned({...assigned, emails: [...assigned.emails, email.value]});
     email.value = "";
   }
 
   function handleUnassignEmail(email) {
     const newAssignedEmails = [];
-    for (const assignedEmail of assignedEmails) {
+    for (const assignedEmail of assigned.emails) {
       if (assignedEmail !== email) newAssignedEmails.push(assignedEmail);
     }
-    setAssignedEmails(newAssignedEmails);
+    setAssigned({...assigned, emails: newAssignedEmails})
   }
 
   function updateName(event) {
     if (!event.target.value || !event.target.validity.valid) return;
-    setFormName(event.target.value);
+    setFormSettings({...formSettings, title: event.target.value});
+  }
+
+  function updateTimeLimit(event) {
+    if (!event.target.validity.valid) return;
+    const validTimeLimit = Math.max(parseInt(event.target.value), 0) || 0;
+    setFormSettings({...formSettings, time_limit_m: validTimeLimit});
+  }
+
+  function _getSaveData() {
+    const saveData = {
+      "uuid": String(localStorage.getItem("uuid")),
+      "form_id": formId,
+      "settings": formSettings,
+      "structure": formComponents,
+      "assigned": assigned
+    }
+
+    return saveData;
   }
 
   async function sendSave(_, diffCheck=false) {
-    if (diffCheck && !previousSentDataRef.current) return;
+    const saveData = _getSaveData();
     
-    const structure = formComponents;
-    const settings = {
-      "title": formName,
-      "is_anonymous": isAnon,
-      "time_limit_m": Math.max(parseInt(document.getElementById("form-ans-time-limit").value), 0) || 0,
-      "password": document.getElementById("form-password").value,
-      "assigned_only": isAssignedOnly,
-      "hide_answers": hideAnswers
-    };
-    const assigned = {
-      "lists": assignedLists,
-      "emails": assignedEmails
-    }
-
-    const changedData = {
-      structure: structure,
-      assigned: assigned,
-    }
-    if (diffCheck && isEqual(changedData, previousSentDataRef.current)) return;
-    previousSentDataRef.current = changedData;
+    if (diffCheck && isEqual(saveData, previousSentDataRef.current)) return;
+    previousSentDataRef.current = saveData;
     
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        uuid: String(localStorage.getItem("uuid")),
-        form_id: formId,
-        settings: settings,
-        structure: structure,
-        assigned: assigned
-      }),
+      body: JSON.stringify(saveData)
     };
 
     const response = await fetch(import.meta.env.VITE_API_URL + "/forms/update-form", requestOptions);
@@ -194,11 +179,15 @@ export default function FormBuilder() {
   }
 
   useEffect(() => {
+    if (previousSentDataRef.current === null) {
+      previousSentDataRef.current = _getSaveData();
+    }
+    
     const interval = setInterval(() => {
       sendSave(true, true);
     }, 1000);
     return () => clearInterval(interval);
-  }, [formComponents, assignedLists, assignedEmails]);
+  }, [formComponents, formSettings, assigned]);
   
 
   function addFormComponent(componentType) {
@@ -209,17 +198,16 @@ export default function FormBuilder() {
     const listId = event.target.getAttribute("optionkey");
     const state = event.target.checked;
 
-    if (state && !assignedLists.includes(listId)) {
-      const newAssignedLists = [...assignedLists, listId];
-      setAssignedLists(newAssignedLists); 
+    if (state && !assigned.lists.includes(listId)) {
+      setAssigned({...assigned, lists: [...assigned.lists, listId]})
     }
 
-    if (!state && assignedLists.includes(listId)) {
+    if (!state && assigned.lists.includes(listId)) {
       const newAssignedLists = [];
-      for (const assignedList of assignedLists) {
+      for (const assignedList of assigned.lists) {
         if (assignedList !== listId) newAssignedLists.push(assignedList);
       }
-      setAssignedLists(newAssignedLists);
+      setAssigned({...assigned, lists: newAssignedLists})
     }
   }
 
@@ -236,7 +224,7 @@ export default function FormBuilder() {
     const response = await fetch(import.meta.env.VITE_API_URL + "/forms/start", requestOptions);
     const data = await response.json();
     if (data.status) { 
-      setIsActive(true);
+      setFormSettings({...formSettings, is_active: true});
       displayMessage("Form is now active.");
     }
     else { displayMessage("Failed to start, " + data.err_msg); }
@@ -255,7 +243,7 @@ export default function FormBuilder() {
     const response = await fetch(import.meta.env.VITE_API_URL + "/forms/end", requestOptions);
     const data = await response.json();
     if (data.status) { 
-      setIsActive(false);
+      setFormSettings({...formSettings, is_active: false});
       displayMessage("Form is now: not active.");
     }
     else { displayMessage("Failed to end, " + data.err_msg); }
@@ -279,7 +267,6 @@ export default function FormBuilder() {
     const response = await fetch(import.meta.env.VITE_API_URL + "/forms/fetch-form", requestOptions);
     const data = await response.json();
     
-    if (data.status) setFormData(data.data);
     setCurrentlyResponding(data.data.responding);
     setResponses(data.data.answers);
     displayMessage("Refreshed");
@@ -297,7 +284,7 @@ export default function FormBuilder() {
   
     await fetch(import.meta.env.VITE_API_URL + "/forms/remove-form", requestOptions);
     navigate("/dash");
-    displayMessage(`Deleted ${formName}`);
+    displayMessage(`Deleted ${formSettings.title}`);
 
   }
 
@@ -316,7 +303,7 @@ export default function FormBuilder() {
       </div>
       
       <header className='dash-header'>
-      <img src='../logo.svg' height={42} onClick={async () => {await sendSave(); navigate('/')}}></img>
+      <img src='../logo.svg' height={42} onClick={() => {sendSave().finally(() => {navigate('/')})}}></img>
       <h1 className='welcome-msg'>
         Form <span id='welcome-msg-name'>builder</span>
       </h1>
@@ -340,14 +327,14 @@ export default function FormBuilder() {
                 <InputLabel>
                   <Type/>Form name
                 </InputLabel>
-                <Input onChange={updateName} onBlur={sendSave} value={formData.settings.title} minlen={1} maxlen={32}></Input>
+                <Input onChange={updateName} value={formSettings.title} minlen={1} maxlen={32}></Input>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
                   <LockKeyhole/>Password
                 </InputLabel>
-                <Input type='password' id='form-password' value={formPassword} onBlur={sendSave}></Input>
+                <Input type='password' id='form-password' onChange={(c) => {setFormSettings({...formSettings, "password": c.target.value})}} value={formSettings.password}></Input>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
@@ -355,7 +342,7 @@ export default function FormBuilder() {
                   <Hourglass/>Answer time limit
                 </InputLabel>
                 <div className='input-with-action'>
-                  <Input type='number' id='form-ans-time-limit' value={formData.settings.time_limit_m} min={0} onBlur={sendSave}></Input>
+                  <Input type='number' id='form-ans-time-limit' onChange={updateTimeLimit} value={formSettings.time_limit_m} min={0}></Input>
                   <p className='input-unit'>Minutes.</p>
                 </div>
               </InputGroup>
@@ -364,21 +351,21 @@ export default function FormBuilder() {
                 <InputLabel>
                   <VenetianMask/>Anonymous answers
                 </InputLabel>
-                <TrueFalse qid="anon-answers" defValueState={isAnon} setter={setIsAnon} onChange={sendSave} isDimmed></TrueFalse>
+                <TrueFalse qid="anon-answers" defValueState={formSettings.is_anonymous} setter={(isAnon) => {setFormSettings({...formSettings, is_anonymous: isAnon})}} isDimmed></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
                   <EyeOff/>Hide answers after response
                 </InputLabel>
-                <TrueFalse qid="hide-answers" defValueState={hideAnswers} setter={setHideAnswers} onChange={sendSave} isDimmed></TrueFalse>
+                <TrueFalse qid="hide-answers" defValueState={formSettings.hide_answers} setter={(hideAnswers) => {setFormSettings({...formSettings, hide_answers: hideAnswers})}} isDimmed></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
               <InputGroup>
                 <InputLabel>
                   <UserCheck/>Assigned respondents only
                 </InputLabel>
-                <TrueFalse qid="assigned-only" defValueState={isAssignedOnly} setter={setIsAssignedOnly} onChange={sendSave} isDimmed></TrueFalse>
+                <TrueFalse qid="assigned-only" defValueState={formSettings.assigned_only} setter={(assignedOnly) => {setFormSettings({...formSettings, assigned_only: assignedOnly})}} isDimmed></TrueFalse>
               </InputGroup>
               <div className='hzSep'></div>
               <InputLabel>
@@ -430,7 +417,7 @@ export default function FormBuilder() {
                         <MultiSelect
                           qid="assign-lists"
                           options={authorLists}
-                          selectedIds={assignedLists}
+                          selectedIds={assigned.lists}
                           onOptionChange={onListAssignChange}
                         ></MultiSelect>
                       </div>
@@ -442,7 +429,7 @@ export default function FormBuilder() {
                       <div className='hzSep'></div>
                       <div className='assignees-container'>
                         {
-                          assignedEmails.map((email) => (
+                          assigned.emails.map((email) => (
                             <div className='assignee-item' key={email}>
                               <p>{email}</p>
                               <MinusCircle onClick={() => {handleUnassignEmail(email)}}/>
@@ -472,7 +459,7 @@ export default function FormBuilder() {
               isShareModalOpen && (
                 <Modal title="Share form." close={setIsShareModalOpen}>
                   <div className='share-form-content'>
-                    <span className='is-active-info'>Form is {(isActive) ? 'active' : 'not active'}</span>
+                    <span className='is-active-info'>Form is {(formSettings.is_active) ? 'active' : 'not active'}</span>
                     <div className='hzSep'></div>
                     <div className='link-container'>
                       <span className='link-header row'>
@@ -486,7 +473,7 @@ export default function FormBuilder() {
                     <InputLabel>Assigned Formly users can access this form from their dashboards.</InputLabel>
                     <div className='hzSep'></div>
                     {
-                      !isActive? (
+                      !formSettings.is_active? (
                         <PrimaryButton wide onClick={startForm}>
                           <Send/>Start now
                         </PrimaryButton>
@@ -505,7 +492,7 @@ export default function FormBuilder() {
 
         <div className='builder-form-panel'>
           <div className='builder-panel-header'>
-            <ClipboardList/><h2>{formName}</h2>
+            <ClipboardList/><h2>{formSettings.title}</h2>
           </div>
           <div className='hzSepMid'></div>
           {
