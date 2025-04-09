@@ -466,7 +466,7 @@ export default function FormBuilder() {
             }
 
             <PrimaryButton wide onClick={() => {setIsShareModalOpen(true)}}>
-              <Send/>Deploy
+              <Send/>Publish
             </PrimaryButton>
             {
               isShareModalOpen && (
