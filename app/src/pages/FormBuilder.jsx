@@ -117,6 +117,7 @@ export default function FormBuilder() {
   const [currentlyResponding, setCurrentlyResponding] = useState({});
   const [responses, setResponses] = useState({});
   const [viewedResponse, setViewedResponse] = useState(null);
+  const [gradingSchemas, setGradingSchemas] = useState({});
   const previousSentDataRef = useRef(null);
 
   function handleAssignEmail() {
@@ -290,6 +291,22 @@ export default function FormBuilder() {
 
   }
 
+  async function loadGradingSchemas() {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+      }),
+    };
+    
+    const response = await fetch(import.meta.env.VITE_API_URL + "/grading-schemas/fetch", requestOptions);
+    const data = await response.json();
+    setGradingSchemas(data.data);
+  }
+
+  useEffect(() => {loadGradingSchemas()}, []);
+  
   if (loading) return <p className='info-text'>Loading {formId}</p>;
   
   return (
@@ -385,12 +402,7 @@ export default function FormBuilder() {
               <InputLabel>
                 <Trophy/>Grading schema
               </InputLabel>
-              <DropdownGroup>
-
-                <DropdownItem>Abc schema name 1</DropdownItem>
-                <DropdownItem>Another schema name</DropdownItem>
-
-              </DropdownGroup>
+              <DropdownGroup key={JSON.stringify(gradingSchemas)} items={gradingSchemas} selectedItemID={formSettings.grading_schema} setter={(s) => {setFormSettings({...formSettings, grading_schema: s})}} refresh={loadGradingSchemas}></DropdownGroup>
               <div className='hzSep'></div>
               <p className='danger-text-btn' onClick={() => {setIsDeleteModalOpen(true)}}>
                 <Trash2/>Delete form

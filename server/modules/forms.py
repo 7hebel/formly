@@ -26,7 +26,8 @@ Saved form format:
         "time_limit_m": 60 | 0 for not limit (in minutes), 
         "password": BCRYPT_HEX | False for no password,
         "assigned_only": True  (Allow only user with accounts to answer),
-        "hide_answers": False 
+        "hide_answers": False,
+        "grading_schema":  SCHEMA_ID or NULL for %
     },
     "assigned": {
         "lists": [],
@@ -61,7 +62,8 @@ class FormSettings:
     time_limit_m: int = 0
     password: str | None = None
     assigned_only: bool = False
-    hide_answers: bool = False
+    hide_answers: bool = False,
+    grading_schema: str | None = None
     
     @staticmethod
     def from_dict(settings: dict) -> "FormSettings":
@@ -157,6 +159,25 @@ def update_form(form_id: str, new_settings: dict, structure: list, assigned: dic
     logs.info("Forms", f"Updated form settings and structure ({form_id})")
 
 
+def get_grade_from_schema(schema_id: str, user_uuid: str, percentage_value: int) -> str | None:
+    user_data = UsersDB.fetch(user_uuid)
+    if user_data is None:
+        return logs.warn("Forms", f"Failed to fetch grade from schema: `{schema_id}` by user: <{user_uuid}> (user not found)")
+    
+    schema = user_data["grading_schemas"].get(schema_id)
+    if schema is None:
+        return logs.warn("Forms", f"Failed to fetch grade from schema: `{schema_id}` by user: <{user_uuid}> (schema not found)")
+    
+    steps = schema["steps"]
+    grades = schema["grades"]
+
+    grade = None
+    for (index, step) in enumerate(steps + [100]):
+        if percentage_value in range(step):
+            grade = grades[index]
+    
+    return grade
+
 def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
     form_data = FormsDB.fetch(form_id)
     if form_data is None:
@@ -211,9 +232,13 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
         characteristics.append({"type": "submitted", "content": f"Submitted: [{submit_time}]"})
         characteristics.append({"type": "timelimit", "content": f"Answered in [{total_time}]"})
 
-        grade = form_data["answers"][user_email]["grade"]
-        characteristics.append({"type": "grade", "content": f"Grade: [{grade}]"})
-        
+        percentage_grade = form_data["answers"][user_email]["grade"]
+        if form_settings["grading_schema"] and form_settings["grading_schema"] != "%":
+            schema_grade = get_grade_from_schema(form_settings["grading_schema"], form_data["author_uuid"], int(percentage_grade.removesuffix("%")))
+            characteristics.append({"type": "grade", "content": f"Grade: [{schema_grade}]  ({percentage_grade})"})
+        else:
+            characteristics.append({"type": "grade", "content": f"Grade: [{percentage_grade}]"})
+            
     else:
         if form_settings["time_limit_m"] > 0:
             characteristics.append({"type": "timelimit", "content": f"Time limit: [{form_settings['time_limit_m']} minutes]"})

@@ -5,6 +5,7 @@ import './modal.css';
 
 let modalsCount = 0;
 
+
 export function Modal({ title, close, children }) {
   const modalRoot = document.getElementById('modal-root');
   const containerRef = useRef(null);

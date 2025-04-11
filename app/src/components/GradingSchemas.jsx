@@ -57,7 +57,6 @@ function SchemaEditor({ schema, onRefresh }) {
   async function onSchemaUpdate() {
     const clearSteps = [...stepsValue];
     if (clearSteps.length > 0) clearSteps.splice(0, 1);
-    console.log("Grades:", gradesValue)
 
     const requestOptions = {
       method: "POST",
@@ -75,6 +74,7 @@ function SchemaEditor({ schema, onRefresh }) {
     
     if (data.status) {
       onRefresh();
+      displayMessage("Schema saved");
     } else {
       displayMessage(data.err_msg);
     }
