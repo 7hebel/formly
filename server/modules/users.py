@@ -30,6 +30,7 @@ def register_user(fullname: str, email: str, raw_password: str, user_ip: str) ->
         "email": email,
         "password": encrypted_password,
         "trusted_ip": hash_ip(user_ip),
+        "grading_schemas": []
     }
     
     user = UsersDB.create(data)

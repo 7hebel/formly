@@ -4,7 +4,6 @@ import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import { DropdownGroup, DropdownItem } from '../ui/Dropdown.jsx';
 import { MultiSelect } from '../ui/Select.jsx';
 import { Switch } from '../ui/Swtich.jsx';
-import { TrueFalse } from '../ui/TrueFalse.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2, LayoutDashboard, Trophy } from 'lucide-react';
@@ -15,6 +14,7 @@ import butterup from 'butteruptoasts';
 import 'butteruptoasts/src/butterup.css';
 import './styles/builder.css'
 import { isEqual } from 'lodash';
+import { AnimatePresence, motion } from 'framer-motion';
 
 
 function displayMessage(content) {
@@ -38,6 +38,7 @@ export default function FormBuilder() {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isAnswersView, setIsAnswersView] = useState(false);
   const [authorLists, setAuthorLists] = useState([]);
+  const refreshIconRef = useRef(null);
 
   const fetchAuthorLists = async () => {
     const requestOptions = {
@@ -270,7 +271,7 @@ export default function FormBuilder() {
     
     setCurrentlyResponding(data.data.responding);
     setResponses(data.data.answers);
-    displayMessage("Refreshed");
+    refreshIconRef.current.style.rotate = ((parseInt(refreshIconRef.current.style.rotate) || 0) + 360) + "deg";
   }
   
   async function removeForm() {
@@ -483,7 +484,7 @@ export default function FormBuilder() {
                         <Copy/>Copy
                       </span>
                     </div>
-                    <InputLabel>Assigned Formly users can access this form from their dashboards.</InputLabel>
+                    <p className='info-text'>Assigned Formly users can access this form from their dashboards.</p>
                     <div className='hzSep'></div>
                     {
                       !formSettings.is_active? (
@@ -517,7 +518,7 @@ export default function FormBuilder() {
                   </span>
                   Manage responses
                   <span className='responses-view-header-btn' onClick={refreshResponses}>
-                    <RefreshCcw/>Refresh
+                    <RefreshCcw ref={refreshIconRef}/>Refresh
                   </span>
                 </div>
                 <div className='responses-view'>
@@ -562,18 +563,28 @@ export default function FormBuilder() {
                 formComponents.map((componentData, qIndex) => {
                   const DynamicComponentBuilder = getComponentBuilder(componentData.componentType)  ;
                   return (
-                    <DynamicComponentBuilder 
-                      key={componentData.componentId} 
-                      questionNo={qIndex + 1} 
-                      formComponents={formComponents}
-                      setFormComponents={setFormComponents}
-                      locked
-                      {...componentData}
-                    ></DynamicComponentBuilder>
+                    <AnimatePresence key={componentData.componentId}>
+                      <motion.div           
+                        key={componentData.componentId}
+                        layout
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        transition={{ duration: 0.2 }}
+                        className='form-component-builder-group'>
+                        <DynamicComponentBuilder 
+                          key={componentData.componentId} 
+                          questionNo={qIndex + 1} 
+                          formComponents={formComponents}
+                          setFormComponents={setFormComponents}
+                          locked
+                          {...componentData}
+                        ></DynamicComponentBuilder>
+                      </motion.div>
+                    </AnimatePresence>
                   )
                 })
               }
-  
               <div className='builder-new-blocks'>
                 <div className='add-component-btn' onClick={() => {addFormComponent("short-text-answer")}}>
                   <TextCursorInput/>Short text answer

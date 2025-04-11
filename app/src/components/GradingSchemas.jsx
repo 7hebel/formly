@@ -135,8 +135,8 @@ export function GradingSchemasManager() {
 
 
         <div className='row'>
-          <DangerButton small><Trash2/>Delete</DangerButton>
           <TertiaryButton small><PenLine/>Rename</TertiaryButton>
+          <DangerButton small><Trash2/>Delete</DangerButton>
         </div>
       </div>
       <div className='hzSepMid'></div>

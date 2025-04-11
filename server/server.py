@@ -322,7 +322,7 @@ async def post_remove_response(data: schemas.FormIdSchema, request: Request) -> 
 @protected_form_endpoint(author_only=True)
 async def post_grade_response(data: schemas.GradeResponse, request: Request) -> JSONResponse:
     status = forms.set_grades(data.form_id, data.response_id, data.grades)
-    if not status.endswith("%"):
+    if not status.endswith("%") and status != "Not graded yet.":
         return api_response(False, err_msg=status)
 
     return api_response(True, status)

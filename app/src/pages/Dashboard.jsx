@@ -43,7 +43,7 @@ function MyListsPanel({ lists, selectedList, onSwitchList }) {
               </div>
   
               {
-                (index != lists.length - 1) && <div className='hzSepMid'></div>
+                (index != lists.length - 1) && <div className='hzSep'></div>
               }
             </div>
           )
@@ -308,9 +308,7 @@ export default function Dashboard() {
           </DashboardCategorySwitcher>
         </div>
         
-        <div className='hzSepStrong'></div>
         <div className='dash-categories-content-container'>
-
           <div className='dash-category-content' ref={formsViewRef}>
             <div className='dash-forms-category-container'>
               <h1>Assigned to me:</h1>
@@ -381,14 +379,14 @@ export default function Dashboard() {
                     )
                   }
                 </div>
-                <div className='hzSepStrong'></div>
+                <div className='hzSepMid'></div>
                 <div className='my-lists'>
                   <MyListsPanel lists={lists} selectedList={selectedList} onSwitchList={switchList}/>
                 </div>
               </div>
               <div className='list-details'>
                 <h1>{selectedList?.name ?? '-'}</h1>
-                <div className='hzSepStrong'></div>
+                <div className='hzSepMid'></div>
                 <ListView refreshPanel={() => {setSelectedList(null); fetchLists()}} listNameSetter={(name) => {setSelectedList({...selectedList, name: name}); fetchLists()}} listData={selectedList}/>
               </div>
             </div>

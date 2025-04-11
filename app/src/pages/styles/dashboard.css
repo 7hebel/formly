@@ -32,8 +32,11 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding-inline: 16px;
-
+    padding-inline: 20px;
+    border-bottom: 2px solid var(--color-border);
+    border-radius: 4px;
+    padding-bottom: 4px;
+    box-shadow: var(--subtle-shadow);
 }
 
 .dashboard-category-switch {
@@ -46,8 +49,8 @@
 }
 
 .dashboard-category-switch[active="1"] {
-    text-decoration: underline 3px var(--color-primary);
-    text-underline-offset: 4px;
+    text-decoration: underline 2px var(--color-primary);
+    text-underline-offset: 10px;
 }
 
 .dashboard-category-switch[active="1"] > svg {
@@ -67,7 +70,6 @@
     box-shadow: 0px -10px 50px 2px var(--color-primary);
 }
 
-
 .dashboard-category-switch > svg {
     height: 16px;
     width: 16px;
@@ -80,14 +82,14 @@
 
 .dash-categories-content-container {
     width: 100%;
-    padding-inline: 20px;
+    padding-inline: 24px;
 }
 
 .dash-category-content[active="0"] { display: none; }
 
 .dash-category-content {
     width: 100%;
-    margin-top: 20px;
+    margin-top: 50px;
 }
 
 /* --- FORMS --- */
@@ -132,7 +134,7 @@
     flex-direction: column;
     display: flex;
     transition: box-shadow .6s;
-    box-shadow: var(--subtle-shadow);
+    box-shadow: var(--inner-depth), var(--subtle-shadow);
 }
 
 .form-brief-view[isfinished="1"] {
@@ -273,10 +275,13 @@
     justify-content: space-between;
     align-items: center;
     font-family: var(--ui-font);
-    font-size: 14px;
     padding-inline: 8px;
     color: var(--color-text);
     gap: 12px;
+}
+
+.my-lists-header > h1 {
+    font-size: 22px;
 }
 
 .my-lists {
@@ -296,7 +301,7 @@
 }
 
 .my-list[selected="1"] > h3 {
-    font-weight: 700;
+    font-weight: 500;
     text-decoration: underline 2px var(--color-primary);
     text-underline-offset: 3px;
 }
@@ -306,14 +311,14 @@
     min-width: 16px;
     height: 16px;
     width: 16px;
-    color: var(--color-primary-muted);
+    color: var(--color-text);
     opacity: 0;
     transition: opacity .2s;
 }
 
 .my-list[selected="1"] > svg,
 .my-list:hover > svg {
-    opacity: 1;
+    opacity: .3;
 }
 
 .my-list > h3 {
@@ -369,7 +374,7 @@
 .list-details > h1 {
     font-family: var(--ui-font);
     color: var(--color-text);
-    font-size: 28px;
+    font-size: 22px;
     padding-inline: 8px;
     text-align: center;
     overflow-y: clip;
