@@ -3,7 +3,7 @@ from modules import logs
 
 import hashlib
 import bcrypt
-
+import uuid
 
 
 def is_email_used(email: str) -> bool:
@@ -30,7 +30,7 @@ def register_user(fullname: str, email: str, raw_password: str, user_ip: str) ->
         "email": email,
         "password": encrypted_password,
         "trusted_ip": hash_ip(user_ip),
-        "grading_schemas": []
+        "grading_schemas": {}
     }
     
     user = UsersDB.create(data)
@@ -83,3 +83,74 @@ def update_password(user_uuid: str, new_raw_password: str, current_password: str
     logs.info("Users", f"Changed user's password for: <{user_uuid}>")
     return True
 
+
+def generate_grading_schema_name(user_uuid: str) -> str:
+    user_data = UsersDB.fetch(user_uuid)
+    index = len(user_data["grading_schemas"]) + 1
+    return f"Schema {index}"
+
+
+def create_grading_schema(user_uuid: str) -> dict | str:
+    title = generate_grading_schema_name(user_uuid)
+    new_schema_id = uuid.uuid4().hex
+    new_schema_data = {
+        "schema_id": new_schema_id,
+        "title": title,
+        "steps": [],
+        "grades": []
+    }
+    
+    if len(title.strip()) < 3:
+        logs.error("Users", f"Failed to create new grading schema: `{title}` for <{user_uuid}> (title too short)")
+        return "Title too short."
+    
+    user_data = UsersDB.fetch(user_uuid)
+    user_data["grading_schemas"][new_schema_id] = new_schema_data
+    UsersDB.save(user_uuid, user_data)
+    
+    logs.info("Users", f"Created new grading schema: `{title}` for <{user_uuid}> as `{new_schema_id}`")
+    return new_schema_data
+    
+
+def rename_grading_schema(user_uuid: str, schema_id: str, new_title: str) -> bool | str:
+    if len(new_title.strip()) < 3:
+        logs.error("Users", f"Failed to rename grading schema: `{schema_id}` for <{user_uuid}> to: `{new_title}` (title too short)")
+        return "New title too short"
+    
+    user_data = UsersDB.fetch(user_uuid)
+    if schema_id not in user_data["grading_schemas"]:
+        logs.error("Users", f"Failed to rename grading schema: `{schema_id}` for <{user_uuid}> to: `{new_title}` (schema not found)")
+        return "Schema not found"
+
+    user_data["grading_schemas"][schema_id]["title"] = new_title
+    UsersDB.save(user_uuid, user_data)
+    logs.info("Users", f"Renamed grading schema: `{schema_id}` for: <{user_uuid}> to: `{new_title}`")
+    return True    
+    
+
+def update_grading_schema(user_uuid: str, schema_id: str, steps: list[int], grades: list) -> bool | str:    
+    user_data = UsersDB.fetch(user_uuid)
+    if schema_id not in user_data["grading_schemas"]:
+        logs.error("Users", f"Failed to update grading schema: `{schema_id}` for <{user_uuid}> (schema not found)")
+        return "Schema not found"
+
+    user_data["grading_schemas"][schema_id]["steps"] = steps
+    user_data["grading_schemas"][schema_id]["grades"] = grades
+    UsersDB.save(user_uuid, user_data)
+    
+    logs.info("Users", f"Updated grading schema: `{schema_id}` for: <{user_uuid}>")
+    return True    
+    
+
+def remove_grading_schema(user_uuid: str, schema_id: str) -> bool | str:    
+    user_data = UsersDB.fetch(user_uuid)
+    if schema_id not in user_data["grading_schemas"]:
+        logs.error("Users", f"Failed to remove grading schema: `{schema_id}` for <{user_uuid}> (schema not found)")
+        return "Schema not found"
+
+    user_data["grading_schemas"].pop(schema_id)
+    UsersDB.save(user_uuid, user_data)
+    
+    logs.info("Users", f"Removed grading schema: `{schema_id}` for: <{user_uuid}>")
+    return True    
+    

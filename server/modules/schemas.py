@@ -46,10 +46,18 @@ class ListUpdate(ProtectedModel):
     
 # Grading schemas.
     
-class CreateGradingSchema(ProtectedModel):
-    title: str
+class EditGradingSchema(ProtectedModel):
+    schema_id: str
     steps: list[int]
     grades: list    
+    
+class RenameGradingSchema(ProtectedModel):
+    schema_id: str
+    new_title: str
+    
+class RemoveGradingSchema(ProtectedModel):
+    schema_id: str
+
 
 
 # Forms.

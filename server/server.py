@@ -177,14 +177,44 @@ async def post_account_update_password(data: schemas.PasswordUpdateSchema, reque
 
 # Grading schemas.
 
-# @api.post("/api/grading-schemas/create")
-# @protected_endpoint
-# async def post_create_grading_schema(data: schemas.CreateGradingSchema, request: Request) -> JSONResponse:
-#     # status = users.update_password(data.uuid, data.new_password, data.current_password)
-#     # if isinstance(status, str):
-#     #     return api_response(False, err_msg=status)
-#     # return api_response(True)
-#     pass
+@api.post("/api/grading-schemas/fetch")
+@protected_endpoint
+async def post_fetch_grading_schemas(data: schemas.ProtectedModel, request: Request) -> JSONResponse:
+    grading_schemas = UsersDB.fetch(data.uuid)["grading_schemas"]
+    return api_response(True, grading_schemas)
+
+@api.post("/api/grading-schemas/create")
+@protected_endpoint
+async def post_create_grading_schema(data: schemas.ProtectedModel, request: Request) -> JSONResponse:
+    status = users.create_grading_schema(data.uuid)
+    if isinstance(status, str):
+        return api_response(False, status)
+    return api_response(True, status)
+    
+@api.post("/api/grading-schemas/rename")
+@protected_endpoint
+async def post_rename_grading_schema(data: schemas.RenameGradingSchema, request: Request) -> JSONResponse:
+    status = users.rename_grading_schema(data.uuid, data.schema_id, data.new_title)
+    if isinstance(status, str):
+        return api_response(False, status)
+    return api_response(True)
+
+@api.post("/api/grading-schemas/edit")
+@protected_endpoint
+async def post_edit_grading_schema(data: schemas.EditGradingSchema, request: Request) -> JSONResponse:
+    status = users.update_grading_schema(data.uuid, data.schema_id, data.steps, data.grades)
+    if isinstance(status, str):
+        return api_response(False, status)
+    return api_response(True)
+
+@api.post("/api/grading-schemas/remove")
+@protected_endpoint
+async def post_edit_grading_schema(data: schemas.RemoveGradingSchema, request: Request) -> JSONResponse:
+    status = users.remove_grading_schema(data.uuid, data.schema_id)
+    if isinstance(status, str):
+        return api_response(False, status)
+    return api_response(True)
+
 
 
 # Lists.

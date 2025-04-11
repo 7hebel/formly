@@ -3,17 +3,20 @@ import { X } from 'lucide-react';
 import ReactDOM from 'react-dom';
 import './modal.css';
 
+let modalsCount = 0;
 
 export function Modal({ title, close, children }) {
   const modalRoot = document.getElementById('modal-root');
   const containerRef = useRef(null);
   const closeRef = useRef(null);
   const modalRef = useRef(null);
+  modalsCount += 1;
 
   function onClose() {
     if (modalRef && modalRef.current) {
       modalRef.current.classList.add('modal-transition');
       setTimeout(close, 250);
+      modalsCount -= 1;
       return () => clearTimeout(timer);
     }
   }
@@ -46,7 +49,7 @@ export function Modal({ title, close, children }) {
 
   return ReactDOM.createPortal((
     <div id='modal-container' ref={containerRef}>
-      <div className="modal" ref={modalRef}>
+      <div className="modal" ref={modalRef} style={{marginTop: (10 * modalsCount) + 'px'}}>
         <div className='modal-header'>
           <h1>{title}</h1>
           <X ref={closeRef}/>

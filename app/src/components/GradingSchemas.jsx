@@ -1,15 +1,26 @@
 import ReactSlider from 'react-slider'
-import { Input } from '../ui/Input'
 import './gradingSchema.css'
 import { useState } from 'react'
-import { Plus, MinusSquare, Trash2, PenLine, Save, CheckCheck } from 'lucide-react'
+import { Plus, MinusSquare, Trash2, PenLine, Save, CheckCheck, Edit3 } from 'lucide-react'
 import { PrimaryButton, SecondaryButton, TertiaryButton, DangerButton } from '../ui/Button.jsx' 
+import { InputGroup, Input, InputLabel } from '../ui/Input'
 import { Modal } from '../ui/Modal.jsx'
+import butterup from 'butteruptoasts';
+import 'butteruptoasts/src/butterup.css';
+import { useEffect } from 'react'
 
 
-function SchemaEditor({ steps, grades }) {
-  const [stepsValue, setStepsValue] = useState([0, ...steps]);
-  const [gradesValue, setGradesValue] = useState(grades);
+function displayMessage(content) {
+    butterup.toast({
+      message: content,
+      location: 'bottom-center',
+      dismissable: true,
+    });
+}
+
+function SchemaEditor({ schema, onRefresh }) {
+  const [stepsValue, setStepsValue] = useState([0, ...schema.steps]);
+  const [gradesValue, setGradesValue] = useState(schema.grades);
 
   function handleRemoveStep(index) {
     const newSteps = [...stepsValue];
@@ -43,6 +54,37 @@ function SchemaEditor({ steps, grades }) {
     setGradesValue(newGrades);
   }
 
+  async function onSchemaUpdate() {
+    const clearSteps = [...stepsValue];
+    if (clearSteps.length > 0) clearSteps.splice(0, 1);
+    console.log("Grades:", gradesValue)
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        schema_id: schema.schema_id,
+        steps: clearSteps,
+        grades: gradesValue,
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/grading-schemas/edit", requestOptions);
+    const data = await response.json();
+    
+    if (data.status) {
+      onRefresh();
+    } else {
+      displayMessage(data.err_msg);
+    }
+  }
+
+  function changeGrade(change, index) {
+    const newGrades = [...gradesValue];
+    newGrades[index] = change.target.value;
+    setGradesValue(newGrades);
+  }
 
   return (
     <div className='schema-editor'>
@@ -81,8 +123,8 @@ function SchemaEditor({ steps, grades }) {
                 <div className='grade-edit'>
                   <span className='grade-range'>{step} - {toStep}%</span>
                   <div className='grade-line'></div>
-                  <Input groupName="grading-schema-grade-input" minlen={1} maxlen={3} value={gradesValue[index]} placeholder={index + 1}></Input>
-                  { (stepsValue.length > 1) ? <MinusSquare onClick={() => {handleRemoveStep(index)}}/> : <></> }
+                  <Input groupName="grading-schema-grade-input" onChange={(c) => {changeGrade(c, index)}} minlen={1} maxlen={3} value={gradesValue[index]} placeholder={index + 1}></Input>
+                  { (stepsValue.length > 1) && <MinusSquare onClick={() => {handleRemoveStep(index)}}/> }
                   
                 </div>
                 {
@@ -93,15 +135,18 @@ function SchemaEditor({ steps, grades }) {
                         <div className='insert-between-line'></div>
                       </div>
                     </div>
-                  ) : <></>
+                  ) : null
                 }
               </div>
             )
           })
         }
         {
-          gradesValue.length == 0 ? <PrimaryButton onClick={() => handleInsertStepBetween(0)}><Plus/>Add step</PrimaryButton> : null
+          gradesValue.length == 0 ? <SecondaryButton onClick={() => handleInsertStepBetween(0)}><Plus/>Add step</SecondaryButton> : null
         }
+      </div>
+      <div className='right-content'>
+        <PrimaryButton onClick={onSchemaUpdate}><CheckCheck/>Save</PrimaryButton>
       </div>
     </div>
   )
@@ -109,41 +154,172 @@ function SchemaEditor({ steps, grades }) {
 }
 
 export function GradingSchemasManager() {
-  // TODO load schemas using api by localstorage.uuid
-  const schemas = [
-    {
-      title: 'Schema 1',
-      steps: [40, 52, 70, 84, 95],
-      grades: [1, 2, 3, 4, 5, 6]
-      // steps: [],
-      // grades: [],
+  const [isRenameOpen, setIsRenameOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [schemas, setSchemas] = useState({});
+  const [currentSchema, setCurrentSchema] = useState(null);
+
+  useEffect(() => {loadSchemas()}, []);
+
+  async function loadSchemas() {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/grading-schemas/fetch", requestOptions);
+    const data = await response.json();
+    
+    if (data.status) {
+      setSchemas(data.data);
+      if (!currentSchema && Object.values(data.data).length > 0) {
+        setCurrentSchema(Object.values(data.data)[Object.values(data.data).length - 1]);
+      }
+    } else {
+      displayMessage(data.err_msg);
     }
-  ]
+  }
+
+  async function onSchemaCreate() {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/grading-schemas/create", requestOptions);
+    const data = await response.json();
+    
+    if (data.status) {
+      await loadSchemas();
+      setCurrentSchema(data.data)
+    } else {
+      displayMessage(data.err_msg);
+    }
+  }
+
+  async function onSchemaRemove() {
+    if (!currentSchema) return;
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        schema_id: currentSchema.schema_id
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/grading-schemas/remove", requestOptions);
+    const data = await response.json();
+    
+    if (data.status) {
+      await loadSchemas();
+      setCurrentSchema(null);
+    } else {
+      displayMessage(data.err_msg);
+    }
+  }
+
+  async function onSchemaRename() {
+    if (!currentSchema) return;
+    const newTitle = document.getElementById("new-schema-title");
+    if (!newTitle.value || !newTitle.validity.valid) { return; };
+    
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uuid: String(localStorage.getItem("uuid")),
+        schema_id: currentSchema.schema_id,
+        new_title: newTitle.value
+      }),
+    };
+
+    const response = await fetch(import.meta.env.VITE_API_URL + "/grading-schemas/rename", requestOptions);
+    const data = await response.json();
+    
+    if (data.status) {
+      await loadSchemas();
+    } else {
+      displayMessage(data.err_msg);
+    }
+  }
 
   return (
     <div className='schemas-editor-content'>
       <div className='schemas-editor-header'>
-        
         <div className='row'>
-          <select className='text-select-dropdown'>
-            <option>Schema 1</option>
-            <option>Schema 2</option>
-            <option>Schema 3</option>
+          <select
+            className="text-select-dropdown"
+            value={currentSchema?.schema_id ?? ""}
+            onChange={(e) => {
+              const selectedSchema = Object.values(schemas).find(
+                schema => schema.schema_id == e.target.value
+              );
+              setCurrentSchema(selectedSchema);
+            }}
+          >
+            {
+              Object.values(schemas).map(schema => (
+                <option key={schema.schema_id} value={schema.schema_id}>
+                  {schema.title}
+                </option>
+              ))
+            }
           </select>
-          <PrimaryButton small><Plus/>Create</PrimaryButton>
+          <PrimaryButton small onClick={onSchemaCreate}><Plus/>Create</PrimaryButton>
         </div>
 
-
-        <div className='row'>
-          <TertiaryButton small><PenLine/>Rename</TertiaryButton>
-          <DangerButton small><Trash2/>Delete</DangerButton>
-        </div>
       </div>
-      <div className='hzSepMid'></div>
-      <SchemaEditor grades={schemas[0].grades} steps={schemas[0].steps}></SchemaEditor>
-      <div className='right-content'>
-        <PrimaryButton><CheckCheck/>Save</PrimaryButton>
+      <div className='hzSep'></div>
+      <div className='row right-content'>
+        {
+          currentSchema && (
+            <>
+              <TertiaryButton small onClick={() => {setIsRenameOpen(true)}}><PenLine/>Rename</TertiaryButton>
+              {
+                isRenameOpen && (
+                  <Modal title="Rename schema" close={setIsRenameOpen}>
+                    <InputGroup>
+                      <InputLabel>New schema title</InputLabel>
+                      <Input type="text" id="new-schema-title" placeholder={currentSchema.title} minlen={3}></Input>
+                    </InputGroup>
+                    <PrimaryButton wide onClick={() => {onSchemaRename(); setIsRenameOpen(false)}}><Edit3/>Rename</PrimaryButton>
+                  </Modal>
+                )
+              }
+    
+              <DangerButton small onClick={() => {setIsDeleteOpen(true)}}><Trash2/>Delete</DangerButton>
+              {
+                isDeleteOpen && (
+                  <Modal title="Remove schema?" close={setIsDeleteOpen}>
+                    <p className='info-text'>Schema <b>{currentSchema.title}</b> will be irreversibly deleted. <br></br>Forms with this schema will remain.</p>
+                    <div className='row wide'>
+                      <TertiaryButton wide onClick={() => {setIsDeleteOpen(false)}}>Cancel</TertiaryButton>
+                      <DangerButton wide onClick={() => {onSchemaRemove(); setIsDeleteOpen(false)}}>Delete</DangerButton>
+                    </div>
+                  </Modal>
+                )
+              }
+            </>
+          )
+        }
       </div>
+      {
+        currentSchema? (
+          <div key={currentSchema.schema_id}>
+            <SchemaEditor schema={currentSchema} onRefresh={loadSchemas}></SchemaEditor>
+          </div>
+        ) : (
+          <p className='info-text'>Select schema to modify it or create new. Use grading schemas to automatically assign grades.</p>
+        )
+      }
     </div>
   )
 

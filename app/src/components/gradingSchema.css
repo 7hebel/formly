@@ -61,7 +61,7 @@ input[group="grading-schema-grade-input"] {
 
 .schema-title {
     font-family: var(--ui-font);
-    font-size: 20px;
+    font-size: 16px;
     color: var(--color-text);
     font-weight: 600;
 }

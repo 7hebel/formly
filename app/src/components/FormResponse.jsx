@@ -62,7 +62,7 @@ export function FormResponse({formId, responseData, formComponents, onRemoved, w
       displayMessage("Removed response.");
       if (onRemoved) onRemoved(null);
     } 
-    else { displayMessage(data.data); }
+    else { displayMessage(data.err_msg); }
   }
 
   async function gradeResponse(responseId) {

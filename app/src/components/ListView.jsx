@@ -18,7 +18,6 @@ function displayMessage(content) {
     });
 }
 
-
 export default function ListView({ refreshPanel, listNameSetter, listData=null }) {
   if (!listData) return <p className='info-text text-center'>Select a list to view details.</p>
 
