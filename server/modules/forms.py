@@ -5,10 +5,9 @@ from modules import logs
 
 from dataclasses import dataclass, asdict
 from datetime import datetime
-import json
+import threading
 import time
 import uuid
-import os
 
 
 """
@@ -234,7 +233,10 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
 
         percentage_grade = form_data["answers"][user_email]["grade"]
         if form_settings["grading_schema"] and form_settings["grading_schema"] != "%":
-            schema_grade = get_grade_from_schema(form_settings["grading_schema"], form_data["author_uuid"], int(percentage_grade.removesuffix("%")))
+            if percentage_grade.removesuffix("%").isnumeric():
+                percentage_grade = int(percentage_grade.removesuffix("%"))
+                
+            schema_grade = get_grade_from_schema(form_settings["grading_schema"], form_data["author_uuid"], percentage_grade)
             characteristics.append({"type": "grade", "content": f"Grade: [{schema_grade}]  ({percentage_grade})"})
         else:
             characteristics.append({"type": "grade", "content": f"Grade: [{percentage_grade}]"})
@@ -292,9 +294,15 @@ def create_responder_entry(form_id: str, email: str, fullname: str, host: str) -
     return (True, response_id)    
     
     
-def auto_grade_answers(form_id: str, answers: dict[str, str]) -> dict:
+def auto_grade_answers(form_id: str, email: str) -> None:
     form_data = FormsDB.fetch(form_id)
     structure = form_data["structure"]
+    answers = form_data["answers"].get(email)
+    if answers is None:
+        return logs.error("Forms", f"Failed to auto-grade form: `{form_id}` for: {email} (response not found,)")
+
+    answers = answers.get("answers")
+    logs.info("Forms", f"Starting auto-grading response for form: `{form_id}` for: {email}")
 
     def get_component_data(component_id: str) -> dict | None:
         for component in structure:
@@ -347,7 +355,10 @@ def auto_grade_answers(form_id: str, answers: dict[str, str]) -> dict:
                     points = 0
                 answers[component_id]["grade"] = points
          
-    return answers       
+    form_data["answers"][email]["answers"] = answers
+    form_data["answers"][email]["grade"] = get_full_grade(form_id, answers)
+    FormsDB.save(form_id, form_data)
+    logs.info("Forms", f"Finished auto-grading form: `{form_id}` for: {email}")
          
 
 def get_full_grade(form_id: str, answers: dict) -> str | int:
@@ -392,12 +403,14 @@ def handle_response(form_id: str, response_id: str, answers: dict) -> bool | str
         "fullname": response_data["fullname"],
         "started_at": response_data["started_at"],
         "finished_at": int(time.time()),
-        "answers": auto_grade_answers(form_id, answers),
+        "answers": answers,
         "response_id": response_id,
         "grade": get_full_grade(form_id, answers)
     }
     
     FormsDB.save(form_id, form_data)
+    threading.Thread(target=auto_grade_answers, args=(form_id, email), daemon=True).start()
+    
     logs.info("Forms", f"Saved response: {response_id} at form: ({form_id}) for respondent: {email} - {response_data['fullname']}")
     return True
 

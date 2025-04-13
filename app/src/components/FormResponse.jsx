@@ -38,6 +38,8 @@ function getTimeDifference(startTimestmap, endTimestamp) {
 
 
 export function FormResponse({formId, responseData, formComponents, onRemoved, withGradePanel}) {   
+  console.log(responseData)
+  
   function getComponentById(componentId) {
     for (let componentData of formComponents) {
       if (componentData.componentId == componentId) return componentData
