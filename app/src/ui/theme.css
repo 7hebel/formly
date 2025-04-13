@@ -80,13 +80,37 @@ body {
 .butteruptoast {
     background-color: var(--color-panel) !important;
     border: 1px solid var(--color-border) !important;
+    width: auto !important;
+    padding: 12px !important;
+    align-items: center;
+    max-width: 400px;
+}
+
+.butteruptoast.warn {
+    background-color: #FFF2E5 !important;
 }
 
 .notif .desc .message {
-    font-weight: 500 !important;
+    font-weight: 400 !important;
     color: var(--color-text) !important;
     font-size: 14px !important;
+    font-family: var(--form-font) !important;
 }
+
+.butteruptoast .icon svg {
+    fill: transparent !important;
+    color: var(--color-text);
+    opacity: .5;
+    margin-right: 2px;
+    width: 18px !important;
+    height: 18px !important;
+    vertical-align: middle;
+}
+
+.butteruptoast.warn .icon svg {
+    color: #a76b0e !important;
+}
+
 
 /* Scroll bar */
 

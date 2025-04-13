@@ -10,20 +10,11 @@ import { Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, Loc
 import { useEffect, useRef, useState } from 'react';
 import { getComponentBuilder } from "../formComponents/AllComponents.jsx"
 import { FormResponse } from "../components/FormResponse.jsx";
-import butterup from 'butteruptoasts';
-import 'butteruptoasts/src/butterup.css';
-import './styles/builder.css'
 import { isEqual } from 'lodash';
 import { AnimatePresence, motion } from 'framer-motion';
+import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
+import '../pages/styles/builder.css'
 
-
-function displayMessage(content) {
-  butterup.toast({
-    message: content,
-    location: 'bottom-center',
-    dismissable: true,
-  });
-}
 
 export default function FormBuilder() {
   const navigate = useNavigate();
@@ -88,7 +79,7 @@ export default function FormBuilder() {
       }
 
     } catch (error) {
-      displayMessage("Failed to load form.");
+      displayWarnMessage("Failed to load form.");
       navigate("/dash");
       
     } finally {
@@ -178,7 +169,7 @@ export default function FormBuilder() {
 
     const response = await fetch(import.meta.env.VITE_API_URL + "/forms/update-form", requestOptions);
     const data = await response.json();
-    if (!data.status) { displayMessage("Failed to save, " + data.err_msg); }
+    if (!data.status) { displayWarnMessage("Failed to save, " + data.err_msg); }
   }
 
   useEffect(() => {
@@ -228,9 +219,10 @@ export default function FormBuilder() {
     const data = await response.json();
     if (data.status) { 
       setFormSettings({...formSettings, is_active: true});
-      displayMessage("Form is now active.");
+      console.log("ACTIVE")
+      displayInfoMessage("Form is now active.");
     }
-    else { displayMessage("Failed to start, " + data.err_msg); }
+    else { displayWarnMessage("Failed to start, " + data.err_msg); }
   }
 
   async function endForm() {
@@ -247,9 +239,9 @@ export default function FormBuilder() {
     const data = await response.json();
     if (data.status) { 
       setFormSettings({...formSettings, is_active: false});
-      displayMessage("Form is now: not active.");
+      displayInfoMessage("Form is now: not active.");
     }
-    else { displayMessage("Failed to end, " + data.err_msg); }
+    else { displayWarnMessage("Failed to end, " + data.err_msg); }
   }
 
   function switchResponseDetailsTarget(email) {
@@ -287,7 +279,7 @@ export default function FormBuilder() {
   
     await fetch(import.meta.env.VITE_API_URL + "/forms/remove-form", requestOptions);
     navigate("/dash");
-    displayMessage(`Deleted ${formSettings.title}`);
+    displayInfoMessage(`Deleted ${formSettings.title}`);
 
   }
 
@@ -492,7 +484,7 @@ export default function FormBuilder() {
                         <Link/>URL
                       </span>
                       <span className='link-content'>{window.location.host}/form/{formId}</span>
-                      <span className='link-copy row' onClick={() => {navigator.clipboard.writeText(window.location.host + "/form/" + formId); displayMessage("Copied!")}}>
+                      <span className='link-copy row' onClick={() => {navigator.clipboard.writeText(window.location.host + "/form/" + formId); displayInfoMessage("Copied!")}}>
                         <Copy/>Copy
                       </span>
                     </div>

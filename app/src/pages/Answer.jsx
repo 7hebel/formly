@@ -5,17 +5,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList,CheckCircle, LayoutDashboard, AlarmClock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx"
-import butterup from 'butteruptoasts';
-import 'butteruptoasts/src/butterup.css';
 import './styles/answer.css'
+import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
 
-function displayMessage(content) {
-    butterup.toast({
-      message: content,
-      location: 'bottom-center',
-      dismissable: true,
-    });
-}
 
 const characteristicsIcons = {
   author: User,
@@ -123,7 +115,7 @@ export default function Answer() {
     const data = await response.json();
 
     if (!data.status) {
-      displayMessage(data.err_msg);
+      displayWarnMessage(data.err_msg);
     } else {
       setResponseID(data.data.response_id);
       setFormStructure(data.data.structure);
@@ -134,7 +126,7 @@ export default function Answer() {
           setMinutesLeft(newMinutesLeft);
           if (newMinutesLeft <= 0) {
             finishForm(data.data.response_id, true);
-            displayMessage("Time is up!");
+            displayInfoMessage("Time is up!");
             clearInterval(timerInterval);
           }
 
@@ -155,7 +147,7 @@ export default function Answer() {
       
       if (!force) {
         if (answer === null || !answer) {
-          displayMessage(`Answer question ${questionNum}.`);
+          displayInfoMessage(`Answer question ${questionNum}.`);
           return null;
         }
       }
@@ -187,7 +179,7 @@ export default function Answer() {
       setIsResponded(true);
       clearInterval(timerInterval);
     } else {
-      displayMessage(data.err_msg);
+      displayWarnMessage(data.err_msg);
     }
 
   }

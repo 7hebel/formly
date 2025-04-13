@@ -2,17 +2,8 @@ import { DangerButton, PrimaryButton } from '../ui/Button.jsx';
 import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx";
 import { ResponseGradePanel } from "../formComponents/FormComponentBase.jsx";
 import { Medal, Trash2 } from 'lucide-react';
-import butterup from 'butteruptoasts';
-import '../pages/styles/builder.css'
+import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
 
-
-function displayMessage(content) {
-  butterup.toast({
-    message: content,
-    location: 'bottom-center',
-    dismissable: true,
-  });
-}
 
 function formatTime(timestamp) {
   const date = new Date(timestamp * 1000);
@@ -38,8 +29,6 @@ function getTimeDifference(startTimestmap, endTimestamp) {
 
 
 export function FormResponse({formId, responseData, formComponents, onRemoved, withGradePanel}) {   
-  console.log(responseData)
-  
   function getComponentById(componentId) {
     for (let componentData of formComponents) {
       if (componentData.componentId == componentId) return componentData
@@ -61,10 +50,10 @@ export function FormResponse({formId, responseData, formComponents, onRemoved, w
     const data = await response.json();
     
     if (data.status) {
-      displayMessage("Removed response.");
+      displayInfoMessage("Removed response.");
       if (onRemoved) onRemoved(null);
     } 
-    else { displayMessage(data.err_msg); }
+    else { displayWarnMessage(data.err_msg); }
   }
 
   async function gradeResponse(responseId) {
@@ -92,10 +81,10 @@ export function FormResponse({formId, responseData, formComponents, onRemoved, w
     const data = await response.json();
     
     if (data.status) {
-      displayMessage(`Graded response: ${data.data}`);
+      displayInfoMessage(`Graded response: ${data.data}`);
       document.getElementById("resp-grade-" + responseId).textContent = data.data;
     } 
-    else { displayMessage(data.data); }
+    else { displayWarnMessage(data.data); }
   }
 
   return (

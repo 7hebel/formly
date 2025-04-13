@@ -9,18 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle, Mail, Check, X, CodeSquare } from 'lucide-react';
 import { ErrorLabel } from "../ui/ErrorLabel.jsx"
 import { useEffect, useRef, useState } from 'react';
-import butterup from 'butteruptoasts';
-import 'butteruptoasts/src/butterup.css';
 import './styles/dashboard.css'
-
-
-function displayMessage(content) {
-    butterup.toast({
-      message: content,
-      location: 'bottom-center',
-      dismissable: true,
-    });
-}
+import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
 
 
 function MyListsPanel({ lists, selectedList, onSwitchList }) {
@@ -76,13 +66,13 @@ export default function Dashboard() {
     .then(response => {
       sessionStorage.clear();
       localStorage.clear();
-      displayMessage("Logged out.");
+      displayInfoMessage("Logged out.");
       navigate("/");
     })
     .catch(err => {
       sessionStorage.clear();
       localStorage.clear();
-      displayMessage("Logged out.");
+      displayInfoMessage("Logged out.");
       navigate("/");
     });
   }
@@ -116,14 +106,14 @@ export default function Dashboard() {
         localStorage.setItem("fullname", newName.value);
         newName.value = "";
         navigate("/dash");
-        displayMessage("Full name updated.");
+        displayInfoMessage("Full name updated.");
       } else {
         errorLabel.textContent = response.err_msg;
         errorLabel.setAttribute("iserror", "1");
       }
     })
     .catch(err => {      
-      displayMessage("Failed to update full name.")
+      displayWarnMessage("Failed to update full name.")
       errorLabel.textContent = "Failed to update fullname.";
       errorLabel.setAttribute("iserror", "1");
     });
@@ -159,14 +149,14 @@ export default function Dashboard() {
         errorLabel.setAttribute("iserror", "0");
         newPassword.value = "";
         currentPassword.value = "";
-        displayMessage("Password updated.");
+        displayInfoMessage("Password updated.");
       } else {
         errorLabel.textContent = response.err_msg;
         errorLabel.setAttribute("iserror", "1");
       }
     })
     .catch(err => {      
-      displayMessage("Failed to update password.");
+      displayWarnMessage("Failed to update password.");
       errorLabel.textContent = "Failed to update password.";
       errorLabel.setAttribute("iserror", "1");
     });
@@ -195,7 +185,7 @@ export default function Dashboard() {
     .then(response => response.json())
     .then(response => {
       if (response.status) {
-        displayMessage(`Created list ${name.value}`);
+        displayInfoMessage(`Created list ${name.value}`);
         setIsAddListOpen(false);
         fetchLists();
       }
@@ -218,7 +208,7 @@ export default function Dashboard() {
         const formId = response.data;
         navigate("/builder/" + formId);
       } else {
-        displayMessage(response.err_msg);
+        displayWarnMessage(response.err_msg);
       }
     })
   }

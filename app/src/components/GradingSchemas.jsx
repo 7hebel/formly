@@ -5,18 +5,9 @@ import { Plus, MinusSquare, Trash2, PenLine, Save, CheckCheck, Edit3 } from 'luc
 import { PrimaryButton, SecondaryButton, TertiaryButton, DangerButton } from '../ui/Button.jsx' 
 import { InputGroup, Input, InputLabel } from '../ui/Input'
 import { Modal } from '../ui/Modal.jsx'
-import butterup from 'butteruptoasts';
-import 'butteruptoasts/src/butterup.css';
 import { useEffect } from 'react'
+import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
 
-
-function displayMessage(content) {
-    butterup.toast({
-      message: content,
-      location: 'bottom-center',
-      dismissable: true,
-    });
-}
 
 function SchemaEditor({ schema, onRefresh }) {
   const [stepsValue, setStepsValue] = useState([0, ...schema.steps]);
@@ -74,9 +65,9 @@ function SchemaEditor({ schema, onRefresh }) {
     
     if (data.status) {
       onRefresh();
-      displayMessage("Schema saved");
+      displayInfoMessage("Schema saved");
     } else {
-      displayMessage(data.err_msg);
+      displayWarnMessage(data.err_msg);
     }
   }
 
@@ -179,7 +170,7 @@ export function GradingSchemasManager() {
         setCurrentSchema(Object.values(data.data)[Object.values(data.data).length - 1]);
       }
     } else {
-      displayMessage(data.err_msg);
+      displayWarnMessage(data.err_msg);
     }
   }
 
@@ -199,7 +190,7 @@ export function GradingSchemasManager() {
       await loadSchemas();
       setCurrentSchema(data.data)
     } else {
-      displayMessage(data.err_msg);
+      displayWarnMessage(data.err_msg);
     }
   }
 
@@ -222,7 +213,7 @@ export function GradingSchemasManager() {
       await loadSchemas();
       setCurrentSchema(null);
     } else {
-      displayMessage(data.err_msg);
+      displayWarnMessage(data.err_msg);
     }
   }
 
@@ -247,7 +238,7 @@ export function GradingSchemasManager() {
     if (data.status) {
       await loadSchemas();
     } else {
-      displayMessage(data.err_msg);
+      displayWarnMessage(data.err_msg);
     }
   }
 

@@ -278,7 +278,6 @@ input[type=number] {
 
 .select-container {
     width: min-content;
-    margin-block: 12px;
     display: flex;
     flex-direction: column;
     gap: 8px;

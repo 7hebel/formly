@@ -6,17 +6,8 @@ import { useState, useEffect } from 'react';
 import FormBrief from './FormBrief.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import '../pages/styles/dashboard.css'
-import butterup from 'butteruptoasts';
-import 'butteruptoasts/src/butterup.css';
+import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
 
-
-function displayMessage(content) {
-    butterup.toast({
-      message: content,
-      location: 'bottom-center',
-      dismissable: true,
-    });
-}
 
 export default function ListView({ refreshPanel, listNameSetter, listData=null }) {
   if (!listData) return <p className='info-text text-center'>Select a list to view details.</p>
@@ -60,7 +51,7 @@ export default function ListView({ refreshPanel, listNameSetter, listData=null }
     };
 
     await fetch(import.meta.env.VITE_API_URL + "/lists/remove", requestOptions);
-    displayMessage(`Removed ${listData.name}`);
+    displayInfoMessage(`Removed ${listData.name}`);
     refreshPanel();
   }
 
@@ -109,7 +100,7 @@ export default function ListView({ refreshPanel, listNameSetter, listData=null }
     const response = await fetch(import.meta.env.VITE_API_URL + "/lists/insert-email", requestOptions);
     const data = await response.json();
     if (data.status) {
-      displayMessage(`Added ${email.value}`);
+      displayInfoMessage(`Added ${email.value}`);
       setListEmails([...listEmails, email.value.toLowerCase()]);
       email.value = "";
     } else {

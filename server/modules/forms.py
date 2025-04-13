@@ -237,7 +237,7 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
                 percentage_grade = int(percentage_grade.removesuffix("%"))
                 
             schema_grade = get_grade_from_schema(form_settings["grading_schema"], form_data["author_uuid"], percentage_grade)
-            characteristics.append({"type": "grade", "content": f"Grade: [{schema_grade}]  ({percentage_grade})"})
+            characteristics.append({"type": "grade", "content": f"Grade: [{schema_grade}]  ({percentage_grade}%)"})
         else:
             characteristics.append({"type": "grade", "content": f"Grade: [{percentage_grade}]"})
             

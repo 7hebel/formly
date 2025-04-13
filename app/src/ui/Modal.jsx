@@ -11,7 +11,6 @@ export function Modal({ title, close, children }) {
   const containerRef = useRef(null);
   const closeRef = useRef(null);
   const modalRef = useRef(null);
-  modalsCount += 1;
 
   function onClose() {
     if (modalRef && modalRef.current) {
@@ -23,6 +22,8 @@ export function Modal({ title, close, children }) {
   }
 
   useEffect(() => {
+    modalsCount += 1;
+    
     if (containerRef && containerRef.current) {
       containerRef.current.addEventListener("click", (event) => { 
         if (event.target.id === 'modal-container') onClose()
