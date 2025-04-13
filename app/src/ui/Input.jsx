@@ -12,7 +12,8 @@ export function InputLabel({ children }) {
 }
 
 export function Input({ id, type="text", placeholder, value, pattern, minlen, maxlen, onChange, onBlur, ref, min, max, locked, groupName }) {
-  if (pattern==null && type=="number") pattern = "^\d*\.?\d*$"
+  if (pattern==null && type=="number") pattern = "^\d*\.?\d*$";
+  if (pattern == null && type == "email") pattern = "^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$";
 
   return (
     <input 

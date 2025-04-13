@@ -3,8 +3,7 @@ import { X } from 'lucide-react';
 import ReactDOM from 'react-dom';
 import './modal.css';
 
-let modalsCount = 0;
-
+let openModals = [];
 
 export function Modal({ title, close, children }) {
   const modalRoot = document.getElementById('modal-root');
@@ -16,14 +15,16 @@ export function Modal({ title, close, children }) {
     if (modalRef && modalRef.current) {
       modalRef.current.classList.add('modal-transition');
       setTimeout(close, 250);
-      modalsCount -= 1;
+      openModals.splice(openModals.indexOf(title), 1);
       return () => clearTimeout(timer);
     }
   }
 
+  if (!openModals.includes(title)) {
+    openModals.push(title);
+  }
+
   useEffect(() => {
-    modalsCount += 1;
-    
     if (containerRef && containerRef.current) {
       containerRef.current.addEventListener("click", (event) => { 
         if (event.target.id === 'modal-container') onClose()
@@ -51,7 +52,7 @@ export function Modal({ title, close, children }) {
 
   return ReactDOM.createPortal((
     <div id='modal-container' ref={containerRef}>
-      <div className="modal" ref={modalRef} style={{marginTop: (10 * modalsCount) + 'px'}}>
+      <div className="modal" ref={modalRef} style={{marginTop: (10 * openModals.length) + 'px'}}>
         <div className='modal-header'>
           <h1>{title}</h1>
           <X ref={closeRef}/>
