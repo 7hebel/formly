@@ -10,10 +10,12 @@ from modules import lists
 from modules import forms
 from modules import users
 from modules import logs
+from modules import cdn
 
+from fastapi import Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi import Request
+from fastapi.staticfiles import StaticFiles
 from functools import wraps
 import fastapi
 import uvicorn
@@ -408,6 +410,27 @@ async def post_form_answer(data: schemas.FormResponse, request: Request) -> JSON
         return api_response(False, err_msg=status)
 
     return api_response(True)
+
+
+
+
+# Content delivery.
+
+api.mount("/api/cdn/fetch", StaticFiles(directory="./data/cdn/"), name="forms-cdn")
+
+@api.post("/api/cdn/upload")
+@protected_endpoint
+async def post_upload_cdn_file(uuid: str = Form(...), file: UploadFile = File(...), request: Request = None) -> JSONResponse:
+    file_content = await file.read()
+    if len(file_content) > cdn.MAX_FILE_SIZE:
+        return api_response(False, err_msg="Maximum upload size is 10mb.")
+    
+    file.file.seek(0)
+    (status, content) = cdn.upload_object(file_content)
+    if not status:
+        return api_response(False, err_msg=content)
+    
+    return api_response(True, content)
 
 
 uvicorn.run(api, host="0.0.0.0", port=50500)

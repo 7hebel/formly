@@ -1,5 +1,6 @@
 import { Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input';
+import { isComponentRespondable } from './AllComponents';
 import "./formComponents.css";
 
 export function FormComponentBase({ questionNo, formComponents, setFormComponents, userAnswer, children, ...props }) {
@@ -10,9 +11,16 @@ export function FormComponentBase({ questionNo, formComponents, setFormComponent
   const pointsInfo = (props.points > 0) ? `${props.points} p.` : '';
 
   return (
-    <div className="form-component" _componentid={props.componentId} _componentdata={componentData} _answer={userAnswer}>
-      <h3><span>{questionNo}.</span> {props.question} <span className='points-info'>{pointsInfo}</span></h3>
-      <div className='hzSepMid'></div>
+    <div className={"form-component" + (!isComponentRespondable(props.componentType)? ' component-not-respondable' : "")} _componentid={props.componentId} _componenttype={props.componentType} _componentdata={componentData} _answer={userAnswer}>
+      {
+        questionNo? (
+          <>
+            <h3><span>{questionNo }.</span> {props.question} <span className='points-info'>{pointsInfo}</span></h3>
+            <div className='hzSepMid'></div>
+          </>
+        ) : null
+      }
+    
       {children}
     </div>
   )
@@ -32,7 +40,8 @@ export function ResponseGradePanel({ componentId, currentGrade }) {
   )
 }
 
-export function FormBuilderOptions({ componentId, formComponents, setFormComponents, onQuestionChange, question, onPointsChange, points, noPointsInput }) {
+export function FormBuilderOptions({ componentId, formComponents, setFormComponents, onQuestionChange, question, onPointsChange, points, noPointsInput, noQuestionInput }) {
+  
   function handleDeleteFormComponent() {
     const newComponents = formComponents.filter(c => c.componentId != componentId);
     setFormComponents(newComponents);
@@ -74,10 +83,14 @@ export function FormBuilderOptions({ componentId, formComponents, setFormCompone
         </div>
       </div>
       <div className='hzSepMid'></div>
-      <InputGroup>
-        <InputLabel>Question</InputLabel>
-        <LongInput onChange={updateQuestion} defaultValue={question}></LongInput>
-      </InputGroup>
+      {
+        !noQuestionInput? (
+          <InputGroup>
+            <InputLabel>Question</InputLabel>
+            <LongInput onChange={updateQuestion} defaultValue={question}></LongInput>
+          </InputGroup>
+        ) : null
+      }
       {
         !noPointsInput? (<>
           <div className='hzSep'></div>
@@ -86,7 +99,7 @@ export function FormBuilderOptions({ componentId, formComponents, setFormCompone
             <Input type='number' min={0} value={points} onChange={updatePoints}></Input>
           </InputGroup>
         </>
-        ) : <></>
+        ) : null
       }
     </>
   )

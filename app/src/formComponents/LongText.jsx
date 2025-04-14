@@ -6,7 +6,7 @@ import './formComponents.css';
 
 export function LongTextAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
-  const [points, setPoints] = useState(props.points ?? 1);
+  const [points, setPoints] = useState(props.points);
 
   function changeQuestion(value) {
     setQuestion(value);

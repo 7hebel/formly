@@ -6,9 +6,9 @@ import { MultiSelect } from '../ui/Select.jsx';
 import { Switch } from '../ui/Swtich.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2, LayoutDashboard, Trophy, ChartPie, ChartNoAxesCombinedIcon } from 'lucide-react';
+import { Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2, LayoutDashboard, Trophy, ChartPie, ChartNoAxesCombinedIcon, Pilcrow, ImageIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { getComponentBuilder } from "../formComponents/AllComponents.jsx"
+import { getComponentBuilder, calcQuestionNoFor } from "../formComponents/AllComponents.jsx"
 import { FormResponse } from "../components/FormResponse.jsx";
 import { isEqual } from 'lodash';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -185,7 +185,7 @@ export default function FormBuilder() {
   
 
   function addFormComponent(componentType) {
-    setFormComponents([...formComponents, {"componentType": componentType, "componentId": crypto.randomUUID(), "points": 1}]);
+    setFormComponents([...formComponents, {"componentType": componentType, "componentId": crypto.randomUUID()}]);
   }
 
   function onListAssignChange(event) {
@@ -578,7 +578,7 @@ export default function FormBuilder() {
                         className='form-component-builder-group'>
                         <DynamicComponentBuilder 
                           key={componentData.componentId} 
-                          questionNo={qIndex + 1} 
+                          questionNo={calcQuestionNoFor(qIndex, formComponents)} 
                           formComponents={formComponents}
                           setFormComponents={setFormComponents}
                           locked
@@ -590,23 +590,33 @@ export default function FormBuilder() {
                 })
               }
               <div className='builder-new-blocks'>
-                <div className='add-component-btn' onClick={() => {addFormComponent("short-text-answer")}}>
-                  <TextCursorInput/>Short text answer
+                <div className='blocks-category'>
+                  <div className='add-component-btn' onClick={() => {addFormComponent("short-text-answer")}}>
+                    <TextCursorInput/>Short text answer
+                  </div>
+                  <div className='add-component-btn' onClick={() => {addFormComponent("long-text-answer")}}>
+                    <Text/>Long text answer
+                  </div>
+                  <div className='add-component-btn' onClick={() => {addFormComponent("numeric-answer")}}>
+                    <Binary/>Numeric answer
+                  </div>
+                  <div className='add-component-btn' onClick={() => {addFormComponent("truefalse-answer")}}>
+                    <ToggleRight/>True / False
+                  </div>
+                  <div className='add-component-btn' onClick={() => {addFormComponent("single-select-answer")}}>
+                    <CircleCheck/>Select single option
+                  </div>
+                  <div className='add-component-btn' onClick={() => {addFormComponent("multi-select-answer")}}>
+                    <SquareCheck/>Select multiple options
+                  </div>
                 </div>
-                <div className='add-component-btn' onClick={() => {addFormComponent("long-text-answer")}}>
-                  <Text/>Long text answer
-                </div>
-                <div className='add-component-btn' onClick={() => {addFormComponent("numeric-answer")}}>
-                  <Binary/>Numeric answer
-                </div>
-                <div className='add-component-btn' onClick={() => {addFormComponent("truefalse-answer")}}>
-                  <ToggleRight/>True / False
-                </div>
-                <div className='add-component-btn' onClick={() => {addFormComponent("single-select-answer")}}>
-                  <CircleCheck/>Select single option
-                </div>
-                <div className='add-component-btn' onClick={() => {addFormComponent("multi-select-answer")}}>
-                  <SquareCheck/>Select multiple options
+                <div className='blocks-category'>
+                  <div className='add-component-btn' onClick={() => {addFormComponent("paragraph")}}>
+                    <Pilcrow/>Paragraph
+                  </div>
+                  <div className='add-component-btn' onClick={() => {addFormComponent("image")}}>
+                    <ImageIcon/>Image
+                  </div>
                 </div>
               </div>
             </div>

@@ -4,7 +4,7 @@ import { InputGroup, InputLabel, Input } from '../ui/Input.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList,CheckCircle, LayoutDashboard, AlarmClock } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx"
+import { getAnswerComponentBuilder, calcQuestionNoFor, isComponentRespondable } from "../formComponents/AllComponents.jsx"
 import './styles/answer.css'
 import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
 
@@ -144,16 +144,19 @@ export default function Answer() {
     for (const component of document.getElementsByClassName("form-component")) {
       const id = component.getAttribute("_componentid");
       const answer = component.getAttribute("_answer");
-      
-      if (!force) {
+      const componentType = component.getAttribute("_componenttype");
+
+      if (!force && isComponentRespondable(componentType)) {
         if (answer === null || !answer) {
           displayInfoMessage(`Answer question ${questionNum}.`);
           return null;
         }
       }
 
-      respondentAnswers[id] = answer;
-      questionNum++;
+      if (isComponentRespondable(componentType)) {
+        respondentAnswers[id] = answer;
+        questionNum++;
+      }
     }
 
     return respondentAnswers;
@@ -262,7 +265,7 @@ export default function Answer() {
                 return (
                   <DynamicComponentBuilder 
                     key={componentData.componentId} 
-                    questionNo={qIndex + 1} 
+                    questionNo={calcQuestionNoFor(qIndex, formStructure)} 
                     formComponents={formStructure}
                     setFormComponents={setFormStructure}
                     {...componentData}

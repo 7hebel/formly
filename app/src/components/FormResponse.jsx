@@ -1,5 +1,5 @@
 import { DangerButton, PrimaryButton } from '../ui/Button.jsx';
-import { getAnswerComponentBuilder } from "../formComponents/AllComponents.jsx";
+import { getAnswerComponentBuilder, calcQuestionNoFor, isComponentRespondable } from "../formComponents/AllComponents.jsx";
 import { ResponseGradePanel } from "../formComponents/FormComponentBase.jsx";
 import { Medal, Trash2 } from 'lucide-react';
 import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
@@ -128,12 +128,16 @@ export function FormResponse({formId, responseData, formComponents, onRemoved, w
           Object.entries(responseData.answers).map(([componentId, {answer, grade}], qIndex) => {
             const componentData = getComponentById(componentId);
 
-            const DynamicComponentBuilder = getAnswerComponentBuilder(componentData.componentType)  ;
+            if (!componentData) return null;
+
+            if (!isComponentRespondable(componentData.componentType)) return null;
+            const DynamicComponentBuilder = getAnswerComponentBuilder(componentData.componentType);
+            
             return (
               <div className='form-answer-with-grade' key={componentId}>
                 <DynamicComponentBuilder 
                   key={componentData.componentId} 
-                  questionNo={qIndex + 1}
+                  questionNo={calcQuestionNoFor(qIndex, formComponents)}
                   userAnswer={answer}
                   locked
                   {...componentData}

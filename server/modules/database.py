@@ -1,7 +1,6 @@
 from modules import logs
 
-from typing import NamedTuple, Any
-from collections import namedtuple
+from typing import Any
 import uuid
 import json
 import os

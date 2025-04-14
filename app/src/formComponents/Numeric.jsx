@@ -8,7 +8,7 @@ export function NumericAnswerBuilder({formComponents, setFormComponents, ...prop
   const [question, setQuestion] = useState(props.question || "Question?");
   const [minRange, setMinRange] = useState(props.minrange || null);
   const [maxRange, setMaxRange] = useState(props.maxrange || null);
-  const [points, setPoints] = useState(props.points ?? 1);
+  const [points, setPoints] = useState(props.points);
   const [correct, setCorrect] = useState(props.correct || "");
   if (minRange == 0) setMinRange(null);
   if (maxRange == 0) setMaxRange(null);

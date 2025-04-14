@@ -152,4 +152,8 @@
     vertical-align: middle;
 }
 
+.component-not-respondable {
+    background-color: var(--color-panel) !important;
+}
+
 

@@ -156,3 +156,19 @@
     opacity: .85;
 }
 
+
+.paragraph-block {
+    font-family: var(--ui-font);
+    font-weight: 400;
+    color: var(--color-text);
+    font-size: 14px;
+    word-wrap: break-word;
+    white-space-collapse: preserve-breaks;
+}
+
+.image-block {
+    border-radius: 4px;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--subtle-shadow);
+
+}

@@ -90,12 +90,19 @@
 
 .builder-new-blocks {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 24px;
     margin-top: 40px;
+}
+
+.blocks-category {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .add-component-btn {

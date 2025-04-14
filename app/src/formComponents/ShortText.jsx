@@ -7,7 +7,7 @@ import './formComponents.css';
 
 export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
-  const [points, setPoints] = useState(props.points ?? 1);
+  const [points, setPoints] = useState(props.points);
   const [correct, setCorrect] = useState(props.correct ?? '');
 
   function changeQuestion(value) {
