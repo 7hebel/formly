@@ -29,6 +29,7 @@ export function ParagraphBlockBuilder({formComponents, setFormComponents, ...pro
           setFormComponents={setFormComponents}
           noPointsInput={true}
           noQuestionInput={true}
+          noOptionalInput={true}
         ></FormBuilderOptions>
         <div className='hzSep'></div>
           <InputGroup>

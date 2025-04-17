@@ -11,6 +11,7 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
   const [question, setQuestion] = useState(props.question || "Question?");
   const [options, setOptions] = useState(props.options || [{id: crypto.randomUUID(), value: "Option 1"}]);
   const [correct, setCorrect] = useState(props.correct || []);
+  const [isOptional, setIsOptional] = useState(props.optional || false);
   props.points = correct.length;
 
   function changeQuestion(value) {
@@ -47,6 +48,15 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
     document.getElementById(value).setAttribute("checked", "1");
   }
 
+  function changeIsOptional(value) {
+    setIsOptional(value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, optional: value } : c
+      )
+    );
+  }
+
   function onAddOption() {
     const addedOption = {id: crypto.randomUUID(), value: `Option ${options.length + 1}`};
     const newOptions = [...options, addedOption];
@@ -71,6 +81,8 @@ export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...
           onQuestionChange={changeQuestion}
           points={props.points}
           noPointsInput={true}
+          isOptional={isOptional}
+          onIsOptionalChange={changeIsOptional}
         ></FormBuilderOptions>
         <div className='hzSep'></div>
         <div className='form-builder-options-container'>

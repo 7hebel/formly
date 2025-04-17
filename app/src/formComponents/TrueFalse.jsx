@@ -8,6 +8,8 @@ import { InputGroup, InputLabel } from '../ui/Input.jsx';
 export function TrueFalseAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
   const [correct, setCorrect] = useState(props.correct || null);
+  const [isOptional, setIsOptional] = useState(props.optional || false);
+
   props.points = 1;
 
   function changeQuestion(value) {
@@ -28,6 +30,15 @@ export function TrueFalseAnswerBuilder({formComponents, setFormComponents, ...pr
     );
   }
 
+  function changeIsOptional(value) {
+    setIsOptional(value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, optional: value } : c
+      )
+    );
+  }
+
   return (
     <div className='form-component-builder-group'>
       <TrueFalseAnswer question={question} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></TrueFalseAnswer>
@@ -40,6 +51,8 @@ export function TrueFalseAnswerBuilder({formComponents, setFormComponents, ...pr
           onQuestionChange={changeQuestion}
           points={1}
           noPointsInput={true}
+          isOptional={isOptional}
+          onIsOptionalChange={changeIsOptional}
         ></FormBuilderOptions>
         <div className='hzSep'></div>
         <InputLabel>Correct answer</InputLabel>

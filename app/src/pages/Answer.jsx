@@ -145,9 +145,10 @@ export default function Answer() {
       const id = component.getAttribute("_componentid");
       const answer = component.getAttribute("_answer");
       const componentType = component.getAttribute("_componenttype");
+      const isOptional = component.getAttribute("_optional") == "1";
 
       if (!force && isComponentRespondable(componentType)) {
-        if (answer === null || !answer) {
+        if (!isOptional && (answer === null || !answer)) {
           displayInfoMessage(`Answer question ${questionNum}.`);
           return null;
         }

@@ -314,10 +314,15 @@ def auto_grade_answers(form_id: str, email: str) -> None:
     for (component_id, data) in answers.items():
         component = get_component_data(component_id)
         correct_answer = component.get("correct")
+        if component.get("points") is None:
+            answers[component_id]["grade"] = 0
+            continue
+            
         points = int(component.get("points")) or 1
         user_answer = data["answer"]
 
         if not user_answer or correct_answer is None:
+            answers[component_id]["grade"] = 0
             continue
 
         match component["componentType"]:

@@ -11,6 +11,7 @@ export function SingleSelectAnswerBuilder({formComponents, setFormComponents, ..
   const [question, setQuestion] = useState(props.question || "Question?");
   const [options, setOptions] = useState(props.options || [{id: crypto.randomUUID(), value: "Option 1"}]);
   const [correct, setCorrect] = useState(props.correct || null);
+  const [isOptional, setIsOptional] = useState(props.optional || false);
   props.points = 1;
 
   function changeQuestion(value) {
@@ -64,6 +65,15 @@ export function SingleSelectAnswerBuilder({formComponents, setFormComponents, ..
       )
     );
   }
+
+  function changeIsOptional(value) {
+    setIsOptional(value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, optional: value } : c
+      )
+    );
+  }
   
   return (
     <div className='form-component-builder-group'>
@@ -78,6 +88,8 @@ export function SingleSelectAnswerBuilder({formComponents, setFormComponents, ..
           points={1}
           onPointsChange={changePoints}
           noPointsInput={true}
+          isOptional={isOptional}
+          onIsOptionalChange={changeIsOptional}
         ></FormBuilderOptions>
         <div className='hzSep'></div>
         <div className='form-builder-options-container'>

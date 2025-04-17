@@ -10,6 +10,7 @@ export function NumericAnswerBuilder({formComponents, setFormComponents, ...prop
   const [maxRange, setMaxRange] = useState(props.maxrange || null);
   const [points, setPoints] = useState(props.points);
   const [correct, setCorrect] = useState(props.correct || "");
+  const [isOptional, setIsOptional] = useState(props.optional || false);
   if (minRange == 0) setMinRange(null);
   if (maxRange == 0) setMaxRange(null);
 
@@ -40,6 +41,15 @@ export function NumericAnswerBuilder({formComponents, setFormComponents, ...prop
     setFormComponents(prevComponents =>
       prevComponents.map(c =>
         c.componentId === props.componentId ? { ...c, correct: change.target.value } : c
+      )
+    );
+  }
+  
+  function changeIsOptional(value) {
+    setIsOptional(value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, optional: value } : c
       )
     );
   }
@@ -86,6 +96,8 @@ export function NumericAnswerBuilder({formComponents, setFormComponents, ...prop
           onQuestionChange={changeQuestion}
           points={points}
           onPointsChange={changePoints}
+          isOptional={isOptional}
+          onIsOptionalChange={changeIsOptional}
         ></FormBuilderOptions>
         <div className='hzSep'></div>
         <InputGroup>

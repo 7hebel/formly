@@ -7,6 +7,7 @@ import './formComponents.css';
 export function LongTextAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question || "Question?");
   const [points, setPoints] = useState(props.points);
+  const [isOptional, setIsOptional] = useState(props.optional || false);
 
   function changeQuestion(value) {
     setQuestion(value);
@@ -24,6 +25,14 @@ export function LongTextAnswerBuilder({formComponents, setFormComponents, ...pro
       )
     );
   }
+  function changeIsOptional(value) {
+    setIsOptional(value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, optional: value } : c
+      )
+    );
+  }
 
   return (
     <div className='form-component-builder-group'>
@@ -37,6 +46,8 @@ export function LongTextAnswerBuilder({formComponents, setFormComponents, ...pro
           onQuestionChange={changeQuestion}
           points={points}
           onPointsChange={changePoints}
+          isOptional={isOptional}
+          onIsOptionalChange={changeIsOptional}
         ></FormBuilderOptions>
       </div>
     </div>

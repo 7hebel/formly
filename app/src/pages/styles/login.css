@@ -20,6 +20,5 @@
     font-family: var(--ui-font);
     font-size: 36px;
     text-align: center;
+    color: var(--color-text);
 }
-
-

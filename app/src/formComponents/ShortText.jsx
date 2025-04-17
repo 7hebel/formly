@@ -9,6 +9,7 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
   const [question, setQuestion] = useState(props.question || "Question?");
   const [points, setPoints] = useState(props.points);
   const [correct, setCorrect] = useState(props.correct ?? '');
+  const [isOptional, setIsOptional] = useState(props.optional || false);
 
   function changeQuestion(value) {
     setQuestion(value);
@@ -37,6 +38,15 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
     );
   }
   
+  function changeIsOptional(value) {
+    setIsOptional(value);
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, optional: value } : c
+      )
+    );
+  }
+
   return (
     <div className='form-component-builder-group'>
       <ShortTextAnswer question={question} formComponents={formComponents} setFormComponents={setFormComponents} {...props}></ShortTextAnswer>
@@ -49,6 +59,8 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
           onQuestionChange={changeQuestion}
           points={points}
           onPointsChange={changePoints}
+          isOptional={isOptional}
+          onIsOptionalChange={changeIsOptional}
         ></FormBuilderOptions>
         <div className='hzSep'></div>
           <InputGroup>

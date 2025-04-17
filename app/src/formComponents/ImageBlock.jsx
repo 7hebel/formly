@@ -48,6 +48,7 @@ export function ImageBlockBuilder({formComponents, setFormComponents, ...props})
           setFormComponents={setFormComponents}
           noPointsInput={true}
           noQuestionInput={true}
+          noOptionalInput={true}
         ></FormBuilderOptions>
         <div className='hzSep'></div>
           <TertiaryButton onClick={() => {imgInputRef.current.click();}}>
