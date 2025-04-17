@@ -1,10 +1,17 @@
 import { useState } from 'react';
-
+import { CircleSlash } from 'lucide-react';
 
 export function SingleSelect({ qid, options, answerReporter, selectedId, locked }) {
   function handleAnswerChange(c) {
     const selected = document.querySelector(`input[name='ssel-${qid}']:checked`).getAttribute("optionkey");
     if (answerReporter) answerReporter(selected);
+  }
+
+  function clearSelection() {
+    document.querySelectorAll(`input[name='ssel-${qid}']:checked`).forEach((select) => {
+      select.checked = false;
+    })
+    if (answerReporter) answerReporter(null);
   }
 
   return (
@@ -25,6 +32,8 @@ export function SingleSelect({ qid, options, answerReporter, selectedId, locked 
           </label>
         ))
       }
+
+      <p className='text-button' onClick={clearSelection}><CircleSlash/>Clear selection</p>
     </div>
   )
 }

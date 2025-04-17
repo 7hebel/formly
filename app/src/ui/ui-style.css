@@ -293,6 +293,7 @@ input[type=number] {
     font-family: var(--ui-font);
     font-weight: 500;
     cursor: pointer;
+    opacity: .8;
 }
 
 .select-radio {
@@ -321,6 +322,7 @@ input[type=number] {
 .select-radio-label:has(.select-radio:checked) {
     text-decoration: underline 2px;
     text-decoration-color: var(--color-primary);
+    opacity: 1;
 }
 
 
@@ -360,6 +362,33 @@ input[type=number] {
     width: 14px;
     height: 14px;
     opacity: .7;
+}
+
+.text-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: max-content;
+    color: var(--color-text);
+    font-size: 13px;
+    font-family: var(--ui-font);
+    font-weight: 500;
+    gap: 4px;
+    margin-block: 4px;
+    opacity: .7;
+    transition: opacity .2s;
+}
+
+.text-button:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    opacity: 1;
+}
+
+
+.text-button > svg {
+    height: 13px;
+    width: 13px;
 }
 
 
