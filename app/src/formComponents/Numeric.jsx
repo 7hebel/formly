@@ -5,7 +5,7 @@ import './formComponents.css';
 
 
 export function NumericAnswerBuilder({formComponents, setFormComponents, ...props}) {
-  const [question, setQuestion] = useState(props.question || "Question?");
+  const [question, setQuestion] = useState(props.question);
   const [minRange, setMinRange] = useState(props.minrange || null);
   const [maxRange, setMaxRange] = useState(props.maxrange || null);
   const [points, setPoints] = useState(props.points);

@@ -33,7 +33,12 @@ export function SingleSelect({ qid, options, answerReporter, selectedId, locked 
         ))
       }
 
-      <p className='text-button' onClick={clearSelection}><CircleSlash/>Clear selection</p>
+      {
+        !locked && (
+          <p className='text-button' onClick={clearSelection}><CircleSlash/>Clear selection</p>
+        )
+      }
+
     </div>
   )
 }

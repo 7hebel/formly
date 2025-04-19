@@ -8,7 +8,7 @@ import { TertiaryButton } from '../ui/Button.jsx';
 
 
 export function MultiSelectAnswerBuilder({formComponents, setFormComponents, ...props}) {
-  const [question, setQuestion] = useState(props.question || "Question?");
+  const [question, setQuestion] = useState(props.question);
   const [options, setOptions] = useState(props.options || [{id: crypto.randomUUID(), value: "Option 1"}]);
   const [correct, setCorrect] = useState(props.correct || []);
   const [isOptional, setIsOptional] = useState(props.optional || false);

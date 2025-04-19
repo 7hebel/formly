@@ -94,7 +94,7 @@ export function FormBuilderOptions({ componentId, formComponents, setFormCompone
         !noQuestionInput? (
           <InputGroup>
             <InputLabel>Question</InputLabel>
-            <LongInput onChange={updateQuestion} defaultValue={question}></LongInput>
+            <LongInput onChange={updateQuestion} placeholder="Question?" defaultValue={question}></LongInput>
           </InputGroup>
         ) : null
       }

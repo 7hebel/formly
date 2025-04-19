@@ -280,7 +280,7 @@
 
 .responses-view-header {
     width: 100%;
-    height: 40px;
+    height: 26px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -288,25 +288,25 @@
     align-items: center;
     font-family: var(--ui-font);
     font-weight: 600;
-    border-bottom: 1px solid var(--color-border);
     font-size: 18px;
-    margin-top: -12px;
-    padding-block: 26px;
     color: var(--color-text);
 }
 
 .responses-view-header-btn {
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     display: flex;
     align-items: center;
-    font-weight: 500;
-    
+    font-weight: 500;    
+}
+.responses-view-header-btn:hover {
+    cursor: pointer;
+    text-decoration: underline 2px var(--color-primary);
 }
 .responses-view-header-btn > svg {
-    width: 16px;
-    height: 16px;
-    margin-right: 6px;
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
     color: var(--color-primary-muted);
     transition: rotate .6s;
 }

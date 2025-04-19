@@ -316,7 +316,7 @@ export default function FormBuilder() {
       <header className='dash-header'>
       <img src='../logo.svg' height={42} onClick={() => {sendSave().finally(() => {navigate('/')})}}></img>
       <h1 className='welcome-msg'>
-        Form <span id='welcome-msg-name'>builder</span>
+        <span id='welcome-msg-name'>{formSettings.title}</span>
       </h1>
       <div className='row'>
         <TertiaryButton onClick={() => {navigate('/dash')}}>
@@ -415,7 +415,7 @@ export default function FormBuilder() {
           </div>
           <div className='builder-properties-bottom row'>
             <TertiaryButton wide onClick={() => {setIsAnswersView(true)}}>
-              <Eye/>View responses
+              <Eye/>View results
             </TertiaryButton>
           </div>
           <div className='builder-properties-bottom row'>
@@ -507,26 +507,30 @@ export default function FormBuilder() {
             }
           </div>
         </div>
-
         <div className='builder-form-panel'>
-          <div className='builder-panel-header'>
-            <ClipboardList/><h2>{formSettings.title}</h2>
-          </div>
-          <div className='hzSepMid'></div>
           {
             isAnswersView ? (
               <>
-                <div className='responses-view-header'>
-                  <span className='responses-view-header-btn' onClick={() => {setIsAnswersView(false)}}>
-                    <ArrowLeft/>Back to builder
-                  </span>
-                  Manage responses
-                  <span className='responses-view-header-btn' onClick={refreshResponses}>
-                    <RefreshCcw ref={refreshIconRef}/>Refresh
-                  </span>
+                <div className='builder-panel-header'>
+                  <div className='responses-view-header'>
+                    <span className='responses-view-header-btn' onClick={() => {setIsAnswersView(false)}}>
+                      <ArrowLeft/>Back to builder
+                    </span>
+                    Results
+                    <span className='responses-view-header-btn' onClick={refreshResponses}>
+                      <RefreshCcw ref={refreshIconRef}/>Refresh
+                    </span>
+                  </div>
                 </div>
+                <div className='hzSepMid'></div>
                 <div className='responses-view'>
                   <div className='responses-lists'>
+                    
+                  {/*
+                   left: NAME (email) 
+                   right: Grade
+                  */}
+
                     <div className='responses-type-header'>Currently responding: <span className='header-value'>{Object.keys(currentlyResponding).length}</span></div>
                     <div className='currently-responding-container'>
                       {
@@ -562,64 +566,66 @@ export default function FormBuilder() {
                 </div>
               </>
             ) : (
-            <div className='builder-form-content'>
-              {
-                formComponents.map((componentData, qIndex) => {
-                  const DynamicComponentBuilder = getComponentBuilder(componentData.componentType)  ;
-                  return (
-                    <AnimatePresence key={componentData.componentId}>
-                      <motion.div           
-                        key={componentData.componentId}
-                        layout
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        transition={{ duration: 0.2 }}
-                        className='form-component-builder-group'>
-                        <DynamicComponentBuilder 
-                          key={componentData.componentId} 
-                          questionNo={calcQuestionNoFor(qIndex, formComponents)} 
-                          formComponents={formComponents}
-                          setFormComponents={setFormComponents}
-                          locked
-                          {...componentData}
-                        ></DynamicComponentBuilder>
-                      </motion.div>
-                    </AnimatePresence>
-                  )
-                })
-              }
-              <div className='builder-new-blocks'>
-                <div className='blocks-category'>
-                  <div className='add-component-btn' onClick={() => {addFormComponent("short-text-answer")}}>
-                    <TextCursorInput/>Short text answer
+            <>
+              <div className='builder-form-content'>
+                {
+                  formComponents.map((componentData, qIndex) => {
+                    const DynamicComponentBuilder = getComponentBuilder(componentData.componentType)  ;
+                    return (
+                      <AnimatePresence key={componentData.componentId}>
+                        <motion.div           
+                          key={componentData.componentId}
+                          layout
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          transition={{ duration: 0.2 }}
+                          className='form-component-builder-group'>
+                          <DynamicComponentBuilder 
+                            key={componentData.componentId} 
+                            questionNo={calcQuestionNoFor(qIndex, formComponents)} 
+                            formComponents={formComponents}
+                            setFormComponents={setFormComponents}
+                            locked
+                            {...componentData}
+                          ></DynamicComponentBuilder>
+                        </motion.div>
+                      </AnimatePresence>
+                    )
+                  })
+                }
+                <div className='builder-new-blocks'>
+                  <div className='blocks-category'>
+                    <div className='add-component-btn' onClick={() => {addFormComponent("short-text-answer")}}>
+                      <TextCursorInput/>Short text answer
+                    </div>
+                    <div className='add-component-btn' onClick={() => {addFormComponent("long-text-answer")}}>
+                      <Text/>Long text answer
+                    </div>
+                    <div className='add-component-btn' onClick={() => {addFormComponent("numeric-answer")}}>
+                      <Binary/>Numeric answer
+                    </div>
+                    <div className='add-component-btn' onClick={() => {addFormComponent("truefalse-answer")}}>
+                      <ToggleRight/>True / False
+                    </div>
+                    <div className='add-component-btn' onClick={() => {addFormComponent("single-select-answer")}}>
+                      <CircleCheck/>Select single option
+                    </div>
+                    <div className='add-component-btn' onClick={() => {addFormComponent("multi-select-answer")}}>
+                      <SquareCheck/>Select multiple options
+                    </div>
                   </div>
-                  <div className='add-component-btn' onClick={() => {addFormComponent("long-text-answer")}}>
-                    <Text/>Long text answer
-                  </div>
-                  <div className='add-component-btn' onClick={() => {addFormComponent("numeric-answer")}}>
-                    <Binary/>Numeric answer
-                  </div>
-                  <div className='add-component-btn' onClick={() => {addFormComponent("truefalse-answer")}}>
-                    <ToggleRight/>True / False
-                  </div>
-                  <div className='add-component-btn' onClick={() => {addFormComponent("single-select-answer")}}>
-                    <CircleCheck/>Select single option
-                  </div>
-                  <div className='add-component-btn' onClick={() => {addFormComponent("multi-select-answer")}}>
-                    <SquareCheck/>Select multiple options
-                  </div>
-                </div>
-                <div className='blocks-category'>
-                  <div className='add-component-btn' onClick={() => {addFormComponent("paragraph")}}>
-                    <Pilcrow/>Paragraph
-                  </div>
-                  <div className='add-component-btn' onClick={() => {addFormComponent("image")}}>
-                    <ImageIcon/>Image
+                  <div className='blocks-category'>
+                    <div className='add-component-btn' onClick={() => {addFormComponent("paragraph")}}>
+                      <Pilcrow/>Paragraph
+                    </div>
+                    <div className='add-component-btn' onClick={() => {addFormComponent("image")}}>
+                      <ImageIcon/>Image
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </>
             )
           }
         </div>

@@ -6,7 +6,7 @@ import { InputGroup, InputLabel } from '../ui/Input.jsx';
 
 
 export function TrueFalseAnswerBuilder({formComponents, setFormComponents, ...props}) {
-  const [question, setQuestion] = useState(props.question || "Question?");
+  const [question, setQuestion] = useState(props.question);
   const [correct, setCorrect] = useState(props.correct || null);
   const [isOptional, setIsOptional] = useState(props.optional || false);
 
