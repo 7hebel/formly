@@ -82,7 +82,7 @@ export function FormResponse({formId, responseData, formComponents, onRemoved, w
     
     if (data.status) {
       displayInfoMessage(`Graded response: ${data.data}`);
-      document.getElementById("resp-grade-" + responseId).textContent = data.data;
+      window.setGradeValue[responseId](data.data);
     } 
     else { displayWarnMessage(data.data); }
   }
@@ -115,7 +115,7 @@ export function FormResponse({formId, responseData, formComponents, onRemoved, w
         <div className='response-details-actions'>
         {
           (onRemoved) ? (
-            <DangerButton onClick={() => {removeResponse(responseData.response_id)}}>
+            <DangerButton small onClick={() => {removeResponse(responseData.response_id)}}>
               <Trash2/>Delete
             </DangerButton>
           ) : (<></>)

@@ -17,6 +17,7 @@
     "lucide-react": "^0.484.0",
     "ogl": "^1.0.11",
     "react": "^19.0.0",
+    "react-circular-progressbar": "^2.2.0",
     "react-dom": "^19.0.0",
     "react-haiku": "^2.2.0",
     "react-slider": "^2.0.6",

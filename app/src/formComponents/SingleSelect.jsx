@@ -1,7 +1,7 @@
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import { SingleSelect } from '../ui/Select.jsx';
 import { FormComponentBase, FormBuilderOptions } from './FormComponentBase.jsx';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { PlusCircle, MinusCircle, CheckCircle } from 'lucide-react';
 import './formComponents.css';
 import { TertiaryButton } from '../ui/Button.jsx';
@@ -12,7 +12,6 @@ export function SingleSelectAnswerBuilder({formComponents, setFormComponents, ..
   const [options, setOptions] = useState(props.options || [{id: crypto.randomUUID(), value: "Option 1"}]);
   const [correct, setCorrect] = useState(props.correct || null);
   const [isOptional, setIsOptional] = useState(props.optional || false);
-  props.points = 1;
 
   function changeQuestion(value) {
     setQuestion(value);
@@ -23,15 +22,14 @@ export function SingleSelectAnswerBuilder({formComponents, setFormComponents, ..
     );
   }
 
-  function changePoints(value) {
-    setPoints(value);
+  if (props.points !== 1) {
     setFormComponents(prevComponents =>
       prevComponents.map(c =>
-        c.componentId === props.componentId ? { ...c, points: value } : c
+        c.componentId === props.componentId ? { ...c, points: 1 } : c
       )
     );
   }
-
+  
   function changeCorrect(value) {
     if (value == correct) {
       document.getElementById(value).setAttribute("checked", "");
@@ -86,7 +84,6 @@ export function SingleSelectAnswerBuilder({formComponents, setFormComponents, ..
           question={question}
           onQuestionChange={changeQuestion}
           points={1}
-          onPointsChange={changePoints}
           noPointsInput={true}
           isOptional={isOptional}
           onIsOptionalChange={changeIsOptional}

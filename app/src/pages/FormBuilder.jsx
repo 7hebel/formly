@@ -14,6 +14,7 @@ import { isEqual } from 'lodash';
 import { AnimatePresence, motion } from 'framer-motion';
 import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
 import '../pages/styles/builder.css'
+import { GradeCircle } from '../components/GradeCircle.jsx';
 
 
 export default function FormBuilder() {
@@ -313,16 +314,16 @@ export default function FormBuilder() {
       />
       </div>
       
-      <header className='dash-header'>
-      <img src='../logo.svg' height={42} onClick={() => {sendSave().finally(() => {navigate('/')})}}></img>
-      <h1 className='welcome-msg'>
-        <span id='welcome-msg-name'>{formSettings.title}</span>
-      </h1>
-      <div className='row'>
-        <TertiaryButton onClick={() => {navigate('/dash')}}>
-          <LayoutDashboard/>Dashboard
-        </TertiaryButton>
-      </div>
+      <header className='builder-header'>
+        <img src='../logo.svg' height={42} onClick={() => {sendSave().finally(() => {navigate('/')})}}></img>
+        <h1 className='welcome-msg'>
+          <span id='welcome-msg-name'>{formSettings.title}</span>
+        </h1>
+        <div className='row'>
+          <TertiaryButton onClick={() => {navigate('/dash')}}>
+            <LayoutDashboard/>Dashboard
+          </TertiaryButton>
+        </div>
       </header>
 
       <div className='builder-panels-container'>
@@ -550,8 +551,7 @@ export default function FormBuilder() {
                               <span className='respondent-email'>{email}</span>
                             </div>
                             <div className='submitted-response-right'>
-                              <span className='response-grade' id={"resp-grade-" + data.response_id}>{data.grade}</span>
-                              <ChevronRight/>
+                              <GradeCircle id={data.response_id} initialValue={data.grade}></GradeCircle>
                             </div>
                           </div>
                         ))

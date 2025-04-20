@@ -308,8 +308,6 @@ def auto_grade_answers(form_id: str, email: str) -> None:
         for component in structure:
             if component["componentId"] == component_id:
                 return component
-        else:
-            return None
     
     for (component_id, data) in answers.items():
         component = get_component_data(component_id)

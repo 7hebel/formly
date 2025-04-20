@@ -1,7 +1,11 @@
-header {
+header{
     padding-block: 12px;
     padding-inline: 16px;
     justify-content: space-between;
+}
+
+.builder-header {
+    padding: 0px !important
 }
 
 .header-text {
@@ -13,7 +17,8 @@ header {
     color: var(--color-text);
 }
 
-.dash-header {
+.dash-header,
+.builder-header {
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -25,6 +30,7 @@ header {
     color: var(--color-text);
 }
 
-.dash-header > img {
+.dash-header > img,
+.builder-header > img {
     cursor: pointer;
 }

@@ -10,7 +10,13 @@ export function TrueFalseAnswerBuilder({formComponents, setFormComponents, ...pr
   const [correct, setCorrect] = useState(props.correct || null);
   const [isOptional, setIsOptional] = useState(props.optional || false);
 
-  props.points = 1;
+  if (props.points !== 1) {
+    setFormComponents(prevComponents =>
+      prevComponents.map(c =>
+        c.componentId === props.componentId ? { ...c, points: 1 } : c
+      )
+    );
+  }
 
   function changeQuestion(value) {
     setQuestion(value);
@@ -49,8 +55,8 @@ export function TrueFalseAnswerBuilder({formComponents, setFormComponents, ...pr
           setFormComponents={setFormComponents}
           question={question}
           onQuestionChange={changeQuestion}
-          points={1}
           noPointsInput={true}
+          points={1}
           isOptional={isOptional}
           onIsOptionalChange={changeIsOptional}
         ></FormBuilderOptions>
