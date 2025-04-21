@@ -16,17 +16,24 @@ function formatTime(timestamp) {
   return `${dd}/${mm}/${yy} - ${hh}:${min}`;
 }
 
-function getTimeDifference(startTimestmap, endTimestamp) {
-  const start = new Date(startTimestmap * 1000);
+
+function getTimeDifference(startTimestamp, endTimestamp) {
+  const start = new Date(startTimestamp * 1000);
   const end = new Date(endTimestamp * 1000);
   let diffMs = Math.abs(end.getTime() - start.getTime());
 
-  let hours = Math.floor(diffMs / (1000 * 60 * 60));
-  let minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-  return `${String(hours).padStart(2, "0")}h ${String(minutes).padStart(2, "0")}m`;
+  if (diffMs < 60000) {
+    return "few seconds";
+  } else if (diffMs < 3600000) {
+    let minutes = Math.floor(diffMs / 60000);
+    let seconds = Math.floor((diffMs % 60000) / 1000);
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  } else {
+    let hours = Math.floor(diffMs / 3600000);
+    let minutes = Math.floor((diffMs % 3600000) / 60000);
+    return `${hours}h ${minutes}m`;
+  }
 }
-
 
 export function FormResponse({formId, responseData, formComponents, onRemoved, withGradePanel}) {   
   function getComponentById(componentId) {

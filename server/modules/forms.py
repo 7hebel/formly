@@ -180,6 +180,18 @@ def get_grade_from_schema(schema_id: str, user_uuid: str, percentage_value: int)
     return None
 
 
+def format_duration(seconds: int) -> str:
+    if seconds < 60:
+        return "few seconds"
+    elif seconds < 3600:
+        minutes = seconds // 60
+        remaining_seconds = seconds % 60
+        return f"{minutes:02}:{remaining_seconds:02}"
+    else:
+        hours = seconds // 3600
+        minutes = (seconds % 3600) // 60
+        return f"{hours}h {minutes}m"
+
 def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
     form_data = FormsDB.fetch(form_id)
     if form_data is None:
@@ -227,12 +239,8 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
         submit_time = datetime.fromtimestamp(submitted_at_timestamp).strftime("%H:%M %d/%m/%Y")
 
         total_seconds = submitted_at_timestamp - started_at_timestamp
-        hours = total_seconds // 3600
-        minutes = (total_seconds % 3600) // 60
-        total_time = f"{hours:02}h {minutes:02}m"
-        
         characteristics.append({"type": "submitted", "content": f"Submitted: [{submit_time}]"})
-        characteristics.append({"type": "timelimit", "content": f"Answered in [{total_time}]"})
+        characteristics.append({"type": "timelimit", "content": f"Answered in [{format_duration(total_seconds)}]"})
 
         form_data["graded"] = prepare_grade_info(form_data, user_email)
         form_data["answer"] = form_data["answers"][user_email]
