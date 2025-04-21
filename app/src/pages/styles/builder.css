@@ -334,15 +334,15 @@
 
 .responses-type-header {
     font-family: var(--ui-font);
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 400;   
-    margin-bottom: 8px;
+    margin-bottom: 16px;
+    text-align: center;
 }
 
 .header-value {
-    font-weight: 600;
+    font-weight: 500;
     margin-left: 4px;
-    text-decoration: underline 2px var(--color-primary);
 }
 
 .currently-responding-container {
@@ -365,7 +365,7 @@
     border: 1px solid var(--color-bg-item)
 }
 
-.submitted-response {
+.form-response {
     width: 100%;
     background-color: var(--color-panel);
     font-family: var(--ui-font);
@@ -381,18 +381,18 @@
     transition: box-shadow .2s;
 }
 
-.submitted-response > svg {
+.form-response > svg {
     width: 20px;
     height: 20px;
     min-width: 20px;
     min-height: 20px;
 }
 
-.submitted-response:hover {
+.form-response:hover {
     box-shadow: var(--subtle-shadow);
 }
 
-.submitted-respondent-info {
+.form-respondent-info {
     display: flex;
     flex-direction: column;
 }
@@ -445,7 +445,7 @@
     align-items: center;
 }
 
-.submitted-responses-container {
+.responses-container {
     display: flex;
     flex-direction: column;
     gap: 8px;

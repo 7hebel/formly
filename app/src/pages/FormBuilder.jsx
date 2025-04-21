@@ -527,25 +527,19 @@ export default function FormBuilder() {
                 <div className='hzSepMid'></div>
                 <div className='responses-view'>
                   <div className='responses-lists'>
-                    <div className='responses-type-header'>Currently responding: <span className='header-value'>{Object.keys(currentlyResponding).length}</span></div>
-                    <div className='currently-responding-container'>
-                      {
-                        Object.entries(currentlyResponding).map(([email, data]) => (
-                          <span className='currently-responding' key={email}>{data.fullname} ({email})</span>
-                        ))
-                      }
-                    </div>
-                    <div className='hzSep'></div>
-                    <div className='responses-type-header'>Submitted responses: <span className='header-value'>{Object.keys(responses).length}</span></div>
-                    <div className='submitted-responses-container'>
+                    {/* <div className='responses-type-header'>Currently responding: <span className='header-value'>{Object.keys(currentlyResponding).length}</span></div> */}
+                    {/* <div className='hzSep'></div> */}
+                    {/* <div className='responses-type-header'>Submitted responses: <span className='header-value'>{Object.keys(responses).length}</span></div> */}
+                    <div className='responses-type-header'><span className='header-value'>{Object.keys(responses).length}</span> submitted, <span className='header-value'>{Object.keys(currentlyResponding).length}</span> responding</div>
+                    <div className='responses-container'>
                       {
                         Object.entries(responses).map(([email, data]) => (
-                          <div className='submitted-response' key={email} onClick={() => {switchResponseDetailsTarget(email)}}>
-                            <div className='submitted-respondent-info'>
+                          <div className='form-response' key={email} onClick={() => {switchResponseDetailsTarget(email)}}>
+                            <div className='form-respondent-info'>
                               <span className='respondent-name'>{data.fullname}</span>
                               <span className='respondent-email'>{email}</span>
                             </div>
-                            <div className='submitted-response-right'>
+                            <div className='form-response-right'>
                               {
                                 !isNaN(parseInt(data.grade.percentage)) ? (
                                   <GradeCircle id={data.response_id} initialValue={data.grade.percentage} schemaGrade={data.grade.schema}></GradeCircle>
@@ -558,6 +552,23 @@ export default function FormBuilder() {
                         ))
                       }
                     </div>
+                    <div className='hzSep'></div>
+                    <div className='responses-container'>
+                      {
+                        Object.entries(currentlyResponding).map(([email, data]) => (
+                          <div className='form-response dimmed-response' key={email}>
+                            <div className='form-respondent-info'>
+                              <span className='respondent-name'>{data.fullname}</span>
+                              <span className='respondent-email'>{email}</span>
+                            </div>
+                            <div className='form-response-right'>
+                              <div className='dotsloader'></div>
+                            </div>
+                          </div>
+                        ))
+                      }
+                    </div>
+
                   </div>
                   {
                     viewedResponse? (

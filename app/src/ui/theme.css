@@ -138,3 +138,35 @@ body {
 }
 
 
+/* Loader */
+
+
+.dotsloader {
+    margin-left: -30px;
+    width: 7px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    animation: l5 1s infinite linear alternate;
+}
+
+@keyframes l5 {
+    0% {
+        box-shadow: 14px 0 var(--color-text), -14px 0 #0002;
+        background: var(--color-text)
+    }
+
+    33% {
+        box-shadow: 14px 0 var(--color-text), -14px 0 #0002;
+        background: #0002
+    }
+
+    66% {
+        box-shadow: 14px 0 #0002, -14px 0 var(--color-text);
+        background: #0002
+    }
+
+    100% {
+        box-shadow: 14px 0 #0002, -14px 0 var(--color-text);
+        background: var(--color-text)
+    }
+}
