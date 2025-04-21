@@ -15,7 +15,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
 import '../pages/styles/builder.css'
 import { GradeCircle } from '../components/GradeCircle.jsx';
-
+import { Tooltip } from "react-tooltip";
 
 export default function FormBuilder() {
   const navigate = useNavigate();
@@ -248,7 +248,6 @@ export default function FormBuilder() {
   function switchResponseDetailsTarget(email) {
     responses[email].email = email;
     setViewedResponse(responses[email]);
-    console.log(responses[email])
   }
 
   async function refreshResponses() {
@@ -553,14 +552,21 @@ export default function FormBuilder() {
                     <div className='responses-container'>
                       {
                         Object.entries(currentlyResponding).map(([email, data]) => (
-                          <div className='form-response dimmed-response' key={email}>
-                            <div className='form-respondent-info'>
-                              <span className='respondent-name'>{data.fullname}</span>
-                              <span className='respondent-email'>{email}</span>
+                          <div key={email}>
+                            <div data-tooltip-id={'tooltip-resp-' + email} className='form-response dimmed-response' key={email}>
+                              <div className='form-respondent-info'>
+                                <span className='respondent-name'>{data.fullname}</span>
+                                <span className='respondent-email'>{email}</span>
+                              </div>
+                              <div className='form-response-right'>
+                                <div className='dotsloader'></div>
+                              </div>
                             </div>
-                            <div className='form-response-right'>
-                              <div className='dotsloader'></div>
-                            </div>
+                            <Tooltip
+                              id={'tooltip-resp-' + email}
+                              content={'Started: ' + (new Date(data.started_at * 1000).toLocaleString())}
+                              style={{fontFamily: "var(--ui-font)", fontSize: "14px", fontWeight: 600, backgroundColor: "var(--color-text)"}}
+                            />
                           </div>
                         ))
                       }
