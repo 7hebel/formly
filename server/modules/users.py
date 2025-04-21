@@ -1,4 +1,5 @@
-from modules.database import UsersDB
+from modules.database import UsersDB, FormsDB
+from modules import forms
 from modules import logs
 
 import hashlib
@@ -137,6 +138,9 @@ def update_grading_schema(user_uuid: str, schema_id: str, steps: list[int], grad
     user_data["grading_schemas"][schema_id]["steps"] = steps
     user_data["grading_schemas"][schema_id]["grades"] = grades
     UsersDB.save(user_uuid, user_data)
+    
+    for affected_form in FormsDB.fetch_all_where(lambda form: form["settings"]["grading_schema"] == schema_id):
+        forms.reevaluate_form_responses(affected_form["form_id"])
     
     logs.info("Users", f"Updated grading schema: `{schema_id}` for: <{user_uuid}>")
     return True    

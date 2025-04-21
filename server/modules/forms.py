@@ -155,27 +155,30 @@ def update_form(form_id: str, new_settings: dict, structure: list, assigned: dic
     form_data["structure"] = structure
     form_data["assigned"] = assigned
     FormsDB.save(form_id, form_data)
+    reevaluate_form_responses(form_id)
     logs.info("Forms", f"Updated form settings and structure ({form_id})")
 
 
 def get_grade_from_schema(schema_id: str, user_uuid: str, percentage_value: int) -> str | None:
     user_data = UsersDB.fetch(user_uuid)
     if user_data is None:
-        return logs.warn("Forms", f"Failed to fetch grade from schema: `{schema_id}` by user: <{user_uuid}> (user not found)")
+        logs.warn("Forms", f"Failed to fetch grade from schema: `{schema_id}` by user: <{user_uuid}> (user not found)")
+        return None
     
     schema = user_data["grading_schemas"].get(schema_id)
     if schema is None:
-        return logs.warn("Forms", f"Failed to fetch grade from schema: `{schema_id}` by user: <{user_uuid}> (schema not found)")
-    
-    steps = schema["steps"]
+        logs.warn("Forms", f"Failed to fetch grade from schema: `{schema_id}` by user: <{user_uuid}> (schema not found)")
+        return None
+
+    steps = schema["steps"] + [101]
     grades = schema["grades"]
 
-    grade = None
-    for (index, step) in enumerate(steps + [100]):
-        if percentage_value in range(step):
-            grade = grades[index]
-    
-    return grade
+    for index, step in enumerate(steps):
+        if percentage_value < step:
+            return grades[index]
+
+    return None
+
 
 def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
     form_data = FormsDB.fetch(form_id)
@@ -231,20 +234,7 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
         characteristics.append({"type": "submitted", "content": f"Submitted: [{submit_time}]"})
         characteristics.append({"type": "timelimit", "content": f"Answered in [{total_time}]"})
 
-        percentage_grade = form_data["answers"][user_email]["grade"]
-        if form_settings["grading_schema"] and form_settings["grading_schema"] != "%":
-            if percentage_grade.removesuffix("%").isnumeric():
-                percentage_grade = int(percentage_grade.removesuffix("%"))
-                
-            schema_grade = get_grade_from_schema(form_settings["grading_schema"], form_data["author_uuid"], percentage_grade)
-            form_data["graded"] = {
-                "percentage": percentage_grade,
-                "schema": schema_grade
-            }
-        else:
-            form_data["graded"]["percentage"] = percentage_grade
-            form_data["graded"]["schema"] = ""
-            
+        form_data["graded"] = prepare_grade_info(form_data, user_email)
         form_data["answer"] = form_data["answers"][user_email]
         form_data["answer"]["email"] = user_email
             
@@ -463,7 +453,7 @@ def set_grades(form_id: str, response_id: str, grades: dict) -> str:
     form_data["answers"][email]["grade"] = full_grade
     FormsDB.save(form_id, form_data)
     logs.info("Forms", f"Graded response: {response_id} at form: ({form_id})")
-    return full_grade
+    return prepare_grade_info(FormsDB.fetch(form_id), email)
     
     
 def remove_form(form_id: str) -> bool | str:
@@ -487,23 +477,48 @@ def hide_anonymous_data(form_content: dict) -> dict:
     return form_content
 
 
+def prepare_grade_info(form_content: dict, email: str) -> dict[str, str]:
+    percentage_grade = form_content["answers"][email]["grade"]
+    if form_content["settings"]["grading_schema"] and form_content["settings"]["grading_schema"] != "%":
+        if percentage_grade.removesuffix("%").isnumeric():
+            percentage_grade = int(percentage_grade.removesuffix("%"))
+            
+        schema_grade = get_grade_from_schema(form_content["settings"]["grading_schema"], form_content["author_uuid"], percentage_grade)
+        return {
+            "percentage": percentage_grade,
+            "schema": schema_grade
+        }
+    else:
+        return {
+            "percentage": percentage_grade,
+            "schema": ""
+        }
+
+
 def enrich_response_grades(form_content: dict) -> dict:
     for email in form_content["answers"]:
-        percentage_grade = form_content["answers"][email]["grade"]
-        if form_content["settings"]["grading_schema"] and form_content["settings"]["grading_schema"] != "%":
-            if percentage_grade.removesuffix("%").isnumeric():
-                percentage_grade = int(percentage_grade.removesuffix("%"))
-                
-            schema_grade = get_grade_from_schema(form_content["settings"]["grading_schema"], form_content["author_uuid"], percentage_grade)
-            form_content["answers"][email]["grade"] = {
-                "percentage": percentage_grade,
-                "schema": schema_grade
-            }
-        else:
-            form_content["answers"][email]["grade"] = {
-                "percentage": percentage_grade,
-                "schema": ""
-            }
+        form_content["answers"][email]["grade"] = prepare_grade_info(form_content, email)
         
     return form_content    
     
+
+def reevaluate_form_responses(form_id: str) -> None:
+    form_data = FormsDB.fetch(form_id)
+    
+    def _is_component_in_form(component_id: str) -> bool:
+        for component in form_data["structure"]:
+            if component["componentId"] == component_id:
+                return True
+        return False
+    
+    for email in form_data["answers"]:
+        for component_id in form_data["answers"][email]["answers"]:
+            if component_id in form_data["answers"][email] and not _is_component_in_form(component_id):
+                form_data["answers"][email].pop(component_id)
+                continue
+        
+        form_data["answers"][email]["grade"] = get_full_grade(form_id, form_data["answers"][email]["answers"])
+        
+    FormsDB.save(form_id, form_data)
+    logs.info("Forms", f"Reevalutaed grades for form: ({form_id})")
+        

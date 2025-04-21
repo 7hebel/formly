@@ -527,9 +527,6 @@ export default function FormBuilder() {
                 <div className='hzSepMid'></div>
                 <div className='responses-view'>
                   <div className='responses-lists'>
-                    {/* <div className='responses-type-header'>Currently responding: <span className='header-value'>{Object.keys(currentlyResponding).length}</span></div> */}
-                    {/* <div className='hzSep'></div> */}
-                    {/* <div className='responses-type-header'>Submitted responses: <span className='header-value'>{Object.keys(responses).length}</span></div> */}
                     <div className='responses-type-header'><span className='header-value'>{Object.keys(responses).length}</span> submitted, <span className='header-value'>{Object.keys(currentlyResponding).length}</span> responding</div>
                     <div className='responses-container'>
                       {
@@ -573,7 +570,7 @@ export default function FormBuilder() {
                   {
                     viewedResponse? (
                       <FormResponse formId={formId} responseData={viewedResponse} formComponents={formComponents} onRemoved={() => {setViewedResponse(null); refreshResponses()}} withGradePanel></FormResponse>
-                    ) : (<></>)
+                    ) : null
                   }
                 </div>
               </>

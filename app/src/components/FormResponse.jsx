@@ -81,7 +81,7 @@ export function FormResponse({formId, responseData, formComponents, onRemoved, w
     const data = await response.json();
     
     if (data.status) {
-      displayInfoMessage(`Graded response: ${data.data}`);
+      displayInfoMessage(`Graded response: ${data.data.percentage}%`);
       window.setGradeValue[responseId](data.data);
     } 
     else { displayWarnMessage(data.data); }

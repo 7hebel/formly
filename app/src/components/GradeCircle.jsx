@@ -10,9 +10,10 @@ export function GradeCircle({ id, initialValue = 0, schemaGrade }) {
 
   useEffect(() => {
     if (!window.setGradeValue) window.setGradeValue = {};
-    window.setGradeValue[id] = (newVal) => {
-      setValue(parseInt(newVal));
-      setText(newVal);
+    window.setGradeValue[id] = (gradeInfo) => {
+      console.log(gradeInfo)
+      setValue(parseInt(gradeInfo.percentage));
+      setText(gradeInfo.schema);
     };
 
     return () => {
@@ -20,12 +21,22 @@ export function GradeCircle({ id, initialValue = 0, schemaGrade }) {
     };
   }, [id]);
 
+  useEffect(() => {
+    setValue(value);
+    if (schemaGrade) {
+      setText(schemaGrade);
+    } else {
+      setText(value + "%");
+    }
+  }, [schemaGrade, value]);
+
   return (
-    <div id={id} ref={containerRef} style={{ width: "44px", minWidth: "44px", fontFamily: "var(--ui-font)", fontWeight: 600 }}>
+    <div key={id + value + schemaGrade} id={id} ref={containerRef} style={{ width: "44px", minWidth: "44px", fontFamily: "var(--ui-font)", fontWeight: 600 }}>
       <CircularProgressbar
         value={value}
         text={text}
         strokeWidth={8}
+        key={value+schemaGrade}
         styles={buildStyles({
           strokeLinecap: "butt",
           textColor: "var(--color-text)",
