@@ -248,6 +248,7 @@ export default function FormBuilder() {
   function switchResponseDetailsTarget(email) {
     responses[email].email = email;
     setViewedResponse(responses[email]);
+    console.log(responses[email])
   }
 
   async function refreshResponses() {
@@ -526,12 +527,6 @@ export default function FormBuilder() {
                 <div className='hzSepMid'></div>
                 <div className='responses-view'>
                   <div className='responses-lists'>
-                    
-                  {/*
-                   left: NAME (email) 
-                   right: Grade
-                  */}
-
                     <div className='responses-type-header'>Currently responding: <span className='header-value'>{Object.keys(currentlyResponding).length}</span></div>
                     <div className='currently-responding-container'>
                       {
@@ -551,7 +546,13 @@ export default function FormBuilder() {
                               <span className='respondent-email'>{email}</span>
                             </div>
                             <div className='submitted-response-right'>
-                              <GradeCircle id={data.response_id} initialValue={data.grade}></GradeCircle>
+                              {
+                                !isNaN(parseInt(data.grade.percentage)) ? (
+                                  <GradeCircle id={data.response_id} initialValue={data.grade.percentage} schemaGrade={data.grade.schema}></GradeCircle>
+                                ) : (
+                                  <GradeCircle id={data.response_id} initialValue={0} schemaGrade="?"></GradeCircle>
+                                )
+                              }
                             </div>
                           </div>
                         ))

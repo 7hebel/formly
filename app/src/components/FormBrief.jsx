@@ -49,6 +49,7 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
 
     if (data.status) {
       setFormData(data.data);
+      console.log(data.data)
 
       const settings = data.data.settings;
       setCharacteristics(data.data.characteristics);
@@ -113,9 +114,9 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
                     {
                       isResponseOpen? (
                         <Modal title="My response" close={setIsResponseOpen}>
-                          <FormResponse formId={formId} responseData={formData.answers[localStorage.getItem('email')]} formComponents={formData.structure}></FormResponse>
+                          <FormResponse formId={formId} responseData={formData.answer} formComponents={formData.structure}></FormResponse>
                         </Modal>
-                      ) : (<></>)
+                      ) : null
                     }
                   </>
                 ) : (

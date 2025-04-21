@@ -5,20 +5,20 @@ import 'react-circular-progressbar/dist/styles.css';
 
 export function GradeCircle({ id, initialValue = 0, schemaGrade }) {
   const [value, setValue] = useState(parseInt(initialValue));
+  const [text, setText] = useState((schemaGrade) ? schemaGrade : value + "%");
   const containerRef = useRef(null);
 
   useEffect(() => {
     if (!window.setGradeValue) window.setGradeValue = {};
     window.setGradeValue[id] = (newVal) => {
       setValue(parseInt(newVal));
+      setText(newVal);
     };
 
     return () => {
       delete window.setGradeValue[id];
     };
   }, [id]);
-
-  const text = (schemaGrade) ? schemaGrade : value + "%";
 
   return (
     <div id={id} ref={containerRef} style={{ width: "44px", minWidth: "44px", fontFamily: "var(--ui-font)", fontWeight: 600 }}>

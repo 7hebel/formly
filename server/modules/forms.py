@@ -237,7 +237,6 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
                 percentage_grade = int(percentage_grade.removesuffix("%"))
                 
             schema_grade = get_grade_from_schema(form_settings["grading_schema"], form_data["author_uuid"], percentage_grade)
-            # characteristics.append({"type": "grade", "content": f"Grade: [{schema_grade}]  ({percentage_grade}%)"})
             form_data["graded"] = {
                 "percentage": percentage_grade,
                 "schema": schema_grade
@@ -245,7 +244,9 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
         else:
             form_data["graded"]["percentage"] = percentage_grade
             form_data["graded"]["schema"] = ""
-            # characteristics.append({"type": "grade", "content": f"Grade: [{percentage_grade}]"})
+            
+        form_data["answer"] = form_data["answers"][user_email]
+        form_data["answer"]["email"] = user_email
             
     else:
         if form_settings["time_limit_m"] > 0:
@@ -256,8 +257,10 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
             characteristics.append({"type": "hidden_answers", "content": f"Your answers will be [hidden] after submission."})
 
         form_data["graded"] = None
+        form_data["answer"] = None
         form_data.pop("structure")
 
+    form_data.pop("answers")
     form_data["characteristics"] = characteristics
     return form_data
    
@@ -482,3 +485,25 @@ def hide_anonymous_data(form_content: dict) -> dict:
         form_content["answers"].pop(email)
         
     return form_content
+
+
+def enrich_response_grades(form_content: dict) -> dict:
+    for email in form_content["answers"]:
+        percentage_grade = form_content["answers"][email]["grade"]
+        if form_content["settings"]["grading_schema"] and form_content["settings"]["grading_schema"] != "%":
+            if percentage_grade.removesuffix("%").isnumeric():
+                percentage_grade = int(percentage_grade.removesuffix("%"))
+                
+            schema_grade = get_grade_from_schema(form_content["settings"]["grading_schema"], form_content["author_uuid"], percentage_grade)
+            form_content["answers"][email]["grade"] = {
+                "percentage": percentage_grade,
+                "schema": schema_grade
+            }
+        else:
+            form_content["answers"][email]["grade"] = {
+                "percentage": percentage_grade,
+                "schema": ""
+            }
+        
+    return form_content    
+    

@@ -301,6 +301,7 @@ async def post_load_forms(data: schemas.ProtectedModel, request: Request) -> JSO
 @protected_form_endpoint(author_only=True)
 async def post_fetch_form(data: schemas.FormIdSchema, request: Request) -> JSONResponse:
     content = FormsDB.fetch(data.form_id)
+    content = forms.enrich_response_grades(content)
     if content["settings"]["is_anonymous"]:
         content = forms.hide_anonymous_data(content)
     
