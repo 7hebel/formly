@@ -5,6 +5,7 @@ import { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FormResponse } from './FormResponse.jsx';
 import { Modal } from '../ui/Modal.jsx';
+import { GradeCircle } from "../components/GradeCircle.jsx"
 
 const characteristicsIcons = {
   author: User,
@@ -62,10 +63,20 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
 
   return (
     <div className="form-brief-view" isfinished={Number(isAnswered)} isfeatured={Number(isAssigned)}>
-      <h5>{formName}</h5>
-      <div className='hzSepMid'></div>
+      <div className='form-brief-header'>
+        <h5>{formName}</h5>
+        {
+          (isAnswered && formData?.graded) && 
+          (
+            !isNaN(parseInt(formData.graded.percentage)) ? (
+                <GradeCircle initialValue={formData.graded.percentage} schemaGrade={formData.graded.schema}></GradeCircle>
+              ) : (
+                <GradeCircle initialValue={0} schemaGrade="?"></GradeCircle>
+            )
+          )
+        }
+      </div>
       <div className='form-brief-characteristics-container'>
-
         {
           characteristics.map((characteristic, index) => {
             const Icon = characteristicsIcons[characteristic.type];
@@ -108,9 +119,7 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
                     }
                   </>
                 ) : (
-                  <TertiaryButton small>
-                    <EyeOff/>Response hidden
-                  </TertiaryButton>
+                  <p className='info-text'>Response hidden</p>
                 )
               ) : (
                 <PrimaryButton small onClick={() => {navigate("/form/" + formId)}}>

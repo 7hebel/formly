@@ -237,9 +237,15 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
                 percentage_grade = int(percentage_grade.removesuffix("%"))
                 
             schema_grade = get_grade_from_schema(form_settings["grading_schema"], form_data["author_uuid"], percentage_grade)
-            characteristics.append({"type": "grade", "content": f"Grade: [{schema_grade}]  ({percentage_grade}%)"})
+            # characteristics.append({"type": "grade", "content": f"Grade: [{schema_grade}]  ({percentage_grade}%)"})
+            form_data["graded"] = {
+                "percentage": percentage_grade,
+                "schema": schema_grade
+            }
         else:
-            characteristics.append({"type": "grade", "content": f"Grade: [{percentage_grade}]"})
+            form_data["graded"]["percentage"] = percentage_grade
+            form_data["graded"]["schema"] = ""
+            # characteristics.append({"type": "grade", "content": f"Grade: [{percentage_grade}]"})
             
     else:
         if form_settings["time_limit_m"] > 0:
@@ -249,6 +255,7 @@ def get_sharable_form_data(form_id: str, user_uuid: str) -> dict | None:
         if form_settings["hide_answers"]:
             characteristics.append({"type": "hidden_answers", "content": f"Your answers will be [hidden] after submission."})
 
+        form_data["graded"] = None
         form_data.pop("structure")
 
     form_data["characteristics"] = characteristics

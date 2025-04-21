@@ -137,24 +137,32 @@
     box-shadow: var(--inner-depth), var(--subtle-shadow);
 }
 
-.form-brief-view[isfinished="1"] {
-    background-color: transparent;
-}
-
 .form-brief-view[isfeatured="1"] {
     border-color: var(--color-primary);
     border-width: 1px;
     box-shadow: 0px 10px 50px 0px #A584021A;
 }
 
-.form-brief-view > h5 {
+.form-brief-header > h5 {
     all: unset;
     font-family: var(--ui-font);
     font-size: 16px;
     color: var(--color-text);
-    font-weight: 500;
-    overflow-x: clip;
-    white-space: nowrap;
+    font-weight: 600;
+}
+
+.form-brief-header > div {
+    right: 0px;
+    position: absolute;
+}
+
+.form-brief-header {
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    position: relative;
 }
 
 .form-brief-characteristics-container {
@@ -197,6 +205,7 @@
     font-size: 12px;
     font-family: var(--ui-font);
     white-space: nowrap;
+    font-weight: 500;
 }
 
 .form-brief-active-state-badge[state="0"] {
