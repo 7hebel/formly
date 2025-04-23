@@ -21,7 +21,8 @@
     "react-dom": "^19.0.0",
     "react-haiku": "^2.2.0",
     "react-slider": "^2.0.6",
-    "react-switch": "^7.1.0"
+    "react-switch": "^7.1.0",
+    "react-tooltip": "^5.28.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
