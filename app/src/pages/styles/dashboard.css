@@ -1,10 +1,10 @@
 
 .welcome-msg {
-    font-size: 22px;
+    font-size: 18px;
 }
 
 #welcome-msg-name {
-    text-decoration: underline 3px;
+    text-decoration: underline 2px;
     text-decoration-color: var(--color-primary);
     text-underline-offset: 4px;
 }

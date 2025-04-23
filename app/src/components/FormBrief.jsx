@@ -49,7 +49,6 @@ export default function FormBrief({ isAssigned=false, isMyForm=false, isAnswered
 
     if (data.status) {
       setFormData(data.data);
-      console.log(data.data)
 
       const settings = data.data.settings;
       setCharacteristics(data.data.characteristics);

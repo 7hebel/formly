@@ -31,7 +31,7 @@ export function GradeCircle({ id, initialValue = 0, schemaGrade }) {
     }
   }, [schemaGrade, value]);
 
-  const itemKey = id + value + schemaGrade;
+  const itemKey = id + "." + value + "." + schemaGrade;
   return (
     <>
       <div data-tooltip-id={itemKey} key={itemKey} id={id} ref={containerRef} style={{ width: "44px", minWidth: "44px", fontFamily: "var(--ui-font)", fontWeight: 600 }}>

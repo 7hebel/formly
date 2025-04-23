@@ -6,12 +6,12 @@ import DashboardCategorySwitcher from '../components/dashCategorySwitcher.jsx'
 import FormBrief from '../components/FormBrief.jsx'
 import ListView from '../components/ListView.jsx'
 import { useNavigate } from 'react-router-dom';
-import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle, Mail, Check, X, CodeSquare } from 'lucide-react';
+import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle, Mail, Check, X, CodeSquare, Medal } from 'lucide-react';
 import { ErrorLabel } from "../ui/ErrorLabel.jsx"
 import { useEffect, useRef, useState } from 'react';
 import './styles/dashboard.css'
 import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
-
+import { GradingSchemasManager } from '../components/GradingSchemas.jsx';
 
 function MyListsPanel({ lists, selectedList, onSwitchList }) {
   if (!lists) return <p>Loading...</p>;
@@ -213,9 +213,10 @@ export default function Dashboard() {
     })
   }
 
-  const formsViewRef = useRef(0);
-  const listsViewRef = useRef(0);
-  const accountViewRef = useRef(0);
+  const formsViewRef = useRef(null);
+  const listsViewRef = useRef(null);
+  const schemasViewRef = useRef(null);
+  const accountViewRef = useRef(null);
   const [selectedList, setSelectedList] = useState(null);
   const [lists, setLists] = useState(null);
   const [forms, setForms] = useState(null);
@@ -292,6 +293,9 @@ export default function Dashboard() {
           </DashboardCategorySwitcher>
           <DashboardCategorySwitcher viewRef={listsViewRef}>
             <Users/>Lists
+          </DashboardCategorySwitcher>
+          <DashboardCategorySwitcher viewRef={schemasViewRef}>
+            <Medal/>Grading schemas
           </DashboardCategorySwitcher>
           <DashboardCategorySwitcher viewRef={accountViewRef}>
             <Settings2/>Account
@@ -380,6 +384,10 @@ export default function Dashboard() {
                 <ListView refreshPanel={() => {setSelectedList(null); fetchLists()}} listNameSetter={(name) => {setSelectedList({...selectedList, name: name}); fetchLists()}} listData={selectedList}/>
               </div>
             </div>
+          </div>
+
+          <div className='dash-category-content' ref={schemasViewRef} active="0">
+            <GradingSchemasManager/>
           </div>
 
           <div className='dash-category-content' ref={accountViewRef} active="0">

@@ -6,7 +6,7 @@ import { MultiSelect } from '../ui/Select.jsx';
 import { Switch } from '../ui/Swtich.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2, LayoutDashboard, Trophy, ChartPie, ChartNoAxesCombinedIcon, Pilcrow, ImageIcon } from 'lucide-react';
+import { Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2, LayoutDashboard, Trophy, ChartPie, ChartNoAxesCombinedIcon, Pilcrow, ImageIcon, ChartSpline } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { getComponentBuilder, calcQuestionNoFor } from "../formComponents/AllComponents.jsx"
 import { FormResponse } from "../components/FormResponse.jsx";
@@ -30,6 +30,7 @@ export default function FormBuilder() {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isAnswersView, setIsAnswersView] = useState(false);
+  const [isSummaryView, setIsSummaryView] = useState(false);
   const [authorLists, setAuthorLists] = useState([]);
   const refreshIconRef = useRef(null);
 
@@ -417,7 +418,7 @@ export default function FormBuilder() {
           </div>
           <div className='builder-properties-bottom row'>
             <TertiaryButton wide onClick={() => {setIsAnswersView(true)}}>
-              <Eye/>View results
+              <Eye/>View responses
             </TertiaryButton>
           </div>
           <div className='builder-properties-bottom row'>
@@ -518,7 +519,7 @@ export default function FormBuilder() {
                     <span className='responses-view-header-btn' onClick={() => {setIsAnswersView(false)}}>
                       <ArrowLeft/>Back to builder
                     </span>
-                    Results
+                    Responses
                     <span className='responses-view-header-btn' onClick={refreshResponses}>
                       <RefreshCcw ref={refreshIconRef}/>Refresh
                     </span>
@@ -527,7 +528,9 @@ export default function FormBuilder() {
                 <div className='hzSepMid'></div>
                 <div className='responses-view'>
                   <div className='responses-lists'>
-                    <div className='responses-type-header'><span className='header-value'>{Object.keys(responses).length}</span> submitted, <span className='header-value'>{Object.keys(currentlyResponding).length}</span> responding</div>
+                    <div className='responses-type-header'>
+                      <span className='header-value'>{Object.keys(responses).length}</span> submitted, <span className='header-value'>{Object.keys(currentlyResponding).length}</span> responding
+                    </div>
                     <div className='responses-container'>
                       {
                         Object.entries(responses).map(([email, data]) => (

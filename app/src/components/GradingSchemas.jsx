@@ -166,8 +166,12 @@ export function GradingSchemasManager() {
     
     if (data.status) {
       setSchemas(data.data);
-      if (!currentSchema && Object.values(data.data).length > 0) {
+
+      let currentExists = Object.keys(data.data).includes(currentSchema?.schema_id);
+      if ((!currentExists || !currentSchema) && Object.values(data.data).length > 0) {
         setCurrentSchema(Object.values(data.data)[Object.values(data.data).length - 1]);
+      } else {
+        setCurrentSchema(null);
       }
     } else {
       displayWarnMessage(data.err_msg);
@@ -211,7 +215,6 @@ export function GradingSchemasManager() {
     
     if (data.status) {
       await loadSchemas();
-      setCurrentSchema(null);
     } else {
       displayWarnMessage(data.err_msg);
     }
