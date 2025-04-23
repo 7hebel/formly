@@ -13,7 +13,7 @@ class _AITextGrader:
         self.POSITIVE_THRESHOLD = 0.5
 
         self.__setup_finished = False
-        threading.Thread(target=self.__setup__, daemon=True).start()
+        # threading.Thread(target=self.__setup__, daemon=True).start()
         
     def __setup__(self) -> None:
         from sentence_transformers import SentenceTransformer, util

@@ -4,7 +4,7 @@ if not os.path.exists("./data/"): os.mkdir("./data/")
 if not os.path.exists("./data/logs"): os.mkdir("./data/logs/")
 
 from modules.database import ListsDB, UsersDB, FormsDB
-from modules import text_grading  # Starts background AI models initialization.
+# from modules import text_grading  # Starts background AI models initialization.
 from modules import schemas
 from modules import lists
 from modules import forms
@@ -433,4 +433,4 @@ async def post_upload_cdn_file(uuid: str = Form(...), file: UploadFile = File(..
     return api_response(True, content)
 
 
-uvicorn.run(api, host="0.0.0.0", port=50500)
+uvicorn.run(api, host="0.0.0.0", port=5101)

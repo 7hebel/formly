@@ -7,7 +7,7 @@ import time
 colorama.init()
 
 
-type LogSubjectT = Literal["API", "Forms", "Users", "Lists", "Database"]
+# type "LogSubjectT" = Literal["API", "Forms", "Users", "Lists", "Database"]
 
 
 @dataclass
@@ -41,18 +41,18 @@ def _save_log(log: LogEntity) -> None:
         file.write(log_content)
     
 
-def _log(subject: LogSubjectT, status: Literal['info', 'warn', 'error'], content: str) -> None:    
+def _log(subject: str, status: Literal['info', 'warn', 'error'], content: str) -> None:    
     log_entity = LogEntity(status, content, subject, int(time.time()))
 
     _print_log(log_entity)
     _save_log(log_entity)
 
 
-def info(subject: LogSubjectT, content: str) -> None:
+def info(subject: str, content: str) -> None:
     return _log(subject, "info", content)
 
-def warn(subject: LogSubjectT, content: str) -> None:
+def warn(subject: str, content: str) -> None:
     return _log(subject, "warn", content)
 
-def error(subject: LogSubjectT, content: str) -> None:
+def error(subject: str, content: str) -> None:
     return _log(subject, "error", content)
