@@ -15,6 +15,45 @@
     flex-direction: row;
     gap: 10px;
     margin-top: 30px;
+    position: relative;
+}
+
+.builder-sidebar-collapser {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    border-radius: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-bg-main);
+    padding: 8px;
+    box-shadow: var(--inner-depth), var(--subtle-shadow);
+    border: 1px solid var(--color-border);
+    cursor: pointer;
+}
+
+.builder-sidebar-collapser > svg {
+    width: 20px;
+    height: 20px;
+    color: var(--color-text);
+}
+
+.builder-properties-panel[iscollapsible="1"] {
+    position: absolute;
+    z-index: 5;
+    box-shadow: var(--inner-depth), 20px 0px 20px 0px #0000001a;
+    width: 50%;
+}
+
+.builder-properties-panel[iscollapsed="1"] {
+    display: none;
+}
+
+.builder-properties-panel[iscollapsed="0"] ~ .builder-form-panel .builder-sidebar-collapser {
+    display: block;
+    left: calc(max(45%, 300px) + 40px);
+    z-index: 6;
 }
 
 .builder-properties-panel {
@@ -28,6 +67,10 @@
     display: flex;
     flex-direction: column;
     box-shadow: var(--inner-depth), var(--subtle-shadow);
+}
+
+.builder-properties-panel[collapsed="1"] {
+    display: none;
 }
 
 .builder-form-panel {
@@ -103,6 +146,7 @@
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 12px;
 }
 

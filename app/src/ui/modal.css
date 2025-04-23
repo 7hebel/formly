@@ -21,6 +21,7 @@
     box-shadow: 0px 16px 64px 0px rgba(0, 0, 0, 0.28);
     opacity: 1;
     transition: opacity .3s, transform .3s;
+    max-width: 92dvw;
 }
 
 .modal-transition {

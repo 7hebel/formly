@@ -30,9 +30,22 @@ export default function FormBuilder() {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isAnswersView, setIsAnswersView] = useState(false);
-  const [isSummaryView, setIsSummaryView] = useState(false);
   const [authorLists, setAuthorLists] = useState([]);
+  const [isSidebarCollapsible, setIsSidebarCollapsible] = useState(window.innerWidth < 1000);
+  const [isSidebarFocused, setIsSidebarFocused] = useState(false);
   const refreshIconRef = useRef(null);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSidebarCollapsible(window.innerWidth < 1000);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const fetchAuthorLists = async () => {
     const requestOptions = {
@@ -329,7 +342,7 @@ export default function FormBuilder() {
       </header>
 
       <div className='builder-panels-container'>
-        <div className='builder-properties-panel'>
+        <div className='builder-properties-panel' iscollapsible={Number(isSidebarCollapsible)} iscollapsed={Number(isSidebarCollapsible && !isSidebarFocused)} style={{display: isAnswersView ? "none" : "flex"}}>
           <div className='builder-panel-header'>
             <Settings2/>
             <h2>Properties</h2>
@@ -511,6 +524,9 @@ export default function FormBuilder() {
           </div>
         </div>
         <div className='builder-form-panel'>
+          <div className='builder-sidebar-collapser' onClick={() => {setIsSidebarFocused(!isSidebarFocused)}} style={{display: !isSidebarCollapsible ? "none" : "block"}} >
+            <Settings2/>
+          </div>
           {
             isAnswersView ? (
               <>

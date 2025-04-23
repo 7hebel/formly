@@ -9,9 +9,10 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut, ClipboardList, Users, Settings2, ClipboardPlus, PlusCircle, ChevronRightCircle, Mail, Check, X, CodeSquare, Medal } from 'lucide-react';
 import { ErrorLabel } from "../ui/ErrorLabel.jsx"
 import { useEffect, useRef, useState } from 'react';
-import './styles/dashboard.css'
 import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
 import { GradingSchemasManager } from '../components/GradingSchemas.jsx';
+import './styles/dashboard.css'
+import './styles/_responsive.css'
 
 function MyListsPanel({ lists, selectedList, onSwitchList }) {
   if (!lists) return <p>Loading...</p>;

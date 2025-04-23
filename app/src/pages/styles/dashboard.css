@@ -42,7 +42,7 @@
 .dashboard-category-switch {
     all: unset;
     font-family: var(--ui-font);
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     color: var(--color-text);
     cursor: pointer;
@@ -290,7 +290,7 @@
 }
 
 .my-lists-header > h1 {
-    font-size: 22px;
+    font-size: 20px;
 }
 
 .my-lists {
@@ -397,7 +397,7 @@
 .list-view-container > h2 {
     font-family: var(--ui-font);
     color: var(--color-text);
-    font-size: 24px;
+    font-size: 20px;
     display: flex;
     font-weight: 600;
     flex-direction: row;
@@ -406,8 +406,8 @@
 }
 
 .list-view-container > h2 > svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     opacity: .5;
 }
 
