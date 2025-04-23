@@ -63,4 +63,3 @@ export function DropdownGroup({ id, items={}, selectedItemID, setter, refresh })
 export function DropdownItem({ id, children }) {
   return <div className="dropdown-item" id={id}>{children}</div>
 }
-

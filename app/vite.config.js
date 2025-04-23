@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5100,
-    allowedHosts: ['all', "*", "formly-node.hebel.smallhost.pl"],
+    allowedHosts: ['all', "*", "formly-node.hebel.smallhost.pl", "formly.cc"],
   },
   plugins: [react()],
 })
