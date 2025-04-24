@@ -6,7 +6,7 @@ import { MultiSelect } from '../ui/Select.jsx';
 import { Switch } from '../ui/Swtich.jsx';
 import { Modal } from '../ui/Modal.jsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Settings2, ClipboardList, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2, LayoutDashboard, Trophy, ChartPie, ChartNoAxesCombinedIcon, Pilcrow, ImageIcon, ChartSpline } from 'lucide-react';
+import { Settings2, X, VenetianMask, Type, Hourglass, UserCheck, LockKeyhole, TextCursorInput, Text, Binary, ToggleRight, CircleCheck, SquareCheck, UserPlus, Send, MinusCircle, Users, Mail, PlusCircle, EyeOff, Ban, Link, Copy, Eye, ArrowLeft, RefreshCcw, ChevronRight, Trash2, LayoutDashboard, Trophy, ChartPie, ChartNoAxesCombinedIcon, Pilcrow, ImageIcon, ChartSpline } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { getComponentBuilder, calcQuestionNoFor } from "../formComponents/AllComponents.jsx"
 import { FormResponse } from "../components/FormResponse.jsx";
@@ -331,7 +331,7 @@ export default function FormBuilder() {
       
       <header className='builder-header'>
         <img src='../logo.svg' height={42} onClick={() => {sendSave().finally(() => {navigate('/')})}}></img>
-        <h1 className='welcome-msg'>
+        <h1 className='welcome-msg mobileHide'>
           <span id='welcome-msg-name'>{formSettings.title}</span>
         </h1>
         <div className='row'>
@@ -342,10 +342,13 @@ export default function FormBuilder() {
       </header>
 
       <div className='builder-panels-container'>
-        <div className='builder-properties-panel' iscollapsible={Number(isSidebarCollapsible)} iscollapsed={Number(isSidebarCollapsible && !isSidebarFocused)} style={{display: isAnswersView ? "none" : "flex"}}>
+        <div className='builder-properties-panel' iscollapsible={Number(isSidebarCollapsible)} style={{display: (isAnswersView || Number(isSidebarCollapsible && !isSidebarFocused)) ? "none" : "flex"}}>
           <div className='builder-panel-header'>
             <Settings2/>
             <h2>Properties</h2>
+            {
+              isSidebarCollapsible && <div className='icon-btn close-props-btn' onClick={() => {setIsSidebarFocused(false)}}><X/></div>
+            }
           </div>
           <div className='hzSepMid'></div>
           <div className='builder-properties-container'>

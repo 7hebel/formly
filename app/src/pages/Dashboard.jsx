@@ -282,9 +282,11 @@ export default function Dashboard() {
         <h1 className='welcome-msg'>
             Welcome, <span id='welcome-msg-name'>{fullname}</span>
         </h1>
-        <TertiaryButton small onClick={onLogout}>
-          <LogOut/>Logout
-        </TertiaryButton>
+        <div className='mobileHide'>
+          <TertiaryButton small onClick={onLogout}>
+            <LogOut/>Logout
+          </TertiaryButton>
+        </div>
       </header>
 
       <div className='dash-content-container'>
@@ -418,6 +420,9 @@ export default function Dashboard() {
                   <ErrorLabel id="update-password-errlabel"/>
                 </div>
               </div>
+              <DangerButton small onClick={onLogout}>
+                <LogOut/>Logout
+              </DangerButton>
             </div>
           </div>
           

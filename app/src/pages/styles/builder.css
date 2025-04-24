@@ -46,10 +46,6 @@
     width: 50%;
 }
 
-.builder-properties-panel[iscollapsed="1"] {
-    display: none;
-}
-
 .builder-properties-panel[iscollapsed="0"] ~ .builder-form-panel .builder-sidebar-collapser {
     display: block;
     left: calc(max(45%, 300px) + 40px);
@@ -111,6 +107,12 @@
     left: 12px;
     height: 20px;
     opacity: .5;
+}
+
+.close-props-btn {
+    position: absolute;
+    right: 18px;
+    height: 24px;
 }
 
 .builder-properties-container {

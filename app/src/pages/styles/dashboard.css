@@ -235,16 +235,16 @@
 }
 
 .dash-account-container > h1 {
-    font-size: 32px;
+    font-size: 24px;
 }
 .dash-account-container > h4 {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: 500;
     opacity: .6;
 }
 
 .dash-account-edits-container {
-    margin-top: 40px;
+    margin-block: 30px;
     display: flex;
     flex-direction: row;
     justify-content: center;

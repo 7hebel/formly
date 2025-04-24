@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import './styles/header.css'
 import './styles/home.css'
-
+import './styles/_responsive.css'
 
 export default function Home() {
   const navigate = useNavigate();
@@ -46,7 +46,7 @@ export default function Home() {
 
   return (
     <>
-      <header className='row'>
+      <header className='row homeHeader'>
         <img src='logo.svg' height={42}></img>
         <div className='row'>
           {

@@ -20,16 +20,47 @@
     }
     
     .dash-categories-container {
-        flex-direction: column;
-        align-items: start;
-        gap: 20px;
-        padding-bottom: 20px;
+        align-items: start !important;
+        gap: 40px;
+        padding-bottom: 24px !important;
         margin-bottom: 20px;
         text-underline-offset: 4px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space-collapse: preserve-breaks;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+        align-items: center;
     }
 
-    .schema-editor-range-container {
-        scale: .7
+    .dash-content-container {
+        margin-top: 40px !important;
+        width: 95% !important;
+    }
+
+    .mobileHide {
+        display: none;
+    }
+
+    .dash-header {
+        flex-direction: column !important;
+        gap: 12px;
+    }
+
+    .welcome-msg {
+        font-size: 16px !important;
+        font-weight: 500 !important;
+    }
+
+    .dash-header > img,
+    .builder-header > img {
+        height: 28px !important;
+    }
+
+    .dash-categories-content-container {
+        padding-inline: 4px !important;
     }
 }
 
@@ -40,19 +71,24 @@
 
     .form-component,
     .form-component-builder-editor {
-        min-width: 400px;
+        min-width: 100% !important;
+    }
+
+    .builder-form-content {
+        padding: 8px !important;
     }
     
 }
 
 @media only screen and (max-width: 900px) {
     .lists-category-container {
-        flex-direction: column;
-        gap: 50px;
-    }
+        flex-direction: column !important;
+        gap: 50px !important;
+        width: 100% !important;
+    }   
 
     .my-lists-container {
-        width: 100%;
+        width: 100% !important;
         background-color: var(--color-bg-item);
         padding: 8px;
         border-radius: 6px;
@@ -61,3 +97,16 @@
     }
 }
 
+@media only screen and (max-width: 440px) {
+    .loginForm {
+        width: 90%;
+    }
+}
+
+@media only screen and (max-width: 430px) {
+    .homeHeader {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 20px;
+    }
+}

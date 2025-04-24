@@ -5,7 +5,7 @@ import { ErrorLabel } from "../ui/ErrorLabel.jsx"
 import Squares from '../blocks/Backgrounds/Squares.jsx';
 import { useEffect } from 'react';
 import './styles/login.css'
-
+import './styles/_responsive.css'
 
 
 export function LoginPanel() {
