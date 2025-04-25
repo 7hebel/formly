@@ -1,0 +1,43 @@
+.infinite-scroll-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    height: 100%;
+}
+
+.infinite-scroll-wrapper::before,
+.infinite-scroll-wrapper::after {
+    content: "";
+    position: absolute;
+    background: linear-gradient(var(--dir, to bottom), var(--color-bg-main), transparent);
+    height: 25%;
+    width: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.infinite-scroll-wrapper::before {
+    top: 0;
+}
+
+.infinite-scroll-wrapper::after {
+    --dir: to top;
+    bottom: 0;
+}
+
+.infinite-scroll-container {
+    display: flex;
+    flex-direction: column;
+    overscroll-behavior: contain;
+    padding-inline: 1rem;
+    cursor: grab;
+    transform-origin: center center;
+}
+
+.infinite-scroll-item {
+    user-select: none;
+}

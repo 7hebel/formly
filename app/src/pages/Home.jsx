@@ -1,11 +1,14 @@
 import Squares from '../blocks/Backgrounds/Squares.jsx';
+import RotatingText from '../blocks/TextAnimations/RotatingText.jsx';
+import InfiniteScroll from '../blocks/Components/InfiniteScroll.jsx';
 import { PrimaryButton, SecondaryButton, TertiaryButton } from '../ui/Button.jsx';
-import { UserPlus, LayoutDashboard } from 'lucide-react';
+import { UserPlus, LayoutDashboard, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import './styles/header.css'
 import './styles/home.css'
 import './styles/_responsive.css'
+import { getAnswerComponentBuilder } from '../formComponents/AllComponents.jsx'
 
 export default function Home() {
   const navigate = useNavigate();
@@ -44,6 +47,46 @@ export default function Home() {
       });
     }, []);
 
+    
+    const ShortTextAnswer = getAnswerComponentBuilder("short-text-answer");
+    const LongTextAnswer = getAnswerComponentBuilder("long-text-answer");
+    const NumericAnswer = getAnswerComponentBuilder("numeric-answer");
+    const TrueFalseAnswer = getAnswerComponentBuilder("truefalse-answer");  
+    const SingleSelectAnswer = getAnswerComponentBuilder("single-select-answer");
+    const MultiSelectAnswer = getAnswerComponentBuilder("multi-select-answer");
+
+    const selectOptions = [
+      {
+        "id": "1",
+        "value": "Forms"
+      },
+      {
+        "id": "2",
+        "value": "Surveys"
+      },
+      {
+        "id": "3",
+        "value": "Quizzes"
+      },
+      {
+        "id": "4",
+        "value": "Tests"
+      },
+      {
+        "id": "5",
+        "value": "Polls"
+      }
+    ];
+
+    const items = [
+      { content: <ShortTextAnswer questionNo={1} question={"Short text question"} componentType='' componentId='' /> },
+      { content: <LongTextAnswer questionNo={2} question={"Long text question"} componentType='' componentId='' /> },
+      { content: <MultiSelectAnswer questionNo={6} question={"Multi select"} options={selectOptions} componentType='' componentId='' /> },
+      { content: <NumericAnswer questionNo={3} question={"Numeric answer"} componentType='' componentId='' /> },
+      { content: <TrueFalseAnswer questionNo={4} question={"True/False question"} componentType='' componentId='' /> },
+      { content: <SingleSelectAnswer questionNo={5} question={"Single select"} options={selectOptions} componentType='' componentId='' /> },
+    ];
+
   return (
     <>
       <header className='row homeHeader'>
@@ -51,12 +94,10 @@ export default function Home() {
         <div className='row'>
           {
             (isLogged) ? (
-              <>
-                <PrimaryButton onClick={() => navigate('/dash')}>
-                  <LayoutDashboard/>
-                  Dashboard
-                </PrimaryButton>
-              </>
+              <PrimaryButton onClick={() => navigate('/dash')}>
+                <LayoutDashboard/>
+                Dashboard
+              </PrimaryButton>
             ) : (
               <>
                 <SecondaryButton onClick={() => navigate("/login")}>Login</SecondaryButton>
@@ -78,6 +119,58 @@ export default function Home() {
           hoverFillColor='#f2eedd'
         />
       </div>
+      <main className='homeContainer'>
+        <div className='headerSection'>
+          <div className='bg-glow' id='bg-glow-1'></div>
+          <img src='formly-hollow.png' alt='Formly'/>
+          <h2 className='headingText'>
+            Create powerful
+            <RotatingText
+              texts={['forms', 'quizzes', 'tests', 'surveys', 'polls']}
+              mainClassName="headerRotatingText"
+              staggerFrom={"last"}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "-120%" }}
+              staggerDuration={0.03}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              rotationInterval={2500}
+            />
+          </h2>
+          <PrimaryButton onClick={() => navigate('/register')}>
+            <ArrowRight/>
+            Get started
+          </PrimaryButton>
+        </div>
+        <div className='sectionSeparator'></div>
+        <div className='builderSection'>
+          <div className='builderComponents'>
+            <div className='bg-glow' id='bg-glow-2'></div>
+            <InfiniteScroll
+              items={items}
+              isTilted={true}
+              tiltDirection='left'
+              autoplay={true}
+              autoplaySpeed={0.15}
+              autoplayDirection="down"
+              pauseOnHover={false}
+              maxHeight='100%'
+            />
+          </div>
+          <div className='builderComponentsInfo'>
+            <div className='builderComponentsSections'>
+              <p className='section-info'>
+                <p className='headingBlockText'>Build</p> 
+                Design forms using <span>highly flexible components</span>.&nbsp;
+                Customize logic and scoring to match your exact needs.&nbsp; 
+                <span>Restrict access</span> to selected individuals or respondent groups. 
+                Speed up grading with <span>auto-evaluation</span> and customizable <span>grading schemas</span>.
+              </p>
+            </div>
+            <img src='arrow1.svg' id='arrow1'></img>
+          </div>
+        </div>
+      </main>
     </>
   )
 }
