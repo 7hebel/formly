@@ -6,6 +6,7 @@ import FormBuilder from './pages/FormBuilder.jsx';
 import Answer from './pages/Answer.jsx';
 import Home from './pages/Home.jsx';
 import butterup from "butteruptoasts";
+import "./pages/styles/beta.css";
 
 butterup.options.toastLife = 5000;
 

@@ -267,6 +267,8 @@ export default function Dashboard() {
 
   return (
     <main className='dash'>
+      <div className="beta-tag">Formly.cc is still in the very early stage of development.</div>
+
       <div className='squaresBgContainer'>
         <Squares 
           speed={0.25} 

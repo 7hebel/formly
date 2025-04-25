@@ -1,0 +1,11 @@
+.beta-tag {
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    font-family: var(--ui-font);
+    font-weight: 400;
+    background-color: var(--color-primary);
+    padding-block: 2px;
+}
+
+
