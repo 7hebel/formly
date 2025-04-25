@@ -84,6 +84,7 @@ body {
     padding: 12px !important;
     align-items: center;
     max-width: 400px;
+    box-shadow: var(--inner-depth), var(--subtle-shadow) !important;
 }
 
 .butteruptoast.warn {

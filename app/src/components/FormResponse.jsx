@@ -88,7 +88,7 @@ export function FormResponse({formId, responseData, formComponents, onRemoved, w
     const data = await response.json();
     
     if (data.status) {
-      displayInfoMessage(`Graded response: ${data.data.percentage}%`);
+      displayInfoMessage(`Graded response: ${data.data.percentage}`);
       window.setGradeValue[responseId](data.data);
     } 
     else { displayWarnMessage(data.data); }
@@ -160,7 +160,10 @@ export function FormResponse({formId, responseData, formComponents, onRemoved, w
         }
         {
           withGradePanel? (
-            <PrimaryButton onClick={() => {gradeResponse(responseData.response_id)}}><Medal/>Grade response</PrimaryButton>
+            <>
+              <div className='hzSep'></div>
+              <PrimaryButton onClick={() => {gradeResponse(responseData.response_id)}}><Medal/>Grade response</PrimaryButton>
+            </>
           ) : <></>
         }
       </div>

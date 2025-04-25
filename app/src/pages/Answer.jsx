@@ -5,8 +5,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { LockKeyholeIcon, VenetianMask, EyeOff, User, Users, CalendarClock, Medal, CheckCheck, Hourglass, Hash, ClipboardList,CheckCircle, LayoutDashboard, AlarmClock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getAnswerComponentBuilder, calcQuestionNoFor, isComponentRespondable } from "../formComponents/AllComponents.jsx"
-import './styles/answer.css'
 import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
+import './styles/_responsive.css'
+import './styles/answer.css'
 
 
 const characteristicsIcons = {
@@ -259,6 +260,7 @@ export default function Answer() {
           </div>
         ) : !isResponded? (
           <>
+            <div className='hzSep'></div>
             { (minutesLeft > 0) ? (<div id='timer'><AlarmClock/>{minutesLeft || ' - '} min</div>) : <></> }
             {
               formStructure.map((componentData, qIndex) => {

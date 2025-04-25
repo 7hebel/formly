@@ -305,6 +305,7 @@ def create_responder_entry(form_id: str, email: str, fullname: str, host: str) -
 def auto_grade_answers(form_id: str, email: str) -> None:
     form_data = FormsDB.fetch(form_id)
     structure = form_data["structure"]
+    not_fully_gradable = False
     answers = form_data["answers"].get(email)
     if answers is None:
         return logs.error("Forms", f"Failed to auto-grade form: `{form_id}` for: {email} (response not found,)")
@@ -322,19 +323,22 @@ def auto_grade_answers(form_id: str, email: str) -> None:
         correct_answer = component.get("correct")
         if component.get("points") is None:
             answers[component_id]["grade"] = 0
+            not_fully_gradable = True
             continue
             
-        points = int(component.get("points")) or 1
+        points = int(component.get("points", 1) or 1) or 1
         user_answer = data["answer"]
 
         if not user_answer or correct_answer is None:
             answers[component_id]["grade"] = 0
+            not_fully_gradable = True
             continue
 
         match component["componentType"]:
             case "short-text-answer" | "long-text-answer":
-                grade = text_grading.TextGrader.grade_answer(correct_answer, user_answer, points) or 0
-                answers[component_id]["grade"] = grade
+                # grade = text_grading.TextGrader.grade_answer(correct_answer, user_answer, points) or 0
+                not_fully_gradable = True
+                answers[component_id]["grade"] = 0
                     
             case "numeric-answer":
                 if str(user_answer) == str(correct_answer):
@@ -367,7 +371,12 @@ def auto_grade_answers(form_id: str, email: str) -> None:
                 answers[component_id]["grade"] = points
          
     form_data["answers"][email]["answers"] = answers
-    form_data["answers"][email]["grade"] = get_full_grade(form_id, answers)
+    
+    if not_fully_gradable:
+        form_data["answers"][email]["grade"] = "Not graded yet."
+    else:
+        form_data["answers"][email]["grade"] = get_full_grade(form_id, answers)
+    
     FormsDB.save(form_id, form_data)
     logs.info("Forms", f"Finished auto-grading form: `{form_id}` for: {email}")
          
@@ -378,7 +387,7 @@ def get_full_grade(form_id: str, answers: dict) -> str | int:
     user_points = 0
     
     for component_data in form_data["structure"]:
-        max_points += float(component_data.get("points", 0))
+        max_points += float(component_data.get("points", 1) or 1)
     
     for answer_data in answers.values():
         if answer_data["grade"] is None:
@@ -388,7 +397,7 @@ def get_full_grade(form_id: str, answers: dict) -> str | int:
         
     if max_points == 0:
         return "Not graded."
-    percentage_grade = round((user_points / max_points) * 100)
+    percentage_grade = min(round((user_points / max_points) * 100), 100)
     return f"{percentage_grade}%"
     
     

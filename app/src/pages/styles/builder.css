@@ -31,6 +31,7 @@
     box-shadow: var(--inner-depth), var(--subtle-shadow);
     border: 1px solid var(--color-border);
     cursor: pointer;
+    z-index: 2;
 }
 
 .builder-sidebar-collapser > svg {
@@ -41,15 +42,9 @@
 
 .builder-properties-panel[iscollapsible="1"] {
     position: absolute;
-    z-index: 5;
+    z-index: 3;
     box-shadow: var(--inner-depth), 20px 0px 20px 0px #0000001a;
     width: 50%;
-}
-
-.builder-properties-panel[iscollapsed="0"] ~ .builder-form-panel .builder-sidebar-collapser {
-    display: block;
-    left: calc(max(45%, 300px) + 40px);
-    z-index: 6;
 }
 
 .builder-properties-panel {
@@ -300,6 +295,7 @@
     font-weight: 600;
     padding: 8px;
     cursor: pointer;
+    box-shadow: var(--inner-depth), var(--subtle-shadow);
 }
 
 .link-copy > svg {

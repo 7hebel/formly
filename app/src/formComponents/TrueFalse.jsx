@@ -7,7 +7,7 @@ import { InputGroup, InputLabel } from '../ui/Input.jsx';
 
 export function TrueFalseAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question);
-  const [correct, setCorrect] = useState(props.correct || null);
+  const [correct, setCorrect] = useState(props.correct ?? null);
   const [isOptional, setIsOptional] = useState(props.optional || false);
 
   if (props.points !== 1) {
@@ -72,7 +72,7 @@ export function TrueFalseAnswer({formComponents, setFormComponents, userAnswer, 
   const [answer, setAnswer] = useState(userAnswer);
   let value = null;
   if (userAnswer !== undefined) value = (userAnswer == 1)
-
+  
   return (
     <FormComponentBase formComponents={formComponents} setFormComponents={setFormComponents} userAnswer={answer} {...props}>
       <TrueFalse setter={(v) => {setAnswer(Number(v))}} qid={props.componentId} locked={locked} defValueState={value}></TrueFalse>

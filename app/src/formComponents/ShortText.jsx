@@ -1,13 +1,13 @@
 import { InputGroup, InputLabel, Input, LongInput } from '../ui/Input.jsx';
 import { FormComponentBase, FormBuilderOptions } from './FormComponentBase.jsx';
 import InfoAI from '../components/InfoAI.jsx';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './formComponents.css';
 
 
 export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...props}) {
   const [question, setQuestion] = useState(props.question);
-  const [points, setPoints] = useState(props.points);
+  const [points, setPoints] = useState(props.points ?? 1);
   const [correct, setCorrect] = useState(props.correct ?? '');
   const [isOptional, setIsOptional] = useState(props.optional || false);
 
@@ -28,6 +28,16 @@ export function ShortTextAnswerBuilder({formComponents, setFormComponents, ...pr
       )
     );
   }
+
+  useEffect(() => {
+    if (props.points === null || props.points === undefined) {
+      setFormComponents(prevComponents =>
+        prevComponents.map(c =>
+          c.componentId === props.componentId ? { ...c, points: 1 } : c
+        )
+      );
+    }
+  }, [props.points]);
 
   function changeCorrect(change) {
     setCorrect(change.target.value);

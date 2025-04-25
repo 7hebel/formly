@@ -4,6 +4,20 @@
     }
 }
 
+@media only screen and (max-width: 1080px) {
+    .responses-view {
+        flex-direction: column !important;
+        gap: 50px;
+    }
+    .responses-lists {
+        border-right: none !important;
+        width: 100% !important;
+    }
+    .response-details {
+        width: 100% !important;
+    }
+}
+
 @media only screen and (max-width: 710px) {
     .assign-categories-container {
         flex-direction: column !important;
@@ -11,7 +25,10 @@
     .assignees-container {
         height: auto !important;
     }
-    
+    .form-answer-with-grade > .form-component {
+        width: 100% !important;
+        min-width: auto !important; 
+    }
 }
 
 @media only screen and (max-width: 600px) {
@@ -77,6 +94,39 @@
     .builder-form-content {
         padding: 8px !important;
     }
+
+    .link-container {
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding: 4px;
+    }
+
+    .link-container > span {
+        text-align: center !important;
+        border-radius: 6px !important;
+    }
+
+    .form-info-panel,
+    .respondent-info,
+    .responded-panel {
+        width: 95% !important;
+    }
+    
+}
+
+@media only screen and (max-width: 500px) {
+    .form-answer-with-grade {
+        flex-direction: column !important;
+        width: 100% !important;
+    }
+
+    .form-component-grade-panel {
+        border-radius: 0px 0px 6px 6px !important;
+        padding-top: 12px !important;
+        padding-left: 8px !important;
+        margin-left: 0px !important;
+        margin-top: -12px !important;
+    }
     
 }
 
@@ -100,6 +150,16 @@
 @media only screen and (max-width: 440px) {
     .loginForm {
         width: 90%;
+    }
+
+    .respondent-account {
+        flex-direction: column !important;
+    }
+
+    #respondent-name {
+        text-align: center !important;
+        margin-inline: 0 !important;
+        margin-top: 16px !important;
     }
 }
 
