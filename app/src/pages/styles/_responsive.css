@@ -16,6 +16,54 @@
     .response-details {
         width: 100% !important;
     }
+    
+    .builderSection {
+        flex-direction: column-reverse !important;
+        justify-content: center !important;
+        width: 100% !important;
+        align-items: center !important;
+    }
+    .builderSectionRev {
+        flex-direction: column !important;
+    }
+    .builderComponentsInfo {
+        width: 100% !important;
+    }
+    .builderComponents {
+        width: 80% !important;
+    }
+    .interactiveBadge {
+        font-size: 16px !important;
+    }
+
+    #interactive1 {
+        right: 200px !important;
+    }
+    #list-mock {
+        width: 100% !important;
+        height: auto !important;
+    }
+    #arrow1 {
+        rotate: -20deg !important;
+        scale: 0.8 !important;
+        margin-top: 0px !important;
+        margin-left: 0px !important;
+    }
+    #arrow2 {
+        rotate: 90deg !important;
+        scale: 0.8 !important;
+        margin-block: 70px !important;
+        margin-left: 0px !important;
+    }
+    #arrow3 {
+        rotate: 180deg !important;
+        scale: 0.8 !important;
+        margin-block: 20px !important;
+        margin-left: 0px !important;
+    }
+    #listsShowcase {
+        height: auto !important;
+    }
 }
 
 @media only screen and (max-width: 710px) {
@@ -28,6 +76,12 @@
     .form-answer-with-grade > .form-component {
         width: 100% !important;
         min-width: auto !important; 
+    }
+    .builderComponentsSections {
+        align-items: center !important;
+    }
+    .section-info {
+        width: 90% !important;
     }
 }
 
@@ -79,6 +133,11 @@
     .dash-categories-content-container {
         padding-inline: 4px !important;
     }
+
+    .dash-account-edits-container {
+        flex-direction: column !important;
+        gap: 40px !important;
+    }
 }
 
 @media only screen and (max-width: 560px) {
@@ -127,6 +186,18 @@
         margin-left: 0px !important;
         margin-top: -12px !important;
     }
+
+    .section-info {
+        font-size: 16px !important;
+    }
+
+    .builderComponents {
+        width: 100% !important;
+    }
+
+    #gradingSchemasShowcase {
+        width: 90% !important;
+    }
     
 }
 
@@ -168,5 +239,10 @@
         flex-direction: column !important;
         align-items: center !important;
         gap: 20px;
+        position: relative !important;
+    }
+
+    .headingText {
+        font-size: 24px !important;
     }
 }

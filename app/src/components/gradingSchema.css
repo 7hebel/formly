@@ -15,7 +15,7 @@ input[group="grading-schema-grade-input"] {
     background: #61616141;
     margin-block: 50px;
     margin-inline: 12px;
-    width: 500px;
+    width: 100%;
 }
 
 .custom-thumb {

@@ -433,4 +433,10 @@ async def post_upload_cdn_file(uuid: str = Form(...), file: UploadFile = File(..
     return api_response(True, content)
 
 
-uvicorn.run(api, host="0.0.0.0", port=5101, ssl_keyfile="cert.key", ssl_certfile="cert.pem")
+uvicorn.run(
+    api, 
+    host="0.0.0.0", 
+    port=5101, 
+    # ssl_keyfile="cert.key", 
+    # ssl_certfile="cert.pem"
+)

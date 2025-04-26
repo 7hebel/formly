@@ -9,7 +9,7 @@ import { useEffect } from 'react'
 import { displayInfoMessage, displayWarnMessage } from '../components/Toasts.jsx'
 
 
-function SchemaEditor({ schema, onRefresh }) {
+export function SchemaEditor({ schema, onRefresh, noSave }) {
   const [stepsValue, setStepsValue] = useState([0, ...schema.steps]);
   const [gradesValue, setGradesValue] = useState(schema.grades);
 
@@ -137,7 +137,9 @@ function SchemaEditor({ schema, onRefresh }) {
         }
       </div>
       <div className='right-content'>
-        <PrimaryButton onClick={onSchemaUpdate}><CheckCheck/>Save</PrimaryButton>
+        {
+          !noSave && <PrimaryButton onClick={onSchemaUpdate}><CheckCheck/>Save</PrimaryButton>
+        }
       </div>
     </div>
   )
