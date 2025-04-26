@@ -63,13 +63,13 @@
 
 #bg-glow-1 {
     height: 80px;
-    width: 500px;
+    width: min(100%, 500px);
     opacity: 0.5;
 }
 
 #bg-glow-2 {
     height: 100px;
-    width: 800px;
+    width: min(100%, 800px);
     opacity: 0.3;
     top: 40%;
     left: 10%;
@@ -77,7 +77,7 @@
 
 #bg-glow-3 {
     height: 200px;
-    width: 600px;
+    width: min(100%, 600px);
     opacity: 0.3;
     top: 25%;
     left: 10%;
@@ -85,7 +85,7 @@
 
 #bg-glow-4 {
     height: 300px;
-    width: 600px;
+    width: min(100%, 600px);
     opacity: 0.3;
     top: 30%;
     left: 15%;
