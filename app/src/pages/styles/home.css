@@ -259,6 +259,7 @@
 
 #list-mock {
     transition: all .6s;
+    width: 100% !important;
 }
 
 #list-mock:hover {
